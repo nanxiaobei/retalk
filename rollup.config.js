@@ -20,7 +20,15 @@ if (env === 'es' || env === 'cjs') {
 }
 
 if (env === 'development' || env === 'production') {
-  config.output = { format: 'umd', name: 'Retalk' };
+  config.output = {
+    format: 'umd',
+    name: 'Retalk',
+    globals: {
+      redux: 'redux',
+      thunk: 'redux-thunk',
+      reactRedux: 'react-redux',
+    },
+  };
   config.plugins.push(
     resolve(),
     babel({
