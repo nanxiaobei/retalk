@@ -1,2 +1,3 @@
 # Retalk
-Redux never so simple
+
+Redux Never So Simple
