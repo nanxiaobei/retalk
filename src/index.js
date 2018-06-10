@@ -1,6 +1,6 @@
 import { createStore as reduxCreateStore, combineReducers, compose, applyMiddleware } from 'redux';
 import thunk from 'redux-thunk';
-import { connect as reactReduxConnect } from 'react-redux';
+import { connect as reactReduxConnect, Provider } from 'react-redux';
 import createReducer from './createReducer';
 import createActions from './createActions';
 import isObject from './utils/isObject';
@@ -115,5 +115,6 @@ const withStore = (...modelNames) => Component => connect(
 export {
   createStore,
   connect,
+  Provider,
   withStore,
 };
