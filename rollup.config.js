@@ -6,7 +6,7 @@ import { uglify } from 'rollup-plugin-uglify';
 const env = process.env.NODE_ENV;
 const config = {
   input: 'src/index.js',
-  external: ['react-redux'],
+  external: ['redux', 'redux-thunk', 'react-redux'],
   plugins: [],
 };
 
