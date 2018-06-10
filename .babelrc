@@ -4,7 +4,6 @@
   ],
   "plugins": [
     "syntax-dynamic-import",
-    "transform-object-rest-spread",
-    "external-helpers"
+    "transform-object-rest-spread"
   ]
 }
