@@ -12,8 +12,8 @@ const createActions = (store, rootActions, modelName, modelActions) => {
   // define model setState
   const setState = (type, nextState) => {
     if (typeof type === 'object' && nextState === undefined) {
-      nextState = type;
-      type = modelName;
+      nextState = type; // eslint-disable-line
+      type = modelName; // eslint-disable-line
     }
     theRealDispatch({ type, nextState });
   };
@@ -40,7 +40,8 @@ const createActions = (store, rootActions, modelName, modelActions) => {
     // if action name is renamed with model name, throw error
     if (Object.keys(rootActions).includes(actionName)) {
       throw new Error(
-        `Action name and model name must not be renamed! Please modify the name of \`${actionName}()\` action in \`${modelName}\` model`,
+        `Action name and model name must not be renamed! 
+        Please modify the name of \`${actionName}()\` action in \`${modelName}\` model`,
       );
     }
 

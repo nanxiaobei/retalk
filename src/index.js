@@ -9,31 +9,32 @@ import verifyParam from './utils/verifyParam';
 /**
  * createStore
  *
- * @param {object} models
- * @param {boolean} async
+ * @param {object} models - { model: { state, actions } } or { model: () => import() }
  * @return {object} Store or Promise
  */
-const createStore = async (models, async) => {
+const createStore = async models => {
   if (!isObject(models)) {
     throw new Error('Expected the `models` to be an object');
   }
-  if (async !== undefined && typeof async !== 'boolean') {
-    throw new Error('Expected the `async` to be a boolean');
-  }
+
+  const isAsyncImport = typeof Object.values(models)[0] === 'function';
 
   const rootReducers = {};
   const rootActions = {};
-  if (async) {
-    const importedModels = await Promise.all(models.map((modelName) => {
-      const path = models[modelName];
-      if (typeof path !== 'string') {
-        throw new Error(`If async import model, expected the model path to be a string`);
+
+  if (isAsyncImport) {
+    const modelNames = [];
+    const importedModels = await Promise.all(Object.keys(models).map(modelName => {
+      const importer = models[modelName];
+      if (typeof importer !== 'function') {
+        throw new Error(`If async import model, expected the \`${modelName}\` model to be an import function`);
       }
-      return import(path);
+      modelNames.push(modelName);
+      return importer();
     }));
     importedModels.forEach(({ default: model }, index) => {
-      verifyParam(model);
-      const modelName = models[index];
+      const modelName = modelNames[index];
+      verifyParam(modelName, model);
       const { state: modelState, actions: modelActions } = model;
       rootReducers[modelName] = createReducer(modelName, modelState, modelActions);
       rootActions[modelName] = modelActions;
@@ -41,7 +42,7 @@ const createStore = async (models, async) => {
   } else {
     Object.keys(models).forEach(modelName => {
       const model = models[modelName];
-      verifyParam(model);
+      verifyParam(modelName, model);
       const { state: modelState, actions: modelActions } = model;
       rootReducers[modelName] = createReducer(modelName, modelState, modelActions);
       rootActions[modelName] = modelActions;
@@ -62,7 +63,7 @@ const createStore = async (models, async) => {
     rootActions[modelName] = createActions(store, rootActions, modelName, modelActions);
   });
 
-  if (async) {
+  if (isAsyncImport) {
     store.addModule = (modelName, modelState, modelActions) => {
       if (Object.keys(rootReducers).includes(modelName)) return;
       rootReducers[modelName] = createReducer(modelName, modelState, modelActions);
@@ -80,9 +81,9 @@ const createStore = async (models, async) => {
 /**
  * connect
  *
- * @param {function} mapState
- * @param {function} mapActions
- * @param {array} otherArgs
+ * @param {function} mapState - (state, [ownProps]) => void
+ * @param {function} mapActions - (actions, [ownProps]) => void
+ * @param {array} otherArgs - [mergeProps, options]
  * @return {function}
  */
 const connect = (mapState, mapActions, ...otherArgs) => reactReduxConnect(
@@ -94,25 +95,19 @@ const connect = (mapState, mapActions, ...otherArgs) => reactReduxConnect(
 /**
  * withStore
  *
- * @param {array} modelNames
+ * @param {array} modelNames - [modelA, modelB, ...]
  * @return {function}
  */
-const withStore = (...modelNames) => {
-  modelNames.forEach(modelName => {
+const withStore = (...modelNames) => Component => connect(
+  rootState => Object.assign({}, ...modelNames.map(modelName => {
     if (typeof modelName !== 'string') {
-      throw new Error('Expected the `modelName` to `withStore(modelName)()` to be a string');
+      throw new Error('At `withStore(modelName)()`, expected the `modelName` to be a string');
     }
-  });
-  return Component => {
-    if (!isObject(Component)) {
-      throw new Error('Expected the `Component` to `withStore()(Component)` to be a React component');
-    }
-    return connect(
-      rootState => Object.assign({}, ...modelNames.map(key => rootState[key])),
-      rootActions => Object.assign({}, ...modelNames.map(key => rootActions[key])),
-    )(Component);
-  };
-};
+    return rootState[modelName];
+  })),
+  rootActions => Object.assign({}, ...modelNames.map(modelName => rootActions[modelName])),
+)(Component);
+
 
 /**
  * exports
