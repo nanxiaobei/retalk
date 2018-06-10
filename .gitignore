@@ -3,6 +3,8 @@
 
 /node_modules
 /dist
+/lib
+/es
 
 package-lock.json
 yarn.lock
