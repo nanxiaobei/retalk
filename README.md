@@ -1,2 +1,2 @@
-# retalk
+# Retalk
 Redux never so simple

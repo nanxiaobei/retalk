@@ -1,0 +1,10 @@
+{
+  "presets": [
+    ["env", { "modules": false }]
+  ],
+  "plugins": [
+    "syntax-dynamic-import",
+    "transform-object-rest-spread",
+    "external-helpers"
+  ]
+}
