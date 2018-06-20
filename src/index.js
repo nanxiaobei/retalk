@@ -49,10 +49,15 @@ const createStore = async models => {
     });
   }
 
+  // when using Redux DevTools，`store.replaceReducer()` used in async import will have a problem
+  const composeEnhancers = (!isAsyncImport && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__)
+    ? window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE_
+    : compose;
+
   // creating the Redux store
-  const store = reduxCreateStore(
+  const store = createStore(
     combineReducers(rootReducers),
-    compose(applyMiddleware(thunk)),
+    composeEnhancers(applyMiddleware(thunk)),
   );
 
   // assign `dispatch` to `theRealDispatch`,
