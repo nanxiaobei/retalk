@@ -6,7 +6,13 @@
  */
 const isAsyncFn = fn => {
   const string = fn.toString();
-  return string.includes('regeneratorRuntime.mark') || string.includes('.apply(');
+  return (
+    string.includes('regeneratorRuntime.mark(') ||
+    string.includes('_regenerator') ||
+    string.includes('.apply(') ||
+    string.includes('_promise') ||
+    string.includes('.then(')
+  );
 };
 
 export default isAsyncFn;
