@@ -34,12 +34,14 @@
   },
   "jest": {
     "testRegex": "(/test/.*\\.test.js)$",
-    "moduleNameMapper": { "@/(.*)": "<rootDir>/src/$1" },
+    "moduleNameMapper": {
+      "@/(.*)": "<rootDir>/src/$1"
+    },
     "coverageDirectory": "./coverage/",
     "collectCoverage": true
   },
   "peerDependencies": {
-    "react": "^0.14.0 || ^15.0.0-0 || ^16.0.0-0"
+    "react": "*"
   },
   "dependencies": {
     "react-redux": "^5.0.7",
