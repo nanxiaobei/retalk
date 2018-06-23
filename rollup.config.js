@@ -14,7 +14,7 @@ if (env === 'es' || env === 'cjs') {
   config.output = { format: env };
   config.plugins.push(
     babel({
-      plugins: ['external-helpers'],
+      exclude: 'node_modules/**',
     }),
   );
 }
@@ -33,7 +33,6 @@ if (env === 'development' || env === 'production') {
     resolve(),
     babel({
       exclude: 'node_modules/**',
-      plugins: ['external-helpers'],
     }),
     replace({
       'process.env.NODE_ENV': JSON.stringify(env),
