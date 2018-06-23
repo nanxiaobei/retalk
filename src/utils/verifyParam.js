@@ -6,6 +6,9 @@ import isObject from './isObject';
  * @param {any} model - The model to inspect
  */
 const verifyParam = (modelName, model) => {
+  if (typeof modelName !== 'string') {
+    throw new Error('Expected the `modelName` to be a string');
+  }
   if (!isObject(model)) {
     throw new Error(`Expected the \`${modelName}\` model to be an object`);
   }
@@ -16,7 +19,7 @@ const verifyParam = (modelName, model) => {
       : `Expected \`state\` in in the \`${modelName}\` model to be an object`);
   }
   if (!isObject(modelActions)) {
-    throw new Error(modelState === undefined
+    throw new Error(modelActions === undefined
       ? `Expected to have \`actions\` key in the \`${modelName}\` model`
       : `Expected \`actions\` in in the \`${modelName}\` model to be an object`);
   }

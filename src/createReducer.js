@@ -17,7 +17,7 @@ const createReducer = (modelName, modelState, modelActions) => {
 
   // return module reducer
   return (currentState = modelState, action) => {
-    if (action.type === modelName) {
+    if (action !== undefined && action.type === modelName) {
       return ({ ...currentState, ...action.nextState });
     }
     return currentState;

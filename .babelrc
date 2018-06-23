@@ -1,9 +1,8 @@
 {
-  "presets": [
-    ["env", { "modules": false }]
-  ],
-  "plugins": [
-    "syntax-dynamic-import",
-    "transform-object-rest-spread"
-  ]
+  "presets": [["@babel/preset-env", { "modules": false }]],
+  "env": {
+    "test": {
+      "presets": [["@babel/preset-env"]]
+    }
+  }
 }
