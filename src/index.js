@@ -21,6 +21,12 @@ const createStore = models => {
   const rootActions = {};
   const isAsyncImport = typeof Object.values(models)[0] === 'function';
 
+  const splitModels = (modelName, model) => {
+    verifyParam(modelName, model);
+    const { state: modelState, actions: modelActions } = model;
+    rootReducers[modelName] = createReducer(modelName, modelState, modelActions);
+    rootActions[modelName] = modelActions;
+  };
   const createReduxStore = () => {
     // when using Redux DevTools，`store.replaceReducer()` will have a problem
     const composeEnhancers = (!isAsyncImport && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__)
@@ -58,30 +64,30 @@ const createStore = models => {
 
   if (isAsyncImport) {
     const modelNames = [];
-    Promise.all(Object.keys(models).map(modelName => {
+    return Promise.all(Object.keys(models).map(modelName => {
       const importer = models[modelName];
       if (typeof importer !== 'function') {
-        throw new Error(`If async import model, expected the \`${modelName}\` model to be an import function`);
+        throw new Error(
+          `If async import model, expected the \`${modelName}\` model to be an import function, but got \`${typeof importer}\``,
+        );
       }
       modelNames.push(modelName);
       return importer();
-    })).then(importedModels => {
-      importedModels.forEach(({ default: model }, index) => {
+    })).then(moduleList => {
+      moduleList.forEach((module, index) => {
         const modelName = modelNames[index];
-        verifyParam(modelName, model);
-        const { state: modelState, actions: modelActions } = model;
-        rootReducers[modelName] = createReducer(modelName, modelState, modelActions);
-        rootActions[modelName] = modelActions;
+        if (!isObject(module) || !isObject(module.default)) {
+          throw new Error(`If async import model, expected the \`${modelName}\` model to be an import function`);
+        }
+        const model = module.default;
+        splitModels(modelName, model);
       });
       return createReduxStore();
     });
   } else {
     Object.keys(models).forEach(modelName => {
       const model = models[modelName];
-      verifyParam(modelName, model);
-      const { state: modelState, actions: modelActions } = model;
-      rootReducers[modelName] = createReducer(modelName, modelState, modelActions);
-      rootActions[modelName] = modelActions;
+      splitModels(modelName, model);
     });
     return createReduxStore();
   }
@@ -113,12 +119,7 @@ const connect = (mapState, mapActions, ...otherArgs) => {
  * @return {function}
  */
 const withStore = (...modelNames) => Component => connect(
-  rootState => Object.assign({}, ...modelNames.map(modelName => {
-    if (typeof modelName !== 'string') {
-      throw new Error('At `withStore(modelName)()`, expected the `modelName` to be a string');
-    }
-    return rootState[modelName];
-  })),
+  rootState => Object.assign({}, ...modelNames.map(modelName => rootState[modelName])),
   rootActions => Object.assign({}, ...modelNames.map(modelName => rootActions[modelName])),
 )(Component);
 

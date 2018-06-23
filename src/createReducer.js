@@ -12,7 +12,9 @@ const createReducer = (modelName, modelState, modelActions) => {
   // add `loading` state to model state
   modelState.loading = {};
   Object.keys(modelActions).forEach(actionName => {
-    if (isAsyncFn(modelActions[actionName])) modelState.loading[actionName] = false;
+    if (isAsyncFn(modelActions[actionName])) {
+      modelState.loading[actionName] = false;
+    }
   });
 
   // return module reducer
