@@ -6,7 +6,7 @@ describe('verifyParam', () => {
       verifyParam();
     }).toThrow('Expected the `modelName` to be a string');
     expect(() => {
-      verifyParam({});
+      verifyParam([]);
     }).toThrow('Expected the `modelName` to be a string');
     expect(() => {
       verifyParam('test');
@@ -27,7 +27,13 @@ describe('verifyParam', () => {
       verifyParam('test', { state: {}, actions: [] });
     }).toThrow('Expected `actions` in in the `test` model to be an object');
     expect(() => {
+      verifyParam('test', { state: {}, reducers: [], actions: {} });
+    }).toThrow('if `reducers` key exists, expected `reducers` in in the `test` model to be an object');
+    expect(() => {
       verifyParam('test', { state: {}, actions: {} });
+    }).not.toThrow();
+    expect(() => {
+      verifyParam('test', { state: {}, reducers: {}, actions: {} });
     }).not.toThrow();
   });
 });

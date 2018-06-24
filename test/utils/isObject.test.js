@@ -1,7 +1,7 @@
 import isObject from '@/utils/isObject';
 
 describe('isObject', () => {
-  test('should returns true if argument is an object', () => {
+  test('should return true if argument is an object', () => {
     expect(isObject('123')).toBe(false);
     expect(isObject()).toBe(false);
     expect(isObject(null)).toBe(false);
