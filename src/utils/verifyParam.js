@@ -12,11 +12,16 @@ const verifyParam = (modelName, model) => {
   if (!isObject(model)) {
     throw new Error(`Expected the \`${modelName}\` model to be an object`);
   }
-  const { state: modelState, actions: modelActions } = model;
+  const { state: modelState, reducers: modelReducers, actions: modelActions } = model;
   if (!isObject(modelState)) {
     throw new Error(modelState === undefined
       ? `Expected to have \`state\` key in the \`${modelName}\` model`
       : `Expected \`state\` in in the \`${modelName}\` model to be an object`);
+  }
+  if (modelReducers !== undefined && !isObject(modelReducers)) {
+    throw new Error(
+      `if \`reducers\` key exists, expected \`reducers\` in in the \`${modelName}\` model to be an object`,
+    );
   }
   if (!isObject(modelActions)) {
     throw new Error(modelActions === undefined
