@@ -1,4 +1,4 @@
-# 🐤 Retalk
+# <img src="./logo/logo-title.png" height="120" width="360" alt="Retalk Logo">
 
 Redux Never So Simple
 
