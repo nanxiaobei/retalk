@@ -1,10 +1,9 @@
-import { createStore as reduxCreateStore, combineReducers, compose, applyMiddleware } from 'redux';
-import thunk from 'redux-thunk';
-import { connect as reactReduxConnect, Provider } from 'react-redux';
+import { createStore as theRealCreateStore, combineReducers, compose, applyMiddleware } from 'redux';
 import createReducer from './createReducer';
-import createActions from './createActions';
+import createMethods from './createMethods';
+import middleware from './utils/middleware';
 import isObject from './utils/isObject';
-import verifyParam from './utils/verifyParam';
+import error from './utils/error';
 
 /**
  * createStore
@@ -14,154 +13,91 @@ import verifyParam from './utils/verifyParam';
  */
 const createStore = models => {
   if (!isObject(models)) {
-    throw new Error('Expected the `models` to be an object');
+    throw new Error(error.NOT_OBJECT('models'));
   }
 
-  const storeReducers = {};
+  const isAsyncImport = Object.values(models).some(model => typeof model === 'function');
   const rootReducers = {};
-  const rootActions = {};
-  const isAsyncImport = typeof Object.values(models)[0] === 'function';
 
-  const splitModels = (modelName, model) => {
-    verifyParam(modelName, model);
-    const { state: modelState, reducers: modelReducers, actions: modelActions } = model;
-    storeReducers[modelName] = createReducer(modelName, modelState, modelReducers, modelActions);
-    rootReducers[modelName] = modelReducers;
-    rootActions[modelName] = modelActions;
-  };
-  const createReduxStore = () => {
-    // when using Redux DevTools，`store.replaceReducer()` will have a problem
-    const composeEnhancers = (!isAsyncImport && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__)
-      ? window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE_
-      : compose;
-
-    // creating the Redux store
-    const store = reduxCreateStore(
-      combineReducers(storeReducers),
-      composeEnhancers(applyMiddleware(thunk)),
+  const getStore = () => {
+    const store = theRealCreateStore(
+      combineReducers(rootReducers),
+      compose(applyMiddleware(middleware(models))),
     );
-
-    // assign `dispatch` to `theRealDispatch`,
-    store.theRealDispatch = store.dispatch;
-
-    Object.keys(rootActions).forEach(modelName => {
-      const { reducers, actions } = createActions(store, rootReducers, rootActions, modelName);
-      rootReducers[modelName] = reducers;
-      rootActions[modelName] = actions;
+    Object.keys(models).forEach(name => {
+      const model = models[name];
+      models[name] = createMethods(store, name, model);
     });
-
-    if (isAsyncImport) {
-      store.addModule = (modelName, model) => {
-        if (Object.keys(storeReducers).includes(modelName)) return;
-
-        verifyParam(modelName, model);
-        const { state: modelState, reducers: modelReducers, actions: modelActions } = model;
-        storeReducers[modelName] = createReducer(modelName, modelState, modelReducers, modelActions);
-        rootReducers[modelName] = modelReducers;
-        rootActions[modelName] = modelActions;
-
-        // replace store reducers
-        store.replaceReducer(combineReducers(storeReducers));
-
-        const { reducers, actions } = createActions(store, rootReducers, rootActions, modelName);
-        rootReducers[modelName] = reducers;
-        rootActions[modelName] = actions;
-      };
-    }
-
-    // `dispatch` used in `connect` to get model reducers and actions in a hack way
-    store.dispatch = () => ({ rootReducers, rootActions });
-
+    store.addModel = (name, model) => {
+      if (name in rootReducers) return;
+      rootReducers[name] = createReducer(name, model);
+      store.replaceReducer(combineReducers(rootReducers));
+      models[name] = createMethods(store, name, model);
+    };
     return store;
   };
 
-  // not async import
+  // static import
   if (!isAsyncImport) {
-    Object.keys(models).forEach(modelName => {
-      const model = models[modelName];
-      splitModels(modelName, model);
+    Object.keys(models).forEach(name => {
+      const model = models[name];
+      rootReducers[name] = createReducer(name, model);
     });
-    return createReduxStore();
+    return getStore(true);
   }
 
-  // async import
-  const modelNames = [];
-  return Promise.all(Object.keys(models).map(modelName => {
-    const importer = models[modelName];
-    if (typeof importer !== 'function') {
-      throw new Error(
-        `If async import model, expected the \`${modelName}\` model to be an import function, but got \`${typeof importer}\``, // eslint-disable-line
-      );
+  // dynamic import
+  const modelMap = {};
+  return Promise.all(Object.keys(models).map((name, index) => {
+    modelMap[index] = { name };
+    const model = models[name];
+    if (typeof model === 'function') {
+      modelMap[index].async = true;
+      return model();
     }
-    modelNames.push(modelName);
-    return importer();
-  })).then(moduleList => {
-    moduleList.forEach((module, index) => {
-      const modelName = modelNames[index];
-      if (!isObject(module) || !isObject(module.default)) {
-        throw new Error(`If async import model, expected the \`${modelName}\` model to be an import function`);
+    modelMap[index].async = false;
+    return model;
+  })).then(modelList => {
+    modelList.forEach((model, index) => {
+      const { name, async } = modelMap[index];
+      if (async) {
+        if (!isObject(model) || !isObject(model.default)) {
+          throw new Error(error.INVALID_IMPORTER(name));
+        }
+        model = model.default; // eslint-disable-line
+        models[name] = model;
       }
-      const model = module.default;
-      splitModels(modelName, model);
+      rootReducers[name] = createReducer(name, model);
     });
-    return createReduxStore();
+    return getStore(false);
   });
-};
-
-/**
- * connect
- *
- * @param {function} param.mapState - (state, [ownProps]) => stateProps
- * @param {function} param.mapReducers - (reducers, [ownProps]) => reducersProps
- * @param {function} param.mapActions - (actions, [ownProps]) => actionsProps
- * @param {function} param.mergeProps - (stateProps, dispatchProps, ownProps) => props
- * @param {object} param.options - same as `options` to react-redux `connect()`
- * @return {function}
- */
-const connect = param => {
-  if (param === undefined) return reactReduxConnect();
-  if (!isObject(param)) {
-    throw new Error('If parameter is passed, expected the parameter to be an object');
-  }
-  const { mapState, mapReducers, mapActions, mergeProps: validMergeProps, options: validOptions } = param;
-  const mapStateToProps = mapState || null;
-  const mapDispatchToProps = (typeof mapReducers === 'function' || typeof mapActions === 'function')
-    ? (dispatch, ownProps) => {
-      const { rootReducers, rootActions } = dispatch();
-      let methodProps = mapReducers ? { ...mapReducers(rootReducers, ownProps) } : {};
-      methodProps = mapActions ? { ...methodProps, ...mapActions(rootActions, ownProps) } : methodProps;
-      return methodProps;
-    }
-    : undefined;
-  const mergeProps = (mapStateToProps && mapDispatchToProps) ? validMergeProps : undefined;
-  const options = (mapStateToProps && mapDispatchToProps && mergeProps) ? validOptions : undefined;
-
-  return reactReduxConnect(
-    mapStateToProps,
-    mapDispatchToProps,
-    mergeProps,
-    options,
-  );
 };
 
 /**
  * withStore
  *
- * @param {array} modelNames - ['modelA', 'modelB', ...]
- * @return {function}
+ * @param {...string} names - ['modelA', 'modelB', ...]
+ * @return {array} [mapState, mapMethods]
  */
-const withStore = (...modelNames) => Component => connect({
-  mapState: rootState => Object.assign({}, ...modelNames.map(modelName => rootState[modelName])),
-  mapReducers: rootReducers => Object.assign({}, ...modelNames.map(modelName => rootReducers[modelName])),
-  mapActions: rootActions => Object.assign({}, ...modelNames.map(modelName => rootActions[modelName])),
-})(Component);
+const withStore = (...names) => {
+  if (names.length === 0) {
+    throw new Error(error.INVALID_MODEL_NAME());
+  }
+  return [
+    state => Object.assign({}, ...names.map(name => {
+      if (typeof name !== 'string') {
+        throw new Error(error.INVALID_MODEL_NAME());
+      }
+      return state && state[name];
+    })),
+    dispatch => Object.assign({ dispatch }, ...names.map(name => dispatch && dispatch[name])),
+  ];
+};
 
 /**
  * exports
  */
 export {
   createStore,
-  connect,
-  Provider,
   withStore,
 };

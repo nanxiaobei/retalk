@@ -1,13 +1,13 @@
 import isAsyncFn from '@/utils/isAsyncFn';
 
 describe('isAsyncFn', () => {
-  test('should return true if argument is an async function', () => {
-    expect(isAsyncFn()).toBe(false);
-    expect(isAsyncFn(function() {})).toBe(false);
-    expect(isAsyncFn(() => {})).toBe(false);
-    expect(isAsyncFn(async function() {})).toBe(true);
-    expect(isAsyncFn(async () => {})).toBe(true);
-    expect(isAsyncFn(() => new Promise(resolve => resolve(123)).then(data => data))).toBe(true);
-    expect(isAsyncFn(() => fetch('https://google.com'))).toBe(true);
+  it('should return true if argument is an async function', () => {
+    expect(isAsyncFn()).toBeFalsy();
+    expect(isAsyncFn(function() {})).toBeFalsy();
+    expect(isAsyncFn(() => {})).toBeFalsy();
+    expect(isAsyncFn(async function() {})).toBeTruthy();
+    expect(isAsyncFn(async () => {})).toBeTruthy();
+    expect(isAsyncFn(() => new Promise(resolve => resolve(123)).then(data => data))).toBeTruthy();
+    expect(isAsyncFn(() => fetch('https://google.com'))).toBeTruthy();
   });
 });

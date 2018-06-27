@@ -1,36 +1,31 @@
+import verifyModel from './utils/verifyModel';
 import isAsyncFn from './utils/isAsyncFn';
 
 /**
  * createReducer
  *
- * @param {string} modelName
- * @param {object} modelState
- * @param {object} modelReducers
- * @param {object} modelActions
- * @return {function} Model reducer
+ * @param {string} name
+ * @param {object} model
+ * @return {function} Reducer
  */
-const createReducer = (modelName, modelState, modelReducers, modelActions) => {
-  // add `loading` state to model state
-  modelState.loading = {};
-  Object.keys(modelActions).forEach(actionName => {
-    if (isAsyncFn(modelActions[actionName])) {
-      modelState.loading[actionName] = false;
+const createReducer = (name, model) => {
+  verifyModel(name, model);
+  const { state, reducers, actions } = model;
+
+  state.loading = {};
+  Object.keys(actions).forEach(actionName => {
+    if (isAsyncFn(actions[actionName])) {
+      state.loading[actionName] = false;
     }
   });
 
-  // return module reducer
-  return (currentState = modelState, action) => {
-    if (action.type === `@${modelName}/SET_STATE`) {
+  return (currentState = state, action) => {
+    if (action.type === `@${name}/SET_STATE`) {
       return ({ ...currentState, ...action.nextState });
     }
-    if (modelReducers !== undefined) {
-      const reducerKey = action.type.split('/')[1];
-      if (typeof modelReducers[reducerKey] === 'function') {
-        return modelReducers[reducerKey](currentState, ...action.payload);
-      }
-      return currentState;
-    }
-    return currentState;
+    const [namespace, reducerName] = action.type.split('/');
+    if (namespace !== name) return currentState;
+    return reducers[reducerName](currentState, ...action.payload);
   };
 };
 

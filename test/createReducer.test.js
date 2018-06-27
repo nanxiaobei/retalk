@@ -1,42 +1,44 @@
 import createReducer from '@/createReducer';
 
 describe('createReducer', () => {
-  const modelName = 'test';
-  const modelState = { a: 1, b: 2 };
+  const name = 'test';
+  const model = {
+    state: { a: 1, b: 2 },
+  };
 
-  test('should have action type `@test/SET_STATE` if `reducers` key does not exist', () => {
-    const modelReducers = undefined;
-    const modelActions = {
+  it('should have only one action type `@test/SET_STATE` if `reducers` does not exist', () => {
+    model.reducers = undefined;
+    model.actions = {
       action() {},
     };
-    const reducer = createReducer(modelName, modelState, modelReducers, modelActions);
-    const nextState = reducer(modelState, { type: '@test/SET_STATE', nextState: { a: 10 } });
+    const reducer = createReducer(name, model);
+    const nextState = reducer(model.state, { type: '@test/SET_STATE', nextState: { a: 10 } });
     expect(nextState).toEqual({ a: 10, b: 2, loading: {} });
   });
 
-  test('should have action type `test/add` if `reducers` key exists', () => {
-    const modelReducers = {
+  it('should have an action type `test/add` if `reducers` exists', () => {
+    model.reducers = {
       add(state, num) {
         state.a = state.a + num;
         return state;
       },
     };
-    const modelActions = {
+    model.actions = {
       action() {},
     };
-    const reducer = createReducer(modelName, modelState, modelReducers, modelActions);
-    const nextState = reducer(modelState, { type: 'test/add', payload: [1] });
+    const reducer = createReducer(name, model);
+    const nextState = reducer(model.state, { type: 'test/add', payload: [1] });
     expect(nextState).toEqual({ a: 2, b: 2, loading: {} });
   });
 
-  test('should add `loading` state to the model state', () => {
-    const modelReducers = undefined;
-    const modelActions = {
+  it('should add `loading` state [object] to model state', () => {
+    model.reducers = undefined;
+    model.actions = {
       actionA() {},
       async actionB() {},
     };
-    const reducer = createReducer(modelName, modelState, modelReducers, modelActions);
-    const nextState = reducer(modelState, { type: '@test/SET_STATE', nextState: { a: 20 } });
-    expect(nextState).toEqual({ a: 20, b: 2, loading: { actionB: false } });
+    const reducer = createReducer(name, model);
+    const nextState = reducer(model.state, { type: '@test/SET_STATE', nextState: { a: 10 } });
+    expect(nextState).toEqual({ a: 10, b: 2, loading: { actionB: false } });
   });
 });

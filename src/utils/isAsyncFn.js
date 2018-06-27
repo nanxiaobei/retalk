@@ -1,19 +1,19 @@
 /**
  * isAsyncFn
  *
- * @param {function} fn - The function to inspect
+ * @param {any} fn
  * @return {boolean} True if the argument appears to be an async function
  */
 const isAsyncFn = fn => {
   if (typeof fn !== 'function') return false;
-  const string = fn.toString();
+  const str = fn.toString();
   return (
-    string.includes('regeneratorRuntime.mark(') ||
-    string.includes('_regenerator') ||
-    string.includes('.apply(') ||
-    string.includes('_promise') ||
-    string.includes('.then(') ||
-    string.includes('fetch(')
+    str.includes('regeneratorRuntime.mark(') ||
+    str.includes('_regenerator') ||
+    str.includes('.apply(') ||
+    str.includes('_promise') ||
+    str.includes('.then(') ||
+    str.includes('fetch(')
   );
 };
 

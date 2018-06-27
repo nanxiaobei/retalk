@@ -1,99 +1,68 @@
-import { createStore, connect, withStore } from '@/index';
+import { createStore, withStore } from '@/index';
+import error from '@/utils/error';
 
 describe('retalk', () => {
   describe('createStore', () => {
-    test('should throw error if argument is not an object', () => {
+    it('should throw error if models is not an object', () => {
       expect(() => {
         createStore();
-      }).toThrow('Expected the `models` to be an object');
+      }).toThrow(
+        error.NOT_OBJECT('models'),
+      );
     });
-
-    test('should throw error if model does not have state or actions key', () => {
-      expect(() => {
-        createStore({
-          test: {},
-        });
-      }).toThrow('Expected to have `state` key in the `test` model');
-      expect(() => {
-        createStore({
-          test: { state: {} },
-        });
-      }).toThrow('Expected to have `actions` key in the `test` model');
-    });
-
-    test('should throw error if models are not correct types', () => {
-      expect(() => {
-        createStore({
-          common: { state: {}, actions: {} },
-          test: () => {},
-        });
-      }).toThrow('Expected the `test` model to be an object');
-      expect(() => {
-        createStore({
-          common: () => {},
-          test: {},
-        });
-      }).toThrow('If async import model, expected the `test` model to be an import function, but got `object`');
+    it('should throw error if model importer is not valid', () => {
       expect(
-        createStore({
-          test: () => {},
-        }),
-      ).rejects.toThrow('If async import model, expected the `test` model to be an import function');
+        createStore({ test: () => {} }),
+      ).rejects.toThrow(
+        error.INVALID_IMPORTER('test'),
+      );
     });
-
-    test('should return redux store', async () => {
+    it('should return redux store', async () => {
       const store = createStore({
         test: { state: {}, reducers: {}, actions: {} },
       });
-      expect(store).toHaveProperty('theRealDispatch');
+      expect(store).toHaveProperty('dispatch');
       expect(() => {
-        store.theRealDispatch();
+        store.dispatch();
       }).toThrow();
-      expect(store.dispatch().rootReducers).toHaveProperty('test');
-      expect(store.dispatch().rootActions).toHaveProperty('test');
+      expect(store.dispatch).toHaveProperty('test');
       expect(store.getState()).toEqual({ test: { loading: {} } });
-      const asyncStore = await createStore({ test: () => ({ default: { state: {}, actions: {} } }) });
-      expect(asyncStore).toHaveProperty('addModule');
-      expect(asyncStore.addModule('test', {})).toBe(undefined);
-    });
-  });
-
-  describe('connect', () => {
-    test('should throw error if arguments are not valid', () => {
+      expect(store.addModel('test', {})).toBeUndefined();
+      const asyncStore = await createStore({
+        async: () => ({ default: { state: {}, actions: {} } }),
+        direct: { state: {}, reducers: {}, actions: {} },
+      });
       expect(() => {
-        connect()();
+        asyncStore.addModel();
       }).toThrow();
-      expect(() => {
-        connect()(() => null);
-      }).not.toThrow();
-      expect(() => {
-        connect(
-          rootState => rootState,
-          rootReducers => rootReducers,
-          rootActions => rootActions,
-        )(() => null);
-      }).toThrow('If parameter is passed, expected the parameter to be an object');
-      expect(() => {
-        connect({
-          mapState: rootState => rootState,
-          mapReducers: rootReducers => rootReducers,
-          mapActions: rootActions => rootActions,
-        })(() => null);
-      }).not.toThrow();
+      expect(asyncStore.addModel('add', { state: {}, actions: {} })).toBeUndefined();
     });
   });
 
   describe('withStore', () => {
-    test('should throw error if arguments are not valid', () => {
+    it('should throw error if model name is not valid', () => {
       expect(() => {
-        withStore()();
-      }).toThrow();
+        withStore();
+      }).toThrow(
+        error.INVALID_MODEL_NAME(),
+      );
       expect(() => {
-        withStore()(() => null);
-      }).not.toThrow();
+        withStore(['test'])[0]();
+      }).toThrow(
+        error.INVALID_MODEL_NAME(),
+      );
       expect(() => {
-        withStore('test')(() => null);
-      }).not.toThrow();
+        withStore('test', 123)[0]();
+      }).toThrow(
+        error.INVALID_MODEL_NAME(),
+      );
+      expect(Array.isArray(withStore('test'))).toBeTruthy();
+      expect(withStore('test').length).toBe(2);
+      const connect = (mapState, mapMethods) => {
+        mapState({ test: { a: 1 } });
+        mapMethods({ test: { add: () => {} } });
+      };
+      expect(connect(...withStore('test'))).toBeUndefined();
     });
   });
 });
