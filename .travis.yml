@@ -1,12 +1,8 @@
 language: node_js
 node_js:
   - "8"
-before_script:
-  - npm install react --no-save
 script:
   - npm run lint
   - npm test
 after_success:
   - npm run coverage
-after_script:
-  - npm uninstall react

@@ -6,7 +6,7 @@ import { uglify } from 'rollup-plugin-uglify';
 const env = process.env.NODE_ENV;
 const config = {
   input: 'src/index.js',
-  external: ['redux', 'redux-thunk', 'react-redux'],
+  external: ['redux'],
   plugins: [],
 };
 
@@ -25,8 +25,6 @@ if (env === 'development' || env === 'production') {
     name: 'Retalk',
     globals: {
       redux: 'redux',
-      thunk: 'redux-thunk',
-      reactRedux: 'react-redux',
     },
   };
   config.plugins.push(

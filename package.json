@@ -41,9 +41,7 @@
     "collectCoverage": true
   },
   "dependencies": {
-    "react-redux": "^5.0.7",
-    "redux": "^4.0.0",
-    "redux-thunk": "^2.3.0"
+    "redux": "^4.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.0.0-beta.51",
