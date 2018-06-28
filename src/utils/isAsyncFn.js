@@ -11,8 +11,10 @@ const isAsyncFn = fn => {
     str.includes('regeneratorRuntime.mark(') ||
     str.includes('_regenerator') ||
     str.includes('.apply(') ||
-    str.includes('_promise') ||
     str.includes('.then(') ||
+    str.includes('_promise') ||
+    str.includes('Promise(') ||
+    str.includes('Promise.') ||
     str.includes('fetch(')
   );
 };
