@@ -1,17 +1,17 @@
 # <img src="./logo/logo-title.png" height="100" width="300" alt="Retalk">
 
-Redux Never So Simple
+**Redux Never So Simple**
+
+Retalk is a best practice for Redux. just simple, small, smooth, and smart.
+
+It helps you write Redux easy and clear than ever before, forget about action types, action creators and so on, no more annoying boilerplate code. On top of that, it even provides full support for async import store (code splitting) and automatically handled the loading state.
 
 [![Travis](https://img.shields.io/travis/nanxiaobei/retalk.svg)](https://travis-ci.org/nanxiaobei/retalk)
 [![Codecov](https://img.shields.io/codecov/c/github/nanxiaobei/retalk.svg)](https://codecov.io/gh/nanxiaobei/retalk)
 [![npm](https://img.shields.io/npm/v/retalk.svg)](https://www.npmjs.com/package/retalk)
 [![npm](https://img.shields.io/npm/dt/retalk.svg)](http://www.npmtrends.com/retalk)
 [![license](https://img.shields.io/github/license/nanxiaobei/retalk.svg)](https://github.com/nanxiaobei/retalk/blob/master/LICENSE)
-
-Retalk is a best practice for Redux. just simple, small, smooth, and smart.
-
-It helps you write Redux easy and clear than ever before, forget about action types, action creators and so on, no more annoying boilerplate code. On top of that, it even provides full support for async import store (code splitting) and automatically handled the loading state.
-
+s
 ## Features
 
 * ⚡️ **Simplest Redux practice** only `state` and `actions` need to care, if you like.
