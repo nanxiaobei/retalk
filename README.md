@@ -11,7 +11,7 @@ It helps you write Redux easy and clear than ever before, forget about action ty
 [![npm](https://img.shields.io/npm/v/retalk.svg)](https://www.npmjs.com/package/retalk)
 [![npm](https://img.shields.io/npm/dt/retalk.svg)](http://www.npmtrends.com/retalk)
 [![license](https://img.shields.io/github/license/nanxiaobei/retalk.svg)](https://github.com/nanxiaobei/retalk/blob/master/LICENSE)
-s
+
 ## Features
 
 * ⚡️ **Simplest Redux practice** only `state` and `actions` need to care, if you like.
