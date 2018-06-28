@@ -15,12 +15,12 @@ const error = {
   INVALID_ACTION_TYPE: (type, name, method) => `Invalid action type ${type}${getErrMsg(name, method)}`,
   INVALID_IMPORTER: name => `Invalid () => import() function to ${name} model`,
   INVALID_MODEL_NAME: () => 'Params to withStore() must all be string',
+  // createReducer
+  NO_MODEL_KEY: (name, key) => `${key} [object] is required in ${name} model`,
+  INVALID_REDUCERS: name => `reducers must be an object (in ${name} model)`,
   // createMethods
   ASYNC_REDUCER: (name, reducer) => `Reducer can not be an async function (${name}.${reducer})`,
   METHODS_CONFLICT: (name, reducer) => `Name duplicated in reducers and actions (${name}.${reducer})`,
-  // utils/verifyModel
-  NO_MODEL_KEY: (name, key) => `${key} [object] is required in ${name} model`,
-  INVALID_REDUCERS: name => `reducers must be an object (in ${name} model)`,
   // utils/middleware
   INVALID_NEXT_STATE: () => 'nextState to this.setState() must be an object',
   INVALID_PAYLOAD: () => 'Invalid action.payload, please call dispatch() in the right way in retalk',

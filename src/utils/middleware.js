@@ -10,7 +10,6 @@ import error from './error';
 const middleware = models => () => next => (actionOrType, ...optionalPayload) => {
   const action = isObject(actionOrType) ? actionOrType : { type: actionOrType, payload: optionalPayload };
   const { type, payload } = action;
-
   if (typeof type !== 'string' || !type.includes('/')) {
     throw new Error(error.INVALID_ACTION_TYPE(type));
   }
