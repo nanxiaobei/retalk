@@ -21,13 +21,13 @@ It helps you write Redux easy and clear than ever before, forget about action ty
 
 ## Getting started
 
-Install with **yarn**
+Install with yarn:
 
 ```shell
 yarn add retalk
 ```
 
-Or with **npm**
+Or with npm:
 
 ```shell
 npm install retalk
