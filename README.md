@@ -88,8 +88,8 @@ import { Provider, connect } from 'react-redux';
 import { withStore } from 'retalk';
 import store from './store';
 
-const Count = ({ count, add, addAsync }) => (
-  <div>
+const Count = ({ loading, count, add, addAsync }) => (
+  <div className={loading.addAsync ? 'loading' : 'done'}>
     The count is {count}
     <button onClick={add}>add</button>
     <button onClick={addAsync}>addAsync</button>
@@ -270,15 +270,6 @@ state.loading = {
   actionE: true, // If in process
   actionF: false,
 };
-
-// Use `loading` in component
-const Count = ({ loading, count, add, addAsync }) => (
-  <div className={loading.addAsync ? 'loading' : 'loaded'}>
-    The count is {count}
-    <button onClick={add}>add</button>
-    <button onClick={addAsync}>addAsync</button>
-  </div>
-);
 ```
 
 We recommend to use `async / await` syntax to define an async action.
