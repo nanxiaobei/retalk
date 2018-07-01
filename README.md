@@ -14,10 +14,10 @@ It helps you write Redux easy and clear than ever before, forget about action ty
 
 ## Features
 
-* ⚡️ **Simplest Redux practice** only `state` and `actions` need to care, if you like.
-* 💄 **Just two API** `createStore` and `withStore` (optional helper), no more annoying concepts.
-* 🚚️ **Async import model** `() => import()` for code splitting and `store.addModel` for model injecting.
-* 🚀 **Automatically `loading` state** only main state you need to care.
+* 💡️ **Simplest Redux practice**: only `state` and `actions` need to care, if you like.
+* 💄 **Just two API**: `createStore` and `withStore` (optional helper), no more annoying concepts.
+* 🚚️ **Async import model**: `() => import()` for code splitting and `store.addModel` for model injecting.
+* 🚀 **Automatically `loading` state**: only main state you need to care.
 
 ## Getting started
 
