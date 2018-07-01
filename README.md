@@ -75,7 +75,7 @@ export default count;
 
 Use `this.setState` to update state and `this[action]` to call other actions, just like in a React component.
 
-Umm... That's all! Retalk, just simple like this.
+Umm... That's all, Redux is simple like this, when you using Retalk.
 
 ### Step 3: View
 
@@ -108,7 +108,7 @@ ReactDOM.render(
 
 ## What's More?
 
-### Dynamic import
+### Async import
 
 #### createStore
 
@@ -118,12 +118,12 @@ const store = createStore({
   count,
 });
 
-// 2. Dynamic import (store: [Promise])
+// 2. Async import (store: [Promise])
 const store = createStore({
   count: () => import('./count'),
 });
 
-// 3. Or even mixin them! (store: [Promise])
+// 3. Even mixin them! (store: [Promise])
 const store = createStore({
   count,
   otherModel: () => import('./otherModel'),
@@ -283,6 +283,21 @@ We recommend to use `async / await` syntax to define an async action.
 
 ## API
 
+### `createStore`
+
+`createStore(models)`, `models` must be an object.
+
+```js
+const models = {
+  modelA: { state: {}, actions: {} },
+  modelB: () => import('./modelB'),
+};
+```
+
+`modelA` and `modelB` is `model`, `model` must be an object or an `import` function.
+
+ If `model` is an object, `state` and `actions` must in it, and are all objects. `reducers` is optional, if `reducers` exists, `reducers` must be an object too.
+
 ### `withStore`
 
 Use `withStore` helper to pass whole model to component, param is model's name `[string]`, you can pass more than one model.
@@ -309,7 +324,7 @@ Just like `this.setState` in a React component (different when set other model's
 // Set own state
 this.setState(nextState);
 
-// set other model's state
+// Set other model's state
 this.setState('otherModel', nextState).
 ```
 
@@ -317,4 +332,4 @@ this.setState('otherModel', nextState).
 
 ---
 
-Like Retalk? ★ us on GitHub.🍦
+Like Retalk? ★ us on GitHub.
