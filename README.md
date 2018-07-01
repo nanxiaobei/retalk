@@ -242,14 +242,14 @@ const mapMethods = ({ count: { add, addAsync } }) => ({
 // As we know, first param to `mapDispatchToProps` is `dispatch`, `dispatch` is a function,
 // [mapDispatchToProps](https://github.com/reduxjs/react-redux/blob/master/docs/api.md#arguments)
 // but in above `mapMethods`, we treat it like it's an object.
-// Yes, Retalk did some trick here, it's `dispatch` function, but bound model methods!
+// Yes, Retalk did some tricks here, it's `dispatch` function, but bound model methods on it!
 
 const App = connect(mapState, mapMethods)(Count);
 ```
 
 ### Automatically loading state
 
-Retalk will check if an action is async, then automatically add a `loading` \[object\] state to every model, here is an example.
+Retalk will check if an action is async, then automatically add a `loading [object]` state to every model, here is an example.
 
 ```js
 // In actions
@@ -278,18 +278,20 @@ We recommend to use `async / await` syntax to define an async action.
 
 ### `createStore`
 
-`createStore(models)`, `models` must be an object.
-
 ```js
 const models = {
   modelA: { state: {}, actions: {} },
   modelB: () => import('./modelB'),
 };
+
+createStore(models);
 ```
 
-`modelA` and `modelB` is `model`, `model` must be an object or an `import` function.
+`createStore(models)`, `models` must be an object.
 
- If `model` is an object, `state` and `actions` must in it, and are all objects. `reducers` is optional, if `reducers` exists, `reducers` must be an object too.
+`modelA` or `modelB` is `model`, `model` must be an object or an `() => import()` function.
+
+ If `model` is an object, `state` and `actions` must in it, and must all be objects. `reducers` is optional, if `reducers` exists, `reducers` must be an object too.
 
 ### `withStore`
 
@@ -310,6 +312,10 @@ connect(...withStore('model'))(Component);
 ```
 
 ### `store.addModel`
+
+```js
+store.addModel('list', module.default);
+```
 
 Use `store.addModel(name, model)` to inject async model to store after imported. `name [string]` is model's namespace in store, and `model` is an object with `state`, `reducers [optional]`, and `actions` in it.
 
