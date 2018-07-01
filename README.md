@@ -14,7 +14,7 @@ It helps you write Redux easy and clear than ever before, forget about action ty
 
 ## Features
 
-* 💡️ **Simplest Redux practice**: only `state` and `actions` need to care, if you like.
+* 🎉 **Simplest Redux practice**: only `state` and `actions` need to care, if you like.
 * 💄 **Just two API**: `createStore` and `withStore` (optional helper), no more annoying concepts.
 * 🚚️ **Async import model**: `() => import()` for code splitting and `store.addModel` for model injecting.
 * 🚀 **Automatically `loading` state**: only main state you need to care.
@@ -174,6 +174,8 @@ const AsyncPage = loadable(async store => {
 
 > I want different `reducers`, not only `this.setState` to update state...
 
+Ok... Below is what you want!
+
 #### count.js (state, reducers, actions)
 
 ```js
@@ -315,6 +317,10 @@ withStore('count', 'otherModel', ...);
 ```js
 connect(...withStore('model'))(Component);
 ```
+
+### `store.addModel`
+
+Use `store.addModel(name, model)` to inject async model to store after imported. `name [string]` is model's namespace in store, and `model` is an object with `state`, `reducers [optional]`, and `actions` in it.
 
 ### `this.setState`
 
