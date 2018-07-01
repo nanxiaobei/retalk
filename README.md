@@ -21,11 +21,15 @@ It helps you write Redux easy and clear than ever before, forget about action ty
 
 ## Getting started
 
+Install with **yarn**
+
 ```shell
 yarn add retalk
+```
 
-# or
+Or with **npm**
 
+```shell
 npm install retalk
 ```
 
@@ -44,16 +48,11 @@ const store = createStore({
 export default store;
 ```
 
-
 ### Step 2: Model
 
-**model** brings `state`, `reducers` \[optional\], and `actions` together in one place.
+**model** brings `state`, `reducers [optional]`, and `actions` together in one place.
 
 #### count.js (state, actions)
-
-In actions, use `this.setState` to update state and `this[action]` to call others, just like in a React component.
-
-Umm... That's all. Redux, simple like this.
 
 ```js
 const count = {
@@ -73,6 +72,10 @@ const count = {
 
 export default count;
 ```
+
+Use `this.setState` to update state and `this[action]` to call other actions, just like in a React component.
+
+Umm... That's all! Retalk, just simple like this.
 
 ### Step 3: View
 
@@ -102,10 +105,6 @@ ReactDOM.render(
   document.getElementById('root'),
 );
 ```
-
-Use `withStore` helper to pass whole model to component, param is model's name \[string\], you can even pass more than one name.
-
-`withStore` must be passed in [rest parameter](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/rest_parameters) syntax to `connect`
 
 ## What's More?
 
@@ -151,9 +150,7 @@ start();
 
 #### store.addModel
 
-Actually, above is just code splitting when initialize store, what we really want is when enter a page, then load page's model, not load them together when initialize store.
-
-We need some help to achieve this goal.
+Actually, above is just code splitting when initialize store, what we really want is when enter a page, then load page's model, not load them together when initialize store. We need some help to achieve this goal.
 
 You can use code splitting libraries like [react-loadable](https://github.com/jamiebuilds/react-loadable#loading-multiple-resources) and [loadable-components](https://github.com/smooth-code/loadable-components/#loading-multiple-resources-in-parallel) to dynamic import page component and model together.
 
@@ -173,21 +170,11 @@ const AsyncPage = loadable(async store => {
 });
 ```
 
-### Use this.setState
-
-`this.setState(state)` to set own state.
-
-`this.setState('otherModel', state)` to set other model's state.
-
 ### Use reducers
 
-> I want different `reducers`, not only `this.setState` to update state!
-
-> Ok...
+> I want different `reducers`, not only `this.setState` to update state...
 
 #### count.js (state, reducers, actions)
-
-If `reducers` exists, `setState` will disappear in action's context, you can only use reducers like `add` to update state.
 
 ```js
 
@@ -213,6 +200,9 @@ const count = {
 export default count;
 ```
 
+
+If `reducers` exists, `setState` will disappear in action's context, you can only use reducers like `add` to update state.
+
 ### What's in action's `this` context?
 
 ```js
@@ -236,7 +226,7 @@ export const count = {
 
 ### Customize state and methods
 
-`withStore` is a helper function to pass whole model to `connect`, so you can just pass `mapStateToProps` and `mapDispatchToProps` to `connect` when need some customization.
+You can just pass `mapStateToProps` and `mapDispatchToProps` to `connect` when need some customization, without using `withStore`.
 
 ```jsx
 const mapState = ({ count: { count } }) => ({
@@ -293,8 +283,38 @@ We recommend to use `async / await` syntax to define an async action.
 
 ## API
 
-More detailed docs will coming soon.
+### `withStore`
+
+Use `withStore` helper to pass whole model to component, param is model's name `[string]`, you can pass more than one model.
+
+```js
+// one
+withStore('count');
+
+// more
+withStore('count', 'otherModel', ...);
+```
+
+`withStore` must be passed in [rest parameter](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/rest_parameters) syntax to `connect`.
+
+```js
+connect(...withStore('model'))(Component);
+```
+
+### `this.setState`
+
+Just like `this.setState` in a React component (different when set other model's state).
+
+```js
+// Set own state
+this.setState(nextState);
+
+// set other model's state
+this.setState('otherModel', nextState).
+```
+
+`nextState` must be an object, it will be merge with the previous model state.
 
 ---
 
-Like Retalk? ⭐us on GitHub. 😊
+Like Retalk? ★ us on GitHub.🍦
