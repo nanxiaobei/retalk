@@ -15,7 +15,7 @@ const error = {
   ASYNC_REDUCER: (name, reducer) => `Reducer can not be an async function (${name}.${reducer})`,
   METHODS_CONFLICT: (name, reducer) => `Name duplicated in reducers and actions (${name}.${reducer})`,
   // utils/middleware
-  INVALID_ACTION: () => `Please don't use dispatch in Retalk`,
+  INVALID_ACTION: () => 'Please do not use dispatch in Retalk',
 };
 
 export default error;
