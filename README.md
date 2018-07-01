@@ -24,7 +24,7 @@ It helps you write Redux easy and clear than ever before, forget about action ty
 ```shell
 yarn add retalk
 
-// or
+# or
 
 npm install retalk
 ```
