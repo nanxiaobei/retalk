@@ -295,8 +295,6 @@ createStore(models);
 
 ### `withStore`
 
-Use `withStore` helper to pass whole model to component, param is model's name `[string]`, you can pass more than one model.
-
 ```js
 // one
 withStore('count');
@@ -304,6 +302,8 @@ withStore('count');
 // more
 withStore('count', 'otherModel', ...);
 ```
+
+Use `withStore(name)` to pass whole model to a component, param is model's name `[string]`, you can pass more than one model.
 
 `withStore` must be passed in [rest parameter](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/rest_parameters) syntax to `connect`.
 
@@ -321,8 +321,6 @@ Use `store.addModel(name, model)` to inject async model to store after imported.
 
 ### `this.setState`
 
-Just like `this.setState` in a React component (different when set other model's state).
-
 ```js
 // Set own state
 this.setState(nextState);
@@ -330,6 +328,8 @@ this.setState(nextState);
 // Set other model's state
 this.setState('otherModel', nextState).
 ```
+
+Just like `this.setState` function in a React component (different when set other model's state).
 
 `nextState` must be an object, it will be merge with the previous model state.
 
