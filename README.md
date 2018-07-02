@@ -4,7 +4,7 @@
 
 Retalk is a best practice for Redux. just simple, small, smooth, and smart.
 
-It helps you write Redux easy and clear than ever before, forget about action types, action creators, no more annoying boilerplate code. On top of that, it even supports async import model and automatically loading state.
+It helps you write Redux easy and clear than ever before, forget about action types, action creators, no more annoying boilerplate code. On top of that, it even supports async import model and automatically loading state handling.
 
 [![Travis](https://img.shields.io/travis/nanxiaobei/retalk.svg)](https://travis-ci.org/nanxiaobei/retalk)
 [![Codecov](https://img.shields.io/codecov/c/github/nanxiaobei/retalk.svg)](https://codecov.io/gh/nanxiaobei/retalk)
@@ -14,10 +14,10 @@ It helps you write Redux easy and clear than ever before, forget about action ty
 
 ## Features
 
-* 🎉 **Simplest Redux practice**: only `state` and `actions` need to care, if you like.
-* 💄 **Just two API**: `createStore` and `withStore` (optional helper), no more annoying concepts.
-* 🚚️ **Async import model**: `() => import()` for code splitting and `store.addModel` for model injecting.
-* 🚀 **Automatically `loading` state**: only main state you need to care.
+* ⭐️ **Simplest Redux practice**: only `state` and `actions` need to write, if you like.
+* 🍻 **Just two API**: `createStore` and `withStore` (optional helper), no more annoying concepts.
+* 🎯 **Async import model**: `() => import()` for code splitting and `store.addModel` for model injecting.
+* ⏳ **Automatically `loading` state**: only main state you need to care.
 
 ## Getting started
 
@@ -50,8 +50,6 @@ export default store;
 
 ### Step 2: Model
 
-**model** brings `state`, `reducers [optional]`, and `actions` together in one place.
-
 #### count.js (state, actions)
 
 ```js
@@ -73,9 +71,9 @@ const count = {
 export default count;
 ```
 
-Use `this.setState` to update state and `this[action]` to call other actions, just like in a React component.
+**model** brings `state`, `reducers [optional]`, and `actions` together in one place. Use `this.setState` to update state and `this[action]` to call other actions, just like in a React component.
 
-Umm... That's all, Redux is simple like this, when you using Retalk.
+Umm... ant some more? but that's all. Redux model is just simple like this, when you're using Retalk.
 
 ### Step 3: View
 
@@ -106,7 +104,66 @@ ReactDOM.render(
 );
 ```
 
+If an action is async, you can get `loading.asyncAction [boolean]` state for some loading features if you like.
+
+Well, only 3 steps, A simple Rematch demo is here.
+
 ## What's More?
+
+### Use reducers
+
+> I want different `reducers`, not only `this.setState` to update state...
+
+Ok... below is what you want!
+
+#### count.js (state, reducers, actions)
+
+```js
+
+const count = {
+  state: {
+    count: 0,
+  },
+  rerucers: {
+    add(state) {
+      // Need to return new state
+      return { ...state, count: state.count + 1 };
+    },
+  },
+  actions: {
+    async addAsync() {
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      // this.setState(); ERROR: NO `this.setState` HERE!
+      this.add(); // YES
+    },
+  },
+};
+
+export default count;
+```
+
+If `reducers` exists, `setState` will disappear in action's context, you can only use reducers like `add` to update state.
+
+### What's in action's `this` context?
+
+```js
+export const count = {
+  actions: {
+    add() {
+      // OWN
+      // this.state
+      // this.setState(state) (`reducers` ☓)
+      // this[reducer] (`reducers` √)
+      // this[action]
+
+      // OTHER
+      // this.otherModel.state
+      // this.otherModel[reducer] (otherModel `reducers` √)
+      // this.otherModel[action]
+    },
+  },
+};
+```
 
 ### Async import
 
@@ -168,62 +225,6 @@ const AsyncPage = loadable(async store => {
   store.addModel('count', count);
   return props => <Page {...props} />;
 });
-```
-
-### Use reducers
-
-> I want different `reducers`, not only `this.setState` to update state...
-
-Ok... Below is what you want!
-
-#### count.js (state, reducers, actions)
-
-```js
-
-const count = {
-  state: {
-    count: 0,
-  },
-  rerucers: {
-    add(state) {
-      // Need to return new state
-      return { ...state, count: state.count + 1 };
-    },
-  },
-  actions: {
-    async addAsync() {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      // this.setState(); ERROR: NO `this.setState` HERE!
-      this.add(); // YES
-    },
-  },
-};
-
-export default count;
-```
-
-
-If `reducers` exists, `setState` will disappear in action's context, you can only use reducers like `add` to update state.
-
-### What's in action's `this` context?
-
-```js
-export const count = {
-  actions: {
-    add() {
-      // OWN
-      // this.state
-      // this.setState(state) (`reducers` ☓)
-      // this[reducer] (`reducers` √)
-      // this[action]
-
-      // OTHER
-      // this.otherModel.state
-      // this.otherModel[reducer] (otherModel `reducers` √)
-      // this.otherModel[action]
-    },
-  },
-};
 ```
 
 ### Customize state and methods
