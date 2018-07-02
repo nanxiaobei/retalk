@@ -71,7 +71,11 @@ const count = {
 export default count;
 ```
 
-**model** brings `state`, `reducers [optional]`, and `actions` together in one place. In an action, Use `this.setState` to update state and `this[action]` to call other actions, just like syntax in a React component.
+**model** brings `state`, `reducers [optional]`, and `actions` together in one place.
+
+In an action, Use `this.state` to get state, `this.setState` to update state, use `this.actionName` to call other actions. Just like the syntax in a React component.
+
+How to reach other models? with the namespace, e.g. `this.modelName.state`、`this.modelName.reducerName`，`this.modelName.actionName`
 
 Umm... want some more? but that's all. Redux model is just simple like this, when you're using Retalk.
 
@@ -104,7 +108,7 @@ ReactDOM.render(
 );
 ```
 
-If an action is async, you can get `loading.asyncAction [boolean]` state for some loading features if you like.
+If an action is async, you can get `loading.actionName` state to use for loading if you like.
 
 Well, only 3 steps, A simple Rematch demo is here.
 
@@ -153,13 +157,13 @@ export const count = {
       // OWN
       // this.state
       // this.setState (`reducers` ☓)
-      // this[reducer] (`reducers` √)
-      // this[action]
+      // this.reducerName (`reducers` √)
+      // this.actionName
 
       // OTHER
-      // this.otherModel.state
-      // this.otherModel[reducer] (otherModel `reducers` √)
-      // this.otherModel[action]
+      // this.modelName.state
+      // this.modelName.reducerName (modelName `reducers` √)
+      // this.modelName.actionName
     },
   },
 };
@@ -183,7 +187,7 @@ const store = createStore({
 // 3. Even mixin them! (store: [Promise])
 const store = createStore({
   count,
-  otherModel: () => import('./otherModel'),
+  modelName: () => import('./modelName'),
 });
 ```
 
@@ -301,7 +305,7 @@ createStore(models);
 withStore('count');
 
 // more
-withStore('count', 'otherModel', ...);
+withStore('count', 'modelName', ...);
 ```
 
 Use `withStore(name)` to pass whole model to a component, param is model's name `[string]`, you can pass more than one model.
@@ -327,7 +331,7 @@ Use `store.addModel(name, model)` to inject async model to store after imported.
 this.setState(nextState);
 
 // Set other model's state
-this.setState('otherModel', nextState).
+this.setState('modelName', nextState).
 ```
 
 Just like `this.setState` function in a React component (different when set other model's state).
