@@ -71,9 +71,9 @@ const count = {
 export default count;
 ```
 
-**model** brings `state`, `reducers [optional]`, and `actions` together in one place. Use `this.setState` to update state and `this[action]` to call other actions, just like in a React component.
+**model** brings `state`, `reducers [optional]`, and `actions` together in one place. In an action, Use `this.setState` to update state and `this[action]` to call other actions, just like syntax in a React component.
 
-Umm... ant some more? but that's all. Redux model is just simple like this, when you're using Retalk.
+Umm... want some more? but that's all. Redux model is just simple like this, when you're using Retalk.
 
 ### Step 3: View
 
@@ -152,7 +152,7 @@ export const count = {
     add() {
       // OWN
       // this.state
-      // this.setState(state) (`reducers` ☓)
+      // this.setState (`reducers` ☓)
       // this[reducer] (`reducers` √)
       // this[action]
 
@@ -333,6 +333,33 @@ this.setState('otherModel', nextState).
 Just like `this.setState` function in a React component (different when set other model's state).
 
 `nextState` must be an object, it will be merge with the previous model state.
+
+### `this[reducer]`
+
+```js
+// Call reducer in actions or component
+this.plus(1, 2, 4);
+
+// Params received in reducer
+plus(state, a, b, c) {
+  // a: 1, b: 2, c: 4
+  return { ...state, sum: state.sum + a + b + c };
+}
+```
+
+### `this[action]`
+
+```js
+// Call action in other actions or component
+this.getSum(1, 2, 4);
+
+// Params received in action
+getSum(a, b, c) {
+  // a: 1, b: 2, c: 4
+  const { sum } = this.state;
+  this.setState({ sum: sum + a + b + c });
+}
+```
 
 ---
 
