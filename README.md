@@ -14,8 +14,8 @@ It helps you write Redux easy and clear than ever before, forget about action ty
 
 ## Features
 
-* 🍺️ **Simplest Redux practice**: only `state` and `actions` need to write, if you like.
-* 🎭 **Just two API**: `createStore` and `withStore` (optional helper), no more annoying concepts.
+* 🍺️ **Simplest Redux**: only `state` and `actions` need to write, if you like.
+* 🎭 **Only two API**: `createStore` and `withStore`, no more annoying concepts.
 * ⛵️ **Async import model**: `() => import()` for code splitting and `store.addModel` for model injecting.
 * ⏳ **Automatically `loading` state**: only main state you need to care.
 
@@ -55,15 +55,15 @@ export default store;
 ```js
 const count = {
   state: {
-    count: 0,
+    value: 0,
   },
   actions: {
-    add() {
-      this.setState({ count: this.state.count + 1 });
+    increase() {
+      this.setState({ value: this.state.value + 1 });
     },
-    async addAsync() {
+    async increaseAsync() {
       await new Promise(resolve => setTimeout(resolve, 1000));
-      this.add();
+      this.increase();
     },
   },
 };
@@ -73,9 +73,9 @@ export default count;
 
 **model** brings `state`, `reducers [optional]`, and `actions` together in one place.
 
-In an action, Use `this.state` to get state, `this.setState` to update state, use `this.actionName` to call other actions. Just like the syntax in a React component.
+In an action, use `this.state` to get state, `this.setState` to update state, use `this.actionName` to call other actions. Just like the syntax in a React component.
 
-How to reach other models? with the namespace, e.g. `this.modelName.state`、`this.modelName.reducerName`，`this.modelName.actionName`
+How to reach other models? just add the namespace, e.g. `this.modelName.state`、`this.modelName.reducerName`，`this.modelName.actionName`
 
 Umm... want some more? but that's all. Redux model is just simple like this, when you're using Retalk.
 
@@ -90,11 +90,11 @@ import { Provider, connect } from 'react-redux';
 import { withStore } from 'retalk';
 import store from './store';
 
-const Count = ({ loading, count, add, addAsync }) => (
-  <div className={loading.addAsync ? 'loading' : 'done'}>
-    The count is {count}
-    <button onClick={add}>add</button>
-    <button onClick={addAsync}>addAsync</button>
+const Count = ({ loading, value, increase, increaseAsync }) => (
+  <div className={loading.increaseAsync ? 'loading' : 'done'}>
+    The count is {value}
+    <button onClick={increase}>+</button>
+    <button onClick={increaseAsync}>+ (async)</button>
   </div>
 );
 
@@ -108,9 +108,9 @@ ReactDOM.render(
 );
 ```
 
-If an action is async, you can get `loading.actionName` state to use for loading if you like.
+If an action is async, you can get `loading.actionName` state for loading if you like.
 
-Well, only 3 steps, A simple Rematch demo is here.
+Well, only 3 steps, A simple Retalk demo is here.
 
 ## What's More?
 
@@ -118,7 +118,7 @@ Well, only 3 steps, A simple Rematch demo is here.
 
 > I want different `reducers`, not only `this.setState` to update state...
 
-Ok... below is what you want!
+Ok... below is what you want.
 
 #### count.js (state, reducers, actions)
 
@@ -126,19 +126,19 @@ Ok... below is what you want!
 
 const count = {
   state: {
-    count: 0,
+    value: 0,
   },
   rerucers: {
-    add(state) {
+    increase(state) {
       // Need to return new state
-      return { ...state, count: state.count + 1 };
+      return { ...state, count: state.value + 1 };
     },
   },
   actions: {
-    async addAsync() {
+    async increaseAsync() {
       await new Promise(resolve => setTimeout(resolve, 1000));
       // this.setState(); ERROR: NO `this.setState` HERE!
-      this.add(); // YES
+      this.increase(); // YES
     },
   },
 };
@@ -146,23 +146,21 @@ const count = {
 export default count;
 ```
 
-If `reducers` exists, `setState` will disappear in action's context, you can only use reducers like `add` to update state.
+If `reducers` exists, `setState` will disappear in action's context, you can only use reducers like `increase` to update state.
 
 ### What's in action's `this` context?
 
 ```js
 export const count = {
   actions: {
-    add() {
-      // OWN
+    increase() {
       // this.state
-      // this.setState (`reducers` ☓)
       // this.reducerName (`reducers` √)
+      // this.setState (`reducers` ☓)
       // this.actionName
 
-      // OTHER
       // this.modelName.state
-      // this.modelName.reducerName (modelName `reducers` √)
+      // this.modelName.reducerName (`reducers` √)
       // this.modelName.actionName
     },
   },
@@ -217,32 +215,32 @@ You can use code splitting libraries like [react-loadable](https://github.com/ja
 
 Here is a `loadable-components` example.
 
-```js
+```jsx
 import React from 'react';
 import loadable from 'loadable-components';
 
-const AsyncPage = loadable(async store => {
-  const [{ default: Page }, { default: count }] = await Promise.all([
-    import('./Page'),
-    import('./count'),
+const AsyncBooks = loadable(async (store) => {
+  const [{ default: Books }, { default: books }] = await Promise.all([
+    import('./Books'),
+    import('./books'),
   ]);
-  store.addModel('count', count);
-  return props => <Page {...props} />;
+  store.addModel('books', books);
+  return props => <Books {...props} />;
 });
 ```
 
 ### Customize state and methods
 
-You can just pass `mapStateToProps` and `mapDispatchToProps` to `connect` when need some customization, without using `withStore`.
+You can pass `mapStateToProps` and `mapDispatchToProps` to `connect` when need some customization, without using `withStore`.
 
 ```jsx
-const mapState = ({ count: { count } }) => ({
-  count,
+const mapState = ({ count: { value } }) => ({
+  value,
 });
 
-const mapMethods = ({ count: { add, addAsync } }) => ({
-  add,
-  addAsync,
+const mapMethods = ({ count: { increase, increaseAsync } }) => ({
+  increase,
+  increaseAsync,
 });
 // As we know, first param to `mapDispatchToProps` is `dispatch`, `dispatch` is a function,
 // [mapDispatchToProps](https://github.com/reduxjs/react-redux/blob/master/docs/api.md#arguments)
@@ -327,18 +325,12 @@ Use `store.addModel(name, model)` to inject async model to store after imported.
 ### `this.setState`
 
 ```js
-// Set own state
 this.setState(nextState);
-
-// Set other model's state
-this.setState('modelName', nextState).
 ```
 
-Just like `this.setState` function in a React component (different when set other model's state).
+Just like `this.setState` function in a React component, `nextState` must be an object, it will be merge with the current state.
 
-`nextState` must be an object, it will be merge with the previous model state.
-
-### `this[reducer]`
+### `this.reducerName`
 
 ```js
 // Call reducer in actions or component
@@ -351,7 +343,7 @@ plus(state, a, b, c) {
 }
 ```
 
-### `this[action]`
+### `this.actionName`
 
 ```js
 // Call action in other actions or component
@@ -360,8 +352,7 @@ this.getSum(1, 2, 4);
 // Params received in action
 getSum(a, b, c) {
   // a: 1, b: 2, c: 4
-  const { sum } = this.state;
-  this.setState({ sum: sum + a + b + c });
+  this.setState({ sum: this.state.sum + a + b + c });
 }
 ```
 
