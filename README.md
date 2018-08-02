@@ -310,7 +310,7 @@ createStore({
 withStore('count');
 
 // more
-withStore('count', 'model', ...modelList);
+withStore('count', 'model', ...modelNames);
 ```
 
 Use `withStore(name)` to pass whole model to a component, param is model's name `[string]`, you can pass more than one model.
