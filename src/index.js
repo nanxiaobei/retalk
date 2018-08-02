@@ -14,7 +14,7 @@ import error from './utils/error';
  * createStore
  *
  * @param {object} models - { model: { state, actions } } or { model: () => import() }
- * @param {boolean} useReduxDevTools - if use Redux DevTools, only support >= 2.15.3
+ * @param {boolean} useReduxDevTools - Whether use Redux DevTools, only support >= 2.15.3
  * @return {object} Store or Promise
  */
 const createStore = (models, useReduxDevTools) => {
@@ -47,7 +47,7 @@ const createStore = (models, useReduxDevTools) => {
     return store;
   };
 
-  // static import
+  // Static import
   if (!asyncImport) {
     Object.keys(models).forEach(name => {
       const model = models[name];
@@ -56,7 +56,7 @@ const createStore = (models, useReduxDevTools) => {
     return getStore();
   }
 
-  // dynamic import
+  // Dynamic import
   const modelMap = {};
   return Promise.all(Object.keys(models).map((name, index) => {
     modelMap[index] = { name };
