@@ -1,3 +1,4 @@
+import { compose } from 'redux';
 import { createStore, withStore } from '@/index';
 import error from '@/utils/error';
 
@@ -28,6 +29,11 @@ describe('retalk', () => {
       expect(store.dispatch).toHaveProperty('test');
       expect(store.getState()).toEqual({ test: { loading: {} } });
       expect(store.addModel('test', {})).toBeUndefined();
+      window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ = compose;
+      const storeWithDevtools = createStore({
+        test: { state: {}, actions: {} },
+      }, true);
+      expect(storeWithDevtools).toHaveProperty('getState');
       const asyncStore = await createStore({
         async: () => ({ default: { state: {}, actions: {} } }),
         direct: { state: {}, reducers: {}, actions: {} },
