@@ -276,7 +276,7 @@ We recommend to use `async / await` syntax to define an async action.
 
 ### Hot reloading with Redux
 
-The key to achieving hot reloading with Redux is - put `Provider` in `App.js`, then add:
+The key to achieving hot reloading with Redux is - Put `Provider` in `App.js`, not outside! then add:
 
 ```js
 if (module.hot) {
