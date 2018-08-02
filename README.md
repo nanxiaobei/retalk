@@ -4,7 +4,7 @@
 
 Retalk is a best practice for Redux. just simple, small, smooth, and smart.
 
-It helps you write Redux easy and clear than ever before, forget about action types, action creators, no more annoying boilerplate code. On top of that, it even supports async import model and automatically loading state handling.
+It helps you write Redux easy and clear than ever before, forget about action types, action creators, no more annoying boilerplate code. On top of that, it even supports async import model and smart loading state handling.
 
 [![Travis](https://img.shields.io/travis/nanxiaobei/retalk.svg)](https://travis-ci.org/nanxiaobei/retalk)
 [![Codecov](https://img.shields.io/codecov/c/github/nanxiaobei/retalk.svg)](https://codecov.io/gh/nanxiaobei/retalk)
@@ -17,7 +17,7 @@ It helps you write Redux easy and clear than ever before, forget about action ty
 * 🍺️ **Simplest Redux**: only `state` and `actions` need to write, if you like.
 * 🎭 **Only two API**: `createStore` and `withStore`, no more annoying concepts.
 * ⛵️ **Async import model**: `() => import()` for code splitting and `store.addModel` for model injecting.
-* ⏳ **Automatically `loading` state**: only main state you need to care.
+* ⏳ **Smart `loading` state**: only main state you need to care.
 
 ## Getting started
 
@@ -33,24 +33,9 @@ Or with npm:
 npm install retalk
 ```
 
-### Step 1: Store
+### Step 1: Model
 
-#### store.js
-
-```js
-import { createStore } from 'retalk';
-import count from './count';
-
-const store = createStore({
-  count,
-});
-
-export default store;
-```
-
-### Step 2: Model
-
-#### count.js (state, actions)
+**count.js (state, actions)**
 
 ```js
 const count = {
@@ -73,44 +58,60 @@ export default count;
 
 **model** brings `state`, `reducers [optional]`, and `actions` together in one place.
 
-In an action, use `this.state` to get state, `this.setState` to update state, use `this.actionName` to call other actions. Just like the syntax in a React component.
+In an action, use `this.state` to get state, `this.setState` to update state, use `this.action` to call other actions. Just like the syntax in a React component.
 
-How to reach other models? just add the namespace, e.g. `this.modelName.state`、`this.modelName.reducerName`，`this.modelName.actionName`
+How to reach other models? Just add the namespace, e.g. `this.model.state`、`this.model.reducer`，`this.model.action`
 
-Umm... want some more? but that's all. Redux model is just simple like this, when you're using Retalk.
+That's all. Model is just simple like this, when you're using Retalk.
+
+### Step 2: Store
+
+**store.js**
+
+```js
+import { createStore } from 'retalk';
+import count from './count';
+
+const store = createStore({ count });
+
+export default store;
+```
 
 ### Step 3: View
 
-#### App.js
+**index.js**
 
 ```jsx
-import React from 'react';
+import 'babel-polyfill';
+import React, { Fragment } from 'react';
 import ReactDOM from 'react-dom';
 import { Provider, connect } from 'react-redux';
 import { withStore } from 'retalk';
 import store from './store';
 
-const Count = ({ loading, value, increase, increaseAsync }) => (
-  <div className={loading.increaseAsync ? 'loading' : 'done'}>
-    The count is {value}
-    <button onClick={increase}>+</button>
-    <button onClick={increaseAsync}>+ (async)</button>
-  </div>
+const Count = ({ value, increase, increaseAsync, loading }) => (
+  <Fragment>
+    <h3>Count: {value}</h3>
+    <button onClick={increase}>+ 1</button>
+    <button onClick={increaseAsync}>async + 1 {loading.increaseAsync ? '...' : ''}</button>
+  </Fragment>
 );
 
-const App = connect(...withStore('count'))(Count);
+const CountWrapper = connect(...withStore('count'))(Count);
 
-ReactDOM.render(
+const App = () => (
   <Provider store={store}>
-    <App />
-  </Provider>,
-  document.getElementById('root'),
+    <CountWrapper />
+  </Provider>
 );
+
+ReactDOM.render(<App />, document.getElementById('root'));
 ```
 
-If an action is async, you can get `loading.actionName` state for loading if you like.
+If an action is async, you can get `loading.action` state for loading if you like.
 
-Well, only 3 steps, A simple Retalk demo is here.
+Well, only 3 steps, A simple Retalk demo is here: https://codesandbox.io/s/5l9mqnzvx.
+
 
 ## What's More?
 
@@ -120,24 +121,23 @@ Well, only 3 steps, A simple Retalk demo is here.
 
 Ok... below is what you want.
 
-#### count.js (state, reducers, actions)
+**count.js (state, reducers, actions)**
 
 ```js
-
 const count = {
   state: {
     value: 0,
   },
-  rerucers: {
+  reducers: {
     increase(state) {
       // Need to return new state
-      return { ...state, count: state.value + 1 };
+      return { ...state, value: state.value + 1 };
     },
   },
   actions: {
     async increaseAsync() {
       await new Promise(resolve => setTimeout(resolve, 1000));
-      // this.setState(); ERROR: NO `this.setState` HERE!
+      // this.setState(); NO `this.setState` HERE!
       this.increase(); // YES
     },
   },
@@ -155,13 +155,14 @@ export const count = {
   actions: {
     increase() {
       // this.state
-      // this.reducerName (`reducers` √)
+      // this.reducer (`reducers` √)
       // this.setState (`reducers` ☓)
-      // this.actionName
+      // this.action
 
-      // this.modelName.state
-      // this.modelName.reducerName (`reducers` √)
-      // this.modelName.actionName
+      // this.model.state
+      // this.model.reducer (`reducers` √)
+      // this.model.setState (`reducers` ☓)
+      // this.model.action
     },
   },
 };
@@ -169,7 +170,7 @@ export const count = {
 
 ### Async import
 
-#### createStore
+**createStore**
 
 ```js
 // 1. Static import (store: [Object])
@@ -179,35 +180,33 @@ const store = createStore({
 
 // 2. Async import (store: [Promise])
 const store = createStore({
-  count: () => import('./count'),
+  countAsync: () => import('./countAsync'),
 });
 
 // 3. Even mixin them! (store: [Promise])
 const store = createStore({
   count,
-  modelName: () => import('./modelName'),
+  countAsync: () => import('./countAsync'),
 });
 ```
 
 If async import model in `createStore`, then in entry file you need to write like this.
 
 ```jsx
-import asyncStore from './store';
-
 const start = async () => {
   const store = await asyncStore;
-  ReactDOM.render(
+  const App = () => (
     <Provider store={store}>
-      <App />
-    </Provider>,
-    document.getElementById('root'),
+      <CountWrapper />
+    </Provider>
   );
+  ReactDOM.render(<App />, document.getElementById('root'));
 };
 
 start();
 ```
 
-#### store.addModel
+**store.addModel**
 
 Actually, above is just code splitting when initialize store, what we really want is when enter a page, then load page's model, not load them together when initialize store. We need some help to achieve this goal.
 
@@ -247,12 +246,12 @@ const mapMethods = ({ count: { increase, increaseAsync } }) => ({
 // but in above `mapMethods`, we treat it like it's an object.
 // Yes, Retalk did some tricks here, it's `dispatch` function, but bound model methods on it!
 
-const App = connect(mapState, mapMethods)(Count);
+const CountWrapper = connect(mapState, mapMethods)(Count);
 ```
 
-### Automatically loading state
+### Smart loading state
 
-Retalk will check if an action is async, then automatically add a `loading [object]` state to every model, here is an example.
+Retalk will add a `loading [object]` state to every model, then check if an action is async, here is an example.
 
 ```js
 // In actions
@@ -268,7 +267,7 @@ const count = {
 };
 
 // In count's state
-state.loading = {
+count.loading = {
   actionC: false,
   actionE: true, // If in process
   actionF: false,
@@ -277,22 +276,32 @@ state.loading = {
 
 We recommend to use `async / await` syntax to define an async action.
 
+### Hot reloading with Redux
+
+The key to achieving hot reloading with Redux is - put `Provider` in `App.js`, then add:
+
+```js
+if (module.hot) {
+  module.hot.accept('./App', () => {
+    render(App);
+  });
+}
+```
+Here is a working demo: https://codesandbox.io/s/rw32xv1mv4
+
+
 ## API
 
 ### `createStore`
 
 ```js
-const models = {
+createStore({
   modelA: { state: {}, actions: {} },
   modelB: () => import('./modelB'),
-};
-
-createStore(models);
+});
 ```
 
-`createStore(models)`, `models` must be an object.
-
-`modelA` or `modelB` is `model`, `model` must be an object or an `() => import()` function.
+`createStore(models)`, `models` must be an object. `model` in `models` must be an object or an `() => import()` function.
 
  If `model` is an object, `state` and `actions` must in it, and must all be objects. `reducers` is optional, if `reducers` exists, `reducers` must be an object too.
 
@@ -303,7 +312,7 @@ createStore(models);
 withStore('count');
 
 // more
-withStore('count', 'modelName', ...);
+withStore('count', 'model', ...modelList);
 ```
 
 Use `withStore(name)` to pass whole model to a component, param is model's name `[string]`, you can pass more than one model.
@@ -330,27 +339,27 @@ this.setState(nextState);
 
 Just like `this.setState` function in a React component, `nextState` must be an object, it will be merge with the current state.
 
-### `this.reducerName`
+### `this.reducer`
 
 ```js
 // Call reducer in actions or component
-this.plus(1, 2, 4);
+this.plusReducer(1, 2, 4);
 
 // Params received in reducer
-plus(state, a, b, c) {
+plusReducer(state, a, b, c) {
   // a: 1, b: 2, c: 4
   return { ...state, sum: state.sum + a + b + c };
 }
 ```
 
-### `this.actionName`
+### `this.action`
 
 ```js
 // Call action in other actions or component
-this.getSum(1, 2, 4);
+this.plusAction(1, 2, 4);
 
 // Params received in action
-getSum(a, b, c) {
+plusAction(a, b, c) {
   // a: 1, b: 2, c: 4
   this.setState({ sum: this.state.sum + a + b + c });
 }
