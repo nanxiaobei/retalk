@@ -13,7 +13,7 @@ It helps you write Redux easy and clear than ever before, forget about action ty
 ## Features
 
 * 🍺️ **Simplest Redux**: only `state` and `actions` need to write, if you like.
-* 🎭 **Only two API**: `createStore` and `withStore`, no more annoying concepts.
+* 🎭 **Just two API**: `createStore` and `withStore`, no more annoying concepts.
 * ⛵️ **Async import model**: `() => import()` for code splitting and `store.addModel` for model injecting.
 * ⏳ **Smart `loading` state**: only main state you need to care.
 
@@ -56,9 +56,9 @@ export default count;
 
 **model** brings `state`, `reducers [optional]`, and `actions` together in one place.
 
-In an action, use `this.state` to get state, `this.setState` to update state, use `this.action` to call other actions. Just like the syntax in a React component.
+In an action, use `this.state` to get state, `this.setState` to update state, `this.action` to call other actions. Just like the syntax in a React component.
 
-How to reach other models? Just add the namespace, e.g. `this.model.state`、`this.model.reducer`，`this.model.action`
+How to reach other models? Add the namespace, e.g. `this.model.state`, `this.model.reducer`, `this.model.action`
 
 That's all. Model is just simple like this, when you're using Retalk.
 
