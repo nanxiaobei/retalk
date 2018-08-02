@@ -54,9 +54,9 @@ const count = {
 export default count;
 ```
 
-**model** brings `state`, `reducers [optional]`, `actions` together in one place. 
+**model** brings `state`, `reducers [optional]`, `actions` together in one place. In an action, use `this.state` to get state, `this.setState` to update state, `this.action` to call other actions. Just like the syntax in a React component. 
 
-In an action, use `this.state` to get state, `this.setState` to update state, `this.action` to call other actions. Just like the syntax in a React component. How to reach other models? Just prefix with namespace, e.g. `this.model.state`, `this.model.action`.
+How to reach other models? Just prefix with namespace, e.g. `this.model.state`, `this.model.action`.
 
 ### Step 2: Store
 
