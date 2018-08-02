@@ -1,7 +1,5 @@
 # <img src="./logo/logo-title.png" height="100" width="300" alt="Retalk">
 
-**Redux Never So Simple**
-
 Retalk is a best practice for Redux. just simple, small, smooth, and smart.
 
 It helps you write Redux easy and clear than ever before, forget about action types, action creators, no more annoying boilerplate code. On top of that, it even supports async import model and smart loading state handling.
