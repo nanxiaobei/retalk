@@ -33,7 +33,7 @@
     "coverage": "codecov"
   },
   "jest": {
-    "testURL": "http://localhost/",
+    "testURL": "http://localhost",
     "testRegex": "(/test/.*\\.test.js)$",
     "moduleNameMapper": {
       "@/(.*)": "<rootDir>/src/$1"
