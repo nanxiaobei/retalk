@@ -294,14 +294,14 @@ Here is a working demo: https://codesandbox.io/s/rw32xv1mv4
 
 ```js
 createStore({
-  modelA: { state: {}, actions: {} },
-  modelB: () => import('./modelB'),
+  one: { state: {}, actions: {} },
+  two: () => import('./two'),
 });
 ```
 
-`createStore(models)`, `models` must be an object. `model` in `models` must be an object or an `() => import()` function.
+`createStore(models, ?useReduxDevTools)`, `models` must be an object. `useReduxDevTools` is a boolean, you can pass `true` if you want to use [Redux DevTools extension](https://github.com/zalmoxisus/redux-devtools-extension). But remember, only support extension version >= 2.15.3, because previous version + `redux@^4.0.0` will result in a [bug](https://github.com/reduxjs/redux/issues/2943).
 
- If `model` is an object, `state` and `actions` must in it, and must all be objects. `reducers` is optional, if `reducers` exists, `reducers` must be an object too.
+`model` in `models` must be an object or an `() => import()` function. If `model` is an object, `state` and `actions` must in it, and must all be objects. `reducers` is optional, if `reducers` exists, `reducers` must be an object too.
 
 ### `withStore`
 
@@ -327,7 +327,7 @@ connect(...withStore('model'))(Component);
 store.addModel('list', module.default);
 ```
 
-Use `store.addModel(name, model)` to inject async model to store after imported. `name [string]` is model's namespace in store, and `model` is an object with `state`, `reducers [optional]`, and `actions` in it.
+Use `store.addModel(name, model)` to inject async model to store after imported. `name` is model's namespace in store, and `model` is an object with `state`, `reducers [optional]`, and `actions` in it.
 
 ### `this.setState`
 
