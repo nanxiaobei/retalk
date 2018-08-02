@@ -2,12 +2,12 @@ import isObject from './isObject';
 import error from './error';
 
 /**
- * middleware
+ * methodsStation
  *
  * @param {object} models
  * @return {function} Middleware
  */
-const middleware = models => () => next => action => {
+const methodsStation = models => () => next => action => {
   if (!isObject(action) || typeof action.type !== 'string' || !action.type.includes('/')) {
     throw new Error(error.INVALID_ACTION());
   }
@@ -25,4 +25,4 @@ const middleware = models => () => next => action => {
   return next(action);
 };
 
-export default middleware;
+export default methodsStation;

@@ -1,7 +1,7 @@
-import middleware from '@/utils/middleware';
+import methodsStation from '@/utils/methodsStation';
 import error from '@/utils/error';
 
-describe('middleware', () => {
+describe('methodsStation', () => {
   it('should throw error if action type is not valid', () => {
     const models = {
       test: {
@@ -13,7 +13,7 @@ describe('middleware', () => {
         },
       },
     };
-    const dispatch = middleware(models)()(() => {});
+    const dispatch = methodsStation(models)()(() => {});
 
     expect(() => {
       dispatch('abc');

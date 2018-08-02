@@ -1,7 +1,12 @@
-import { createStore as theRealCreateStore, combineReducers, compose, applyMiddleware } from 'redux';
+import {
+  createStore as theRealCreateStore,
+  combineReducers,
+  compose,
+  applyMiddleware,
+} from 'redux';
 import createReducer from './createReducer';
 import createMethods from './createMethods';
-import middleware from './utils/middleware';
+import methodsStation from './utils/methodsStation';
 import isObject from './utils/isObject';
 import error from './utils/error';
 
@@ -16,13 +21,13 @@ const createStore = models => {
     throw new Error(error.NOT_OBJECT('models'));
   }
 
-  const isAsyncImport = Object.values(models).some(model => typeof model === 'function');
+  const asyncImport = Object.values(models).some(model => typeof model === 'function');
   const rootReducers = {};
 
   const getStore = () => {
     const store = theRealCreateStore(
       combineReducers(rootReducers),
-      compose(applyMiddleware(middleware(models))),
+      compose(applyMiddleware(methodsStation(models))),
     );
     Object.keys(models).forEach(name => {
       const model = models[name];
@@ -38,12 +43,12 @@ const createStore = models => {
   };
 
   // static import
-  if (!isAsyncImport) {
+  if (!asyncImport) {
     Object.keys(models).forEach(name => {
       const model = models[name];
       rootReducers[name] = createReducer(name, model);
     });
-    return getStore(true);
+    return getStore();
   }
 
   // dynamic import
@@ -69,7 +74,7 @@ const createStore = models => {
       }
       rootReducers[name] = createReducer(name, model);
     });
-    return getStore(false);
+    return getStore();
   });
 };
 
@@ -90,7 +95,7 @@ const withStore = (...names) => {
       }
       return state && state[name];
     })),
-    dispatch => Object.assign({ dispatch }, ...names.map(name => dispatch && dispatch[name])),
+    dispatch => Object.assign({}, ...names.map(name => dispatch && dispatch[name])),
   ];
 };
 

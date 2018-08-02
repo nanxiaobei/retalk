@@ -75,7 +75,7 @@ describe('createMethods', () => {
           return this;
         },
         async actionB() {
-          this.setState('common', {});
+          this.setState({});
           return this;
         },
       },

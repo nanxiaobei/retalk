@@ -1,4 +1,3 @@
-import isObject from './utils/isObject';
 import isAsyncFn from './utils/isAsyncFn';
 import error from './utils/error';
 
@@ -17,12 +16,8 @@ const createMethods = (store, name, model) => {
   // Reducers
   const newReducers = {};
 
-  const setState = function reducer(namespace, nextState) {
-    if (isObject(namespace) && nextState === undefined) {
-      nextState = namespace; // eslint-disable-line
-      namespace = name; // eslint-disable-line
-    }
-    dispatch({ type: `@${namespace}/SET_STATE`, nextState });
+  const setState = function reducer(nextState) {
+    dispatch({ type: `@${name}/SET_STATE`, nextState });
   };
 
   if (reducers === undefined) {
@@ -42,10 +37,10 @@ const createMethods = (store, name, model) => {
   const newActions = {};
 
   const context = actionName => {
-    const { [actionName]: self, ...otherMethods } = dispatch[name]; // eslint-disable-line
+    const { [actionName]: self, ...methods } = dispatch[name]; // eslint-disable-line
     return {
       state: getState()[name],
-      ...otherMethods,
+      ...methods,
       ...Object.keys(dispatch).reduce((root, modelName) => {
         if (modelName !== name) {
           root[modelName] = {
@@ -65,9 +60,9 @@ const createMethods = (store, name, model) => {
       ? action
       : async function asyncAction(...args) {
         setState({ loading: { ...loading(), [actionName]: true } });
-        const resolve = await action(...args);
+        const result = await action(...args);
         setState({ loading: { ...loading(), [actionName]: false } });
-        return resolve;
+        return result;
       };
   });
 
