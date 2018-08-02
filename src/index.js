@@ -14,9 +14,10 @@ import error from './utils/error';
  * createStore
  *
  * @param {object} models - { model: { state, actions } } or { model: () => import() }
+ * @param {boolean} useReduxDevTools - if use Redux DevTools, only support >= 2.15.3
  * @return {object} Store or Promise
  */
-const createStore = models => {
+const createStore = (models, useReduxDevTools) => {
   if (!isObject(models)) {
     throw new Error(error.NOT_OBJECT('models'));
   }
@@ -25,9 +26,13 @@ const createStore = models => {
   const rootReducers = {};
 
   const getStore = () => {
+    const composeEnhancers =
+      (useReduxDevTools === true && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__)
+        ? window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
+        : compose;
     const store = theRealCreateStore(
       combineReducers(rootReducers),
-      compose(applyMiddleware(methodsStation(models))),
+      composeEnhancers(applyMiddleware(methodsStation(models))),
     );
     Object.keys(models).forEach(name => {
       const model = models[name];
