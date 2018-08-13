@@ -44,7 +44,7 @@ const count = {
     increase() {
       this.setState({ value: this.state.value + 1 });
     },
-    async increaseAsync() {
+    async asyncIncrease() {
       await new Promise(resolve => setTimeout(resolve, 1000));
       this.increase();
     },
@@ -56,7 +56,7 @@ export default count;
 
 **model** brings `state`, `reducers [optional]`, `actions` together in one place. In an action, use `this.state` to get state, `this.setState` to update state, `this.action` to call other actions. Just like the syntax in a React component. 
 
-How to reach other models? Just prefix with namespace, e.g. `this.model.state`, `this.model.action`.
+How to reach other models? Just prefix the namespace, e.g. `this.model.state`, `this.model.action`.
 
 ### Step 2: Store
 
@@ -83,11 +83,11 @@ import { Provider, connect } from 'react-redux';
 import { withStore } from 'retalk';
 import store from './store';
 
-const Count = ({ value, increase, increaseAsync, loading }) => (
+const Count = ({ value, increase, asyncIncrease, loading }) => (
   <Fragment>
     <h3>Count: {value}</h3>
     <button onClick={increase}>+ 1</button>
-    <button onClick={increaseAsync}>async + 1 {loading.increaseAsync ? '...' : ''}</button>
+    <button onClick={asyncIncrease}>async + 1 {loading.asyncIncrease ? '...' : ''}</button>
   </Fragment>
 );
 
@@ -102,7 +102,7 @@ const App = () => (
 ReactDOM.render(<App />, document.getElementById('root'));
 ```
 
-If an action is async, you can get `loading.action` state for loading if you like.
+If an action is async, you can get `loading.asyncAction` state for loading if you like.
 
 Well, only 3 steps, A simple Retalk demo is here: https://codesandbox.io/s/5l9mqnzvx.
 
@@ -129,7 +129,7 @@ const count = {
     },
   },
   actions: {
-    async increaseAsync() {
+    async asyncIncrease() {
       await new Promise(resolve => setTimeout(resolve, 1000));
       // this.setState(); NO `this.setState` HERE!
       this.increase(); // YES
@@ -231,9 +231,9 @@ const mapState = ({ count: { value } }) => ({
   value,
 });
 
-const mapMethods = ({ count: { increase, increaseAsync } }) => ({
+const mapMethods = ({ count: { increase, asyncIncrease } }) => ({
   increase,
-  increaseAsync,
+  asyncIncrease,
 });
 // As we know, first param to `mapDispatchToProps` is `dispatch`, `dispatch` is a function,
 // [mapDispatchToProps](https://github.com/reduxjs/react-redux/blob/master/docs/api.md#arguments)
