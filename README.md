@@ -313,8 +313,9 @@ Use `withStore(name)` to pass whole model to a component, param is model's name 
 
 ```js
 connect(...withStore('model'))(Component);
-// `withStore` must be passed in [rest parameter](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/rest_parameters) syntax to `connect`
 ```
+
+`withStore` must be passed in [rest parameter](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/rest_parameters) syntax to `connect`.
 
 ### `store.addModel`
 
