@@ -1,6 +1,5 @@
 /**
  * isObject
- *
  * @param {any} obj
  * @returns {boolean} True if the argument appears to be an object
  */

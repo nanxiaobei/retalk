@@ -3,7 +3,6 @@ import error from './utils/error';
 
 /**
  * createMethods
- *
  * @param {object} store
  * @param {string} name
  * @param {object} model
@@ -23,7 +22,7 @@ const createMethods = (store, name, model) => {
   if (reducers === undefined) {
     newReducers.setState = setState;
   } else {
-    Object.keys(reducers).forEach(reducerName => {
+    Object.keys(reducers).forEach((reducerName) => {
       if (isAsyncFn(reducers[reducerName])) throw new Error(error.ASYNC_REDUCER(name, reducerName));
       if (reducerName in actions) throw new Error(error.METHODS_CONFLICT(name, reducerName));
 
@@ -36,7 +35,7 @@ const createMethods = (store, name, model) => {
   // Actions
   const newActions = {};
 
-  const context = actionName => {
+  const context = (actionName) => {
     const { [actionName]: self, ...methods } = dispatch[name]; // eslint-disable-line
     return {
       state: getState()[name],
@@ -54,7 +53,7 @@ const createMethods = (store, name, model) => {
   };
   const loading = () => getState()[name].loading;
 
-  Object.keys(actions).forEach(actionName => {
+  Object.keys(actions).forEach((actionName) => {
     const action = (...args) => actions[actionName].bind(context(actionName))(...args);
     newActions[actionName] = loading()[actionName] === undefined
       ? action

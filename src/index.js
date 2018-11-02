@@ -12,7 +12,6 @@ import error from './utils/error';
 
 /**
  * createStore
- *
  * @param {object} models - { model: { state, actions } } or { model: () => import() }
  * @param {boolean} useReduxDevTools - Whether use Redux DevTools, only support >= 2.15.3
  * @return {object} Store or Promise
@@ -34,7 +33,7 @@ const createStore = (models, useReduxDevTools) => {
       combineReducers(rootReducers),
       composeEnhancers(applyMiddleware(methodsStation(models))),
     );
-    Object.keys(models).forEach(name => {
+    Object.keys(models).forEach((name) => {
       const model = models[name];
       models[name] = createMethods(store, name, model);
     });
@@ -49,7 +48,7 @@ const createStore = (models, useReduxDevTools) => {
 
   // Static import
   if (!asyncImport) {
-    Object.keys(models).forEach(name => {
+    Object.keys(models).forEach((name) => {
       const model = models[name];
       rootReducers[name] = createReducer(name, model);
     });
@@ -67,7 +66,7 @@ const createStore = (models, useReduxDevTools) => {
     }
     modelMap[index].async = false;
     return model;
-  })).then(modelList => {
+  })).then((modelList) => {
     modelList.forEach((model, index) => {
       const { name, async } = modelMap[index];
       if (async) {
@@ -85,7 +84,6 @@ const createStore = (models, useReduxDevTools) => {
 
 /**
  * withStore
- *
  * @param {...string} names - ['modelA', 'modelB', ...]
  * @return {array} [mapState, mapMethods]
  */

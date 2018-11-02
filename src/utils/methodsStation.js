@@ -3,7 +3,6 @@ import error from './error';
 
 /**
  * methodsStation
- *
  * @param {object} models
  * @return {function} Middleware
  */

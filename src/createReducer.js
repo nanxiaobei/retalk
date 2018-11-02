@@ -4,7 +4,6 @@ import error from './utils/error';
 
 /**
  * createReducer
- *
  * @param {string} name
  * @param {object} model
  * @return {function} Reducer
@@ -32,7 +31,7 @@ const createReducer = (name, model) => {
   }
 
   state.loading = {};
-  Object.keys(actions).forEach(actionName => {
+  Object.keys(actions).forEach((actionName) => {
     if (isAsyncFn(actions[actionName])) {
       state.loading[actionName] = false;
     }

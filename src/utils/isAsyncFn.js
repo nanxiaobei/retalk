@@ -1,10 +1,9 @@
 /**
  * isAsyncFn
- *
  * @param {any} fn
  * @return {boolean} True if the argument appears to be an async function
  */
-const isAsyncFn = fn => {
+const isAsyncFn = (fn) => {
   if (typeof fn !== 'function') return false;
   const str = fn.toString();
   return (
