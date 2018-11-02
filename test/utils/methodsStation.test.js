@@ -37,12 +37,12 @@ describe('methodsStation', () => {
       error.INVALID_ACTION('@abc/SET_STATE', 'abc'),
     );
     expect(() => {
-      dispatch({ type: '@test/SET_STATE', nextState: [] });
+      dispatch({ type: '@test/SET_STATE', partialState: [] });
     }).toThrow(
       error.INVALID_ACTION(),
     );
     expect(() => {
-      dispatch({ type: '@test/SET_STATE', nextState: {} });
+      dispatch({ type: '@test/SET_STATE', partialState: {} });
     }).not.toThrow();
 
     expect(() => {

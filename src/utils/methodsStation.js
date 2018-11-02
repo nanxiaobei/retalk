@@ -12,7 +12,7 @@ const methodsStation = models => () => next => action => {
   }
   if (action.type.match(/@\w+\/SET_STATE/g)) {
     const name = action.type.slice(1, -10);
-    if (!(name in models) || !isObject(action.nextState)) {
+    if (!(name in models) || !isObject(action.partialState)) {
       throw new Error(error.INVALID_ACTION());
     }
   } else {

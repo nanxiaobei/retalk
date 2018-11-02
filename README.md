@@ -328,10 +328,10 @@ Use `store.addModel(name, model)` to inject async model to store after imported.
 ### `this.setState`
 
 ```js
-this.setState(nextState);
+this.setState(partialState);
 ```
 
-Just like `this.setState` function in a React component, `nextState` must be an object, it will be merge with the current state.
+Just like `this.setState` function in a React component, `partialState` must be an object, it will be merge with the current state.
 
 ### `this.reducer`
 
