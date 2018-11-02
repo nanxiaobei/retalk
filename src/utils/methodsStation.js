@@ -3,8 +3,8 @@ import error from './error';
 
 /**
  * methodsStation
- * @param {object} models
- * @return {function} Middleware
+ * @param {Object} models
+ * @returns {Function} Middleware
  */
 const methodsStation = models => () => next => action => {
   if (!isObject(action) || typeof action.type !== 'string' || !action.type.includes('/')) {

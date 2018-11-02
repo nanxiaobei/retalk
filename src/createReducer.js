@@ -5,8 +5,8 @@ import error from './utils/error';
 /**
  * createReducer
  * @param {string} name
- * @param {object} model
- * @return {function} Reducer
+ * @param {Object} model
+ * @returns {Function} Reducer
  */
 const createReducer = (name, model) => {
   if (typeof name !== 'string') {

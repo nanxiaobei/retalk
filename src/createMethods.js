@@ -3,10 +3,10 @@ import error from './utils/error';
 
 /**
  * createMethods
- * @param {object} store
+ * @param {Object} store
  * @param {string} name
- * @param {object} model
- * @return {object} Formatted model
+ * @param {Object} model
+ * @returns {Object} Formatted model
  */
 const createMethods = (store, name, model) => {
   const { dispatch, getState } = store;
