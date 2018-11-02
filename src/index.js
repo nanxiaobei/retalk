@@ -12,9 +12,9 @@ import error from './utils/error';
 
 /**
  * createStore
- * @param {object} models - { model: { state, actions } } or { model: () => import() }
+ * @param {Object} models - { model: { state, actions } } or { model: () => import() }
  * @param {boolean} useReduxDevTools - Whether use Redux DevTools, only support >= 2.15.3
- * @return {object} Store or Promise
+ * @returns {Object} Store or Promise
  */
 const createStore = (models, useReduxDevTools) => {
   if (!isObject(models)) {
@@ -84,21 +84,39 @@ const createStore = (models, useReduxDevTools) => {
 
 /**
  * withStore
- * @param {...string} names - ['modelA', 'modelB', ...]
- * @return {array} [mapState, mapMethods]
+ * @param {...string} names - 'modelA', 'modelB', ...
+ * @returns {Array} [mapState, mapMethods]
  */
 const withStore = (...names) => {
   if (names.length === 0) {
     throw new Error(error.INVALID_MODEL_NAME());
   }
   return [
-    state => Object.assign({}, ...names.map(name => {
-      if (typeof name !== 'string') {
-        throw new Error(error.INVALID_MODEL_NAME());
+    (state) => {
+      let mergedState = { loading: {} };
+      for (let i = 0; i < names.length; i += 1) {
+        const name = names[i];
+        if (typeof name !== 'string') {
+          throw new Error(error.INVALID_MODEL_NAME());
+        }
+        const modelState = state[name];
+        mergedState = {
+          ...mergedState,
+          ...modelState,
+          ...{ loading: { ...mergedState.loading, ...modelState.loading } },
+        };
       }
-      return state && state[name];
-    })),
-    dispatch => Object.assign({}, ...names.map(name => dispatch && dispatch[name])),
+      return mergedState;
+    },
+    (dispatch) => {
+      let mergedMethods = {};
+      for (let i = 0; i < names.length; i += 1) {
+        const name = names[i];
+        const modelMethods = dispatch[name];
+        mergedMethods = { ...mergedMethods, ...modelMethods };
+      }
+      return mergedMethods;
+    },
   ];
 };
 
