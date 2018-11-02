@@ -33,8 +33,7 @@ const createStore = (models, useReduxDevTools) => {
       combineReducers(rootReducers),
       composeEnhancers(applyMiddleware(methodsStation(models))),
     );
-    Object.keys(models).forEach((name) => {
-      const model = models[name];
+    Object.entries(models).forEach(([name, model]) => {
       models[name] = createMethods(store, name, model);
     });
     store.addModel = (name, model) => {
@@ -48,8 +47,7 @@ const createStore = (models, useReduxDevTools) => {
 
   // Static import
   if (!asyncImport) {
-    Object.keys(models).forEach((name) => {
-      const model = models[name];
+    Object.entries(models).forEach(([name, model]) => {
       rootReducers[name] = createReducer(name, model);
     });
     return getStore();
@@ -57,16 +55,17 @@ const createStore = (models, useReduxDevTools) => {
 
   // Dynamic import
   const modelMap = {};
-  return Promise.all(Object.keys(models).map((name, index) => {
-    modelMap[index] = { name };
-    const model = models[name];
-    if (typeof model === 'function') {
-      modelMap[index].async = true;
-      return model();
-    }
-    modelMap[index].async = false;
-    return model;
-  })).then((modelList) => {
+  return Promise.all(
+    Object.entries(models).map(([name, model], index) => {
+      modelMap[index] = { name };
+      if (typeof model === 'function') {
+        modelMap[index].async = true;
+        return model();
+      }
+      modelMap[index].async = false;
+      return model;
+    }),
+  ).then((modelList) => {
     modelList.forEach((model, index) => {
       const { name, async } = modelMap[index];
       if (async) {

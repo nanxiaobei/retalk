@@ -14,6 +14,7 @@ describe('createMethods', () => {
 
   it('should throw error if reducer is an async function', () => {
     const model = {
+      state: {},
       reducers: {
         async add() {},
       },
@@ -27,6 +28,7 @@ describe('createMethods', () => {
 
   it('should throw error if reducer name is duplicated with action name', () => {
     const model = {
+      state: {},
       reducers: {
         add() {},
       },
@@ -43,6 +45,7 @@ describe('createMethods', () => {
 
   it('should return an object with all reducers and actions', () => {
     const model = {
+      state: {},
       reducers: {
         add() {},
       },
@@ -56,7 +59,7 @@ describe('createMethods', () => {
       },
     };
     const newModel = createMethods(store, name, model);
-    expect(Object.keys(newModel)).toEqual(['reducers', 'actions']);
+    expect(Object.keys(newModel)).toEqual(['state', 'reducers', 'actions']);
     const methods = store.dispatch[name];
     expect(Object.keys(methods)).toEqual(['add', 'actionA', 'actionB']);
     expect(methods.add()).toBeUndefined();
@@ -69,6 +72,7 @@ describe('createMethods', () => {
 
   it('should have `setState` reducer in action\'s context if `reducers` does not exist', () => {
     const model = {
+      state: {},
       actions: {
         actionA() {
           this.setState({});

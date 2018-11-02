@@ -57,8 +57,8 @@ describe('createReducer', () => {
       action() {},
     };
     const reducer = createReducer(name, model);
-    const nextState = reducer(model.state, { type: '@test/SET_STATE', nextState: { a: 10 } });
-    expect(nextState).toEqual({ a: 10, b: 2, loading: {} });
+    const partialState = reducer(model.state, { type: '@test/SET_STATE', partialState: { a: 10 } });
+    expect(partialState).toEqual({ a: 10, b: 2 });
   });
 
   it('should have an action type `test/add` if `reducers` exists', () => {
@@ -72,18 +72,7 @@ describe('createReducer', () => {
       action() {},
     };
     const reducer = createReducer(name, model);
-    const nextState = reducer(model.state, { type: 'test/add', payload: [1] });
-    expect(nextState).toEqual({ a: 2, b: 2, loading: {} });
-  });
-
-  it('should add `loading` state [object] to model state', () => {
-    model.reducers = undefined;
-    model.actions = {
-      actionA() {},
-      async actionB() {},
-    };
-    const reducer = createReducer(name, model);
-    const nextState = reducer(model.state, { type: '@test/SET_STATE', nextState: { a: 10 } });
-    expect(nextState).toEqual({ a: 10, b: 2, loading: { actionB: false } });
+    const partialState = reducer(model.state, { type: 'test/add', payload: [1] });
+    expect(partialState).toEqual({ a: 2, b: 2 });
   });
 });
