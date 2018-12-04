@@ -6,20 +6,25 @@ import error from './utils/error';
  * @param {Object} store
  * @param {string} name
  * @param {Object} model
- * @returns {Object} Formatted model
  */
 const createMethods = (store, name, model) => {
   const { dispatch, getState } = store;
   const { state, reducers, actions } = model;
 
   // Reducers
+  // ------------------------------------------------------------
+
   const newReducers = {};
+
   const setState = function reducer(partialState) {
     dispatch({ type: `@${name}/SET_STATE`, partialState });
   };
+
   if (reducers === undefined) {
+    // No `reducers` in model
     newReducers.setState = setState;
   } else {
+    // Has `reducers` in model
     Object.entries(reducers).forEach(([reducerName, reducer]) => {
       if (isAsyncFn(reducer)) {
         throw new Error(error.ASYNC_REDUCER(name, reducerName));
@@ -35,7 +40,10 @@ const createMethods = (store, name, model) => {
   }
 
   // Actions
+  // ------------------------------------------------------------
+
   const newActions = {};
+
   const getContent = (actionName) => {
     const { [actionName]: self, ...methods } = dispatch[name]; // eslint-disable-line
     return {
@@ -53,35 +61,38 @@ const createMethods = (store, name, model) => {
     };
   };
 
+  // Add `loading` state
   state.loading = {};
+  // Used to set `loading` state
   const setLoading = (actionName, loading) => {
     setState({
       loading: { ...getState()[name].loading, [actionName]: loading },
     });
   };
-  Object.entries(actions).forEach(([actionName, action]) => {
-    const boundAction = (...args) => action.bind(getContent(actionName))(...args);
-    if (isAsyncFn(action)) {
+
+  Object.entries(actions).forEach(([actionName, oldAction]) => {
+    const newAction = function action(...args) {
+      return oldAction.bind(getContent(actionName))(...args);
+    };
+
+    if (!isAsyncFn(oldAction)) {
+      // Sync action
+      newActions[actionName] = newAction;
+    } else {
+      // Async action
       state.loading[actionName] = false;
+
       newActions[actionName] = async function asyncAction(...args) {
         setLoading(actionName, true);
-        const result = await boundAction(...args);
+        const result = await newAction(...args);
         setLoading(actionName, false);
         return result;
-      };
-    } else {
-      newActions[actionName] = function action(...args) {
-        return boundAction(...args);
       };
     }
   });
 
+  // Assign model to `dispatch`
   dispatch[name] = { ...newReducers, ...newActions };
-  return {
-    state,
-    reducers: newReducers,
-    actions: newActions,
-  };
 };
 
 export default createMethods;
