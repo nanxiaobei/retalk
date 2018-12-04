@@ -6,7 +6,7 @@ describe('createMethods', () => {
     dispatch: () => {},
     getState: () => ({
       common: {},
-      test: { loading: { actionB: false } },
+      test: { loading: { asyncAdd: false } },
     }),
   };
   store.dispatch.common = {};
@@ -43,42 +43,15 @@ describe('createMethods', () => {
     );
   });
 
-  it('should return an object with all reducers and actions', () => {
-    const model = {
-      state: {},
-      reducers: {
-        add() {},
-      },
-      actions: {
-        actionA() {
-          return this;
-        },
-        async actionB() {
-          return this;
-        },
-      },
-    };
-    const newModel = createMethods(store, name, model);
-    expect(Object.keys(newModel)).toEqual(['state', 'reducers', 'actions']);
-    const methods = store.dispatch[name];
-    expect(Object.keys(methods)).toEqual(['add', 'actionA', 'actionB']);
-    expect(methods.add()).toBeUndefined();
-    const nameList = ['reducer', 'action', 'asyncAction'];
-    Object.values(methods).forEach(method => {
-      expect(nameList.includes(method.name)).toBeTruthy();
-    });
-    expect(Object.keys(methods.actionA())).toEqual(['state', 'add', 'actionB', 'common']);
-  });
-
   it('should have `setState` reducer in action\'s context if `reducers` does not exist', () => {
     const model = {
       state: {},
       actions: {
-        actionA() {
+        add() {
           this.setState({});
           return this;
         },
-        async actionB() {
+        async asyncAdd() {
           this.setState({});
           return this;
         },
@@ -87,6 +60,20 @@ describe('createMethods', () => {
     createMethods(store, name, model);
     const methods = store.dispatch[name];
     expect(methods).toHaveProperty('setState');
-    expect(methods.actionB()).resolves.toHaveProperty('setState');
+    expect(methods.asyncAdd()).resolves.toHaveProperty('setState');
+  });
+
+  it('should have `add` reducer in action\'s context if `reducers` exists', () => {
+    const model = {
+      state: {},
+      reducers: {
+        add() {},
+      },
+      actions: {},
+    };
+    createMethods(store, name, model);
+    const methods = store.dispatch[name];
+    expect(methods).toHaveProperty('add');
+    expect(methods.add()).toBeUndefined();
   });
 });

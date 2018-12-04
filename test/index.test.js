@@ -4,11 +4,35 @@ import error from '@/utils/error';
 
 describe('retalk', () => {
   describe('createStore', () => {
+    const models = {
+      test: { state: {}, reducers: {}, actions: {} },
+    };
     it('should throw error if models is not an object', () => {
       expect(() => {
         createStore();
       }).toThrow(
         error.NOT_OBJECT('models'),
+      );
+    });
+    it('should throw error if options is not an object', () => {
+      expect(() => {
+        createStore(models, []);
+      }).toThrow(
+        error.NOT_OBJECT('options'),
+      );
+    });
+    it('should throw error if options.useDevTools is not a boolean', () => {
+      expect(() => {
+        createStore(models, { useDevTools: 1 });
+      }).toThrow(
+        error.NOT_BOOLEAN('options.useDevTools'),
+      );
+    });
+    it('should throw error if options.plugins is not an array', () => {
+      expect(() => {
+        createStore(models, { plugins: 123 });
+      }).toThrow(
+        error.NOT_ARRAY('options.plugins'),
       );
     });
     it('should throw error if model importer is not valid', () => {
@@ -19,9 +43,7 @@ describe('retalk', () => {
       );
     });
     it('should return redux store', async () => {
-      const store = createStore({
-        test: { state: {}, reducers: {}, actions: {} },
-      });
+      const store = createStore(models);
       expect(store).toHaveProperty('dispatch');
       expect(() => {
         store.dispatch();
@@ -30,9 +52,12 @@ describe('retalk', () => {
       expect(store.getState()).toEqual({ test: { loading: {} } });
       expect(store.addModel('test', {})).toBeUndefined();
       window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ = compose;
-      const storeWithDevtools = createStore({
-        test: { state: {}, actions: {} },
-      }, true);
+      const storeWithDevtools = createStore(
+        {
+          test: { state: {}, actions: {} },
+        },
+        { useDevTools: true },
+      );
       expect(storeWithDevtools).toHaveProperty('getState');
       const asyncStore = await createStore({
         async: () => ({ default: { state: {}, actions: {} } }),
