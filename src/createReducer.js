@@ -16,22 +16,26 @@ const createReducer = (name, model) => {
   }
   const { state, reducers, actions } = model;
   if (!isObject(state)) {
-    throw new Error(state === undefined
-      ? error.NO_MODEL_KEY(name, 'state')
-      : error.NOT_OBJECT(name, 'state'));
+    throw new Error(
+      state === undefined
+        ? error.NO_MODEL_KEY(name, 'state')
+        : error.NOT_OBJECT(name, 'state'),
+    );
   }
   if (reducers !== undefined && !isObject(reducers)) {
     throw new Error(error.INVALID_REDUCERS(name));
   }
   if (!isObject(actions)) {
-    throw new Error(actions === undefined
-      ? error.NO_MODEL_KEY(name, 'actions')
-      : error.NOT_OBJECT(name, 'actions'));
+    throw new Error(
+      actions === undefined
+        ? error.NO_MODEL_KEY(name, 'actions')
+        : error.NOT_OBJECT(name, 'actions'),
+    );
   }
 
   return (currentState = state, action) => {
     if (action.type === `@${name}/SET_STATE`) {
-      return ({ ...currentState, ...action.partialState });
+      return { ...currentState, ...action.partialState };
     }
     const [namespace, reducerName] = action.type.split('/');
     if (namespace !== name) return currentState;

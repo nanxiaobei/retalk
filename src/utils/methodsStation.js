@@ -4,18 +4,21 @@ import error from './error';
 /**
  * methodsStation
  * @param {Object} models
- * @returns {Function} Middleware
+ * @returns {Function} middleware
  */
-const methodsStation = models => () => next => action => {
+const methodsStation = (models) => () => (next) => (action) => {
   if (!isObject(action) || typeof action.type !== 'string' || !action.type.includes('/')) {
     throw new Error(error.INVALID_ACTION());
   }
-  if (action.type.match(/@\w+\/SET_STATE/g)) {
-    const name = action.type.slice(1, -10);
+  const found = action.type.match(/^@(\w+)\/SET_STATE/);
+  if (found) {
+    // No `reducers` in model
+    const name = found[1];
     if (!(name in models) || !isObject(action.partialState)) {
       throw new Error(error.INVALID_ACTION());
     }
   } else {
+    // Has `reducers` in model
     const [name, key] = action.type.split('/');
     if (!(name in models) || !(key in models[name].reducers) || !Array.isArray(action.payload)) {
       throw new Error(error.INVALID_ACTION());
