@@ -12,35 +12,50 @@ import error from './utils/error';
 
 /**
  * createStore
- * @param {Object} models - { model: { state, actions } } or { model: () => import() }
- * @param {boolean} useReduxDevTools - Whether use Redux DevTools, only support >= 2.15.3
+ * @param {Object} models
+ * @param {Object} options
  * @returns {Object} Store or Promise
  */
-const createStore = (models, useReduxDevTools) => {
+const createStore = (models, options = {}) => {
   if (!isObject(models)) {
     throw new Error(error.NOT_OBJECT('models'));
   }
+  if (!isObject(options)) {
+    throw new Error(error.NOT_OBJECT('options'));
+  }
 
-  const asyncImport = Object.values(models).some(model => typeof model === 'function');
+  const { useDevTools = false, plugins = [] } = options;
+  if (typeof useDevTools !== 'undefined' && typeof useDevTools !== 'boolean') {
+    throw new Error(error.NOT_BOOLEAN('options.useDevTools'));
+  }
+  if (typeof plugins !== 'undefined' && !Array.isArray(plugins)) {
+    throw new Error(error.NOT_ARRAY('options.plugins'));
+  }
+
+  const asyncImport = Object.values(models).some(
+    model => typeof model === 'function',
+  );
   const rootReducers = {};
 
   const getStore = () => {
     const composeEnhancers =
-      (useReduxDevTools === true && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__)
+      useDevTools === true && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
         ? window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
         : compose;
+
     const store = theRealCreateStore(
       combineReducers(rootReducers),
-      composeEnhancers(applyMiddleware(methodsStation(models))),
+      composeEnhancers(applyMiddleware(methodsStation(models), ...plugins)),
     );
+
     Object.entries(models).forEach(([name, model]) => {
-      models[name] = createMethods(store, name, model);
+      createMethods(store, name, model);
     });
     store.addModel = (name, model) => {
       if (name in rootReducers) return;
       rootReducers[name] = createReducer(name, model);
       store.replaceReducer(combineReducers(rootReducers));
-      models[name] = createMethods(store, name, model);
+      createMethods(store, name, model);
     };
     return store;
   };
@@ -54,20 +69,19 @@ const createStore = (models, useReduxDevTools) => {
   }
 
   // Dynamic import
-  const modelMap = {};
+  const infoMap = [];
   return Promise.all(
     Object.entries(models).map(([name, model], index) => {
-      modelMap[index] = { name };
+      infoMap[index] = { name };
       if (typeof model === 'function') {
-        modelMap[index].async = true;
-        return model();
+        infoMap[index].async = true;
+        model = model(); // eslint-disable-line
       }
-      modelMap[index].async = false;
       return model;
     }),
-  ).then((modelList) => {
+  ).then(modelList => {
     modelList.forEach((model, index) => {
-      const { name, async } = modelMap[index];
+      const { async, name } = infoMap[index];
       if (async) {
         if (!isObject(model) || !isObject(model.default)) {
           throw new Error(error.INVALID_IMPORTER(name));
@@ -91,10 +105,9 @@ const withStore = (...names) => {
     throw new Error(error.INVALID_MODEL_NAME());
   }
   return [
-    (state) => {
+    state => {
       let mergedState = { loading: {} };
-      for (let i = 0; i < names.length; i += 1) {
-        const name = names[i];
+      names.forEach(name => {
         if (typeof name !== 'string') {
           throw new Error(error.INVALID_MODEL_NAME());
         }
@@ -104,16 +117,15 @@ const withStore = (...names) => {
           ...modelState,
           ...{ loading: { ...mergedState.loading, ...modelState.loading } },
         };
-      }
+      });
       return mergedState;
     },
-    (dispatch) => {
+    dispatch => {
       let mergedMethods = {};
-      for (let i = 0; i < names.length; i += 1) {
-        const name = names[i];
+      names.forEach(name => {
         const modelMethods = dispatch[name];
         mergedMethods = { ...mergedMethods, ...modelMethods };
-      }
+      });
       return mergedMethods;
     },
   ];
@@ -122,7 +134,4 @@ const withStore = (...names) => {
 /**
  * exports
  */
-export {
-  createStore,
-  withStore,
-};
+export { createStore, withStore };
