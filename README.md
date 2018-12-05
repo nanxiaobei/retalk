@@ -4,18 +4,18 @@ Retalk is a best practice for Redux. just simple, small, smooth, and smart.
 
 It helps you write Redux easy and clear than ever before, forget about action types, action creators, no more annoying boilerplate code. On top of that, it even supports async import model and smart loading state handling.
 
-[![Travis](https://img.shields.io/travis/nanxiaobei/retalk.svg)](https://travis-ci.org/nanxiaobei/retalk)
-[![Codecov](https://img.shields.io/codecov/c/github/nanxiaobei/retalk.svg)](https://codecov.io/gh/nanxiaobei/retalk)
-[![npm version](https://img.shields.io/npm/v/retalk.svg)](https://www.npmjs.com/package/retalk)
-[![npm downloads](https://img.shields.io/npm/dt/retalk.svg)](http://www.npmtrends.com/retalk)
-[![license](https://img.shields.io/github/license/nanxiaobei/retalk.svg)](https://github.com/nanxiaobei/retalk/blob/master/LICENSE)
+[![Travis](https://img.shields.io/travis/nanxiaobei/retalk.svg?style=flat-square)](https://travis-ci.org/nanxiaobei/retalk)
+[![Codecov](https://img.shields.io/codecov/c/github/nanxiaobei/retalk.svg?style=flat-square)](https://codecov.io/gh/nanxiaobei/retalk)
+[![npm version](https://img.shields.io/npm/v/retalk.svg?style=flat-square)](https://www.npmjs.com/package/retalk)
+[![npm downloads](https://img.shields.io/npm/dt/retalk.svg?style=flat-square)](http://www.npmtrends.com/retalk)
+[![license](https://img.shields.io/github/license/nanxiaobei/retalk.svg?style=flat-square)](https://github.com/nanxiaobei/retalk/blob/master/LICENSE)
 
 ## Features
 
-* 🍺️ **Simplest Redux**: only `state` and `actions` need to write, if you like.
-* 🎭 **Just two API**: `createStore` and `withStore`, no more annoying concepts.
-* ⛵️ **Async import model**: `() => import()` for code splitting and `store.addModel` for model injecting.
-* ⏳ **Smart `loading` state**: only main state you need to care.
+- **Simplest Redux**: only `state` and `actions` need to write, if you like.
+- **Just two API**: `createStore` and `withStore`, no more annoying concepts.
+- **Async import model**: `() => import()` for code splitting and `store.addModel` for model injecting.
+- **Smart `loading` state**: only main state you need to care.
 
 ## Getting started
 
@@ -45,7 +45,7 @@ const count = {
       this.setState({ value: this.state.value + 1 });
     },
     async asyncIncrease() {
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       this.increase();
     },
   },
@@ -54,7 +54,7 @@ const count = {
 export default count;
 ```
 
-**model** brings `state`, `reducers [optional]`, `actions` together in one place. In an action, use `this.state` to get state, `this.setState` to update state, `this.action` to call other actions. Just like the syntax in a React component. 
+**model** brings `state`, `reducers [optional]`, `actions` together in one place. In an action, use `this.state` to get state, `this.setState` to update state, `this.action` to call other actions. Just like the syntax in a React component.
 
 How to reach other models? Just prefix the namespace, e.g. `this.model.state`, `this.model.action`.
 
@@ -106,7 +106,6 @@ If an action is async, you can get `loading.asyncAction` state for loading if yo
 
 Well, only 3 steps, A simple Retalk demo is here: https://codesandbox.io/s/5l9mqnzvx.
 
-
 ## What's More?
 
 ### Use reducers
@@ -130,7 +129,7 @@ const count = {
   },
   actions: {
     async asyncIncrease() {
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       // this.setState(); NO `this.setState` HERE!
       this.increase(); // YES
     },
@@ -152,7 +151,6 @@ export const count = {
       // this.reducer (`reducers` √)
       // this.setState (`reducers` ☓)
       // this.action
-
       // this.model.state
       // this.model.reducer (`reducers` √)
       // this.model.setState (`reducers` ☓)
@@ -218,7 +216,7 @@ const AsyncBooks = loadable(async (store) => {
     import('./books'),
   ]);
   store.addModel('books', books);
-  return props => <Books {...props} />;
+  return (props) => <Books {...props} />;
 });
 ```
 
@@ -240,7 +238,10 @@ const mapMethods = ({ count: { increase, asyncIncrease } }) => ({
 // but in above `mapMethods`, we treat it like it's an object.
 // Yes, Retalk did some tricks here, it's `dispatch` function, but bound model methods on it!
 
-const CountWrapper = connect(mapState, mapMethods)(Count);
+const CountWrapper = connect(
+  mapState,
+  mapMethods,
+)(Count);
 ```
 
 ### Smart loading state
@@ -281,8 +282,8 @@ if (module.hot) {
   });
 }
 ```
-Here is a working demo: https://codesandbox.io/s/rw32xv1mv4
 
+Here is a working demo: https://codesandbox.io/s/rw32xv1mv4
 
 ## API
 
