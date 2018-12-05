@@ -29,15 +29,6 @@
     "test": "jest",
     "coverage": "codecov"
   },
-  "jest": {
-    "testURL": "http://localhost",
-    "testRegex": "(/test/.*\\.test.js)$",
-    "moduleNameMapper": {
-      "@/(.*)": "<rootDir>/src/$1"
-    },
-    "coverageDirectory": "./coverage/",
-    "collectCoverage": true
-  },
   "dependencies": {
     "redux": "^4.0.1"
   },
@@ -70,5 +61,14 @@
       "prettier --write",
       "git add"
     ]
+  },
+  "jest": {
+    "testURL": "http://localhost",
+    "testRegex": "(/test/.*\\.test.js)$",
+    "moduleNameMapper": {
+      "@/(.*)": "<rootDir>/src/$1"
+    },
+    "coverageDirectory": "./coverage/",
+    "collectCoverage": true
   }
 }
