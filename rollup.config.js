@@ -1,54 +1,30 @@
-import resolve from 'rollup-plugin-node-resolve';
+import { eslint } from 'rollup-plugin-eslint';
 import babel from 'rollup-plugin-babel';
-import replace from 'rollup-plugin-replace';
-import { uglify } from 'rollup-plugin-uglify';
 
-const env = process.env.NODE_ENV;
+import pkg from './package.json';
+
+const { NODE_ENV } = process.env;
+const dependencies = Object.keys(pkg.dependencies);
+
 const config = {
   input: 'src/index.js',
-  external: ['redux'],
-  plugins: [],
+  output: { format: NODE_ENV, indent: false },
+  external: (id) => {
+    if (dependencies.includes(id)) return true;
+    if (id.includes('@babel/runtime/')) return true;
+  },
+  plugins: [
+    eslint({
+      throwOnError: true,
+      throwOnWarning: true,
+      include: ['src/**/*.js'],
+      exclude: ['node_modules/**'],
+    }),
+    babel({
+      exclude: 'node_modules/**',
+      runtimeHelpers: true,
+    }),
+  ],
 };
-
-if (env === 'es' || env === 'cjs') {
-  config.output = { format: env };
-  config.plugins.push(
-    babel({
-      exclude: 'node_modules/**',
-    }),
-  );
-}
-
-if (env === 'development' || env === 'production') {
-  config.output = {
-    format: 'umd',
-    name: 'Retalk',
-    globals: {
-      redux: 'redux',
-    },
-  };
-  config.plugins.push(
-    resolve(),
-    babel({
-      exclude: 'node_modules/**',
-    }),
-    replace({
-      'process.env.NODE_ENV': JSON.stringify(env),
-    }),
-  );
-}
-
-if (env === 'production') {
-  config.plugins.push(
-    uglify({
-      compress: {
-        pure_getters: true,
-        unsafe: true,
-        unsafe_comps: true,
-        warnings: false,
-      },
-    }),
-  );
-}
 
 export default config;
