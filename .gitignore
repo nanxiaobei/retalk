@@ -2,10 +2,8 @@
 .idea
 
 node_modules
-dist
+coverage
 lib
 es
-coverage
 
-package-lock.json
 yarn-error.log
