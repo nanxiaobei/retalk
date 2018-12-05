@@ -21,9 +21,7 @@ describe('createMethods', () => {
     };
     expect(() => {
       createMethods(store, name, model);
-    }).toThrow(
-      error.ASYNC_REDUCER(name, 'add'),
-    );
+    }).toThrow(error.ASYNC_REDUCER(name, 'add'));
   });
 
   it('should throw error if reducer name is duplicated with action name', () => {
@@ -38,12 +36,10 @@ describe('createMethods', () => {
     };
     expect(() => {
       createMethods(store, name, model);
-    }).toThrow(
-      error.METHODS_CONFLICT(name, 'add'),
-    );
+    }).toThrow(error.METHODS_CONFLICT(name, 'add'));
   });
 
-  it('should have `setState` reducer in action\'s context if `reducers` does not exist', () => {
+  it("should have `setState` reducer in action's context if `reducers` does not exist", () => {
     const model = {
       state: {},
       actions: {
@@ -63,7 +59,7 @@ describe('createMethods', () => {
     expect(methods.asyncAdd()).resolves.toHaveProperty('setState');
   });
 
-  it('should have `add` reducer in action\'s context if `reducers` exists', () => {
+  it("should have `add` reducer in action's context if `reducers` exists", () => {
     const model = {
       state: {},
       reducers: {

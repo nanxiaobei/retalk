@@ -10,39 +10,25 @@ describe('createReducer', () => {
   it('should throw error if name or model is not valid', () => {
     expect(() => {
       createReducer();
-    }).toThrow(
-      error.NOT_STRING('name'),
-    );
+    }).toThrow(error.NOT_STRING('name'));
     expect(() => {
       createReducer(name);
-    }).toThrow(
-      error.NOT_OBJECT('model'),
-    );
+    }).toThrow(error.NOT_OBJECT('model'));
     expect(() => {
       createReducer(name, {});
-    }).toThrow(
-      error.NO_MODEL_KEY(name, 'state'),
-    );
+    }).toThrow(error.NO_MODEL_KEY(name, 'state'));
     expect(() => {
       createReducer(name, { state: [] });
-    }).toThrow(
-      error.NOT_OBJECT(name, 'state'),
-    );
+    }).toThrow(error.NOT_OBJECT(name, 'state'));
     expect(() => {
       createReducer(name, { state: {} });
-    }).toThrow(
-      error.NO_MODEL_KEY(name, 'actions'),
-    );
+    }).toThrow(error.NO_MODEL_KEY(name, 'actions'));
     expect(() => {
       createReducer(name, { state: {}, actions: [] });
-    }).toThrow(
-      error.NOT_OBJECT(name, 'actions'),
-    );
+    }).toThrow(error.NOT_OBJECT(name, 'actions'));
     expect(() => {
       createReducer(name, { state: {}, reducers: [], actions: {} });
-    }).toThrow(
-      error.INVALID_REDUCERS(name),
-    );
+    }).toThrow(error.INVALID_REDUCERS(name));
     expect(() => {
       createReducer(name, { state: {}, actions: {} });
     }).not.toThrow();

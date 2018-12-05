@@ -7,7 +7,9 @@ describe('isAsyncFn', () => {
     expect(isAsyncFn(() => {})).toBeFalsy();
     expect(isAsyncFn(async function() {})).toBeTruthy();
     expect(isAsyncFn(async () => {})).toBeTruthy();
-    expect(isAsyncFn(() => new Promise(resolve => resolve(123)).then(data => data))).toBeTruthy();
+    expect(
+      isAsyncFn(() => new Promise((resolve) => resolve(123)).then((data) => data)),
+    ).toBeTruthy();
     expect(isAsyncFn(() => fetch('https://google.com'))).toBeTruthy();
   });
 });

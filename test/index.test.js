@@ -10,37 +10,25 @@ describe('retalk', () => {
     it('should throw error if models is not an object', () => {
       expect(() => {
         createStore();
-      }).toThrow(
-        error.NOT_OBJECT('models'),
-      );
+      }).toThrow(error.NOT_OBJECT('models'));
     });
     it('should throw error if options is not an object', () => {
       expect(() => {
         createStore(models, []);
-      }).toThrow(
-        error.NOT_OBJECT('options'),
-      );
+      }).toThrow(error.NOT_OBJECT('options'));
     });
     it('should throw error if options.useDevTools is not a boolean', () => {
       expect(() => {
         createStore(models, { useDevTools: 1 });
-      }).toThrow(
-        error.NOT_BOOLEAN('options.useDevTools'),
-      );
+      }).toThrow(error.NOT_BOOLEAN('options.useDevTools'));
     });
     it('should throw error if options.plugins is not an array', () => {
       expect(() => {
         createStore(models, { plugins: 123 });
-      }).toThrow(
-        error.NOT_ARRAY('options.plugins'),
-      );
+      }).toThrow(error.NOT_ARRAY('options.plugins'));
     });
     it('should throw error if model importer is not valid', () => {
-      expect(
-        createStore({ test: () => {} }),
-      ).rejects.toThrow(
-        error.INVALID_IMPORTER('test'),
-      );
+      expect(createStore({ test: () => {} })).rejects.toThrow(error.INVALID_IMPORTER('test'));
     });
     it('should return redux store', async () => {
       const store = createStore(models);
@@ -79,19 +67,13 @@ describe('retalk', () => {
       };
       expect(() => {
         connect(...withStore());
-      }).toThrow(
-        error.INVALID_MODEL_NAME(),
-      );
+      }).toThrow(error.INVALID_MODEL_NAME());
       expect(() => {
         connect(...withStore(['test']));
-      }).toThrow(
-        error.INVALID_MODEL_NAME(),
-      );
+      }).toThrow(error.INVALID_MODEL_NAME());
       expect(() => {
         connect(...withStore('test', 123));
-      }).toThrow(
-        error.INVALID_MODEL_NAME(),
-      );
+      }).toThrow(error.INVALID_MODEL_NAME());
       expect(Array.isArray(withStore('test'))).toBeTruthy();
       expect(withStore('test').length).toBe(2);
       expect(connect(...withStore('test'))).toEqual({});

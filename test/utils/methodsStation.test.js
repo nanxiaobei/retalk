@@ -17,49 +17,33 @@ describe('methodsStation', () => {
 
     expect(() => {
       dispatch('abc');
-    }).toThrow(
-      error.INVALID_ACTION(),
-    );
+    }).toThrow(error.INVALID_ACTION());
     expect(() => {
       dispatch({ type: 123 });
-    }).toThrow(
-      error.INVALID_ACTION(),
-    );
+    }).toThrow(error.INVALID_ACTION());
     expect(() => {
       dispatch({ type: 'abc' });
-    }).toThrow(
-      error.INVALID_ACTION(),
-    );
+    }).toThrow(error.INVALID_ACTION());
 
     expect(() => {
       dispatch({ type: '@abc/SET_STATE' });
-    }).toThrow(
-      error.INVALID_ACTION('@abc/SET_STATE', 'abc'),
-    );
+    }).toThrow(error.INVALID_ACTION('@abc/SET_STATE', 'abc'));
     expect(() => {
       dispatch({ type: '@test/SET_STATE', partialState: [] });
-    }).toThrow(
-      error.INVALID_ACTION(),
-    );
+    }).toThrow(error.INVALID_ACTION());
     expect(() => {
       dispatch({ type: '@test/SET_STATE', partialState: {} });
     }).not.toThrow();
 
     expect(() => {
       dispatch({ type: 'abc/add' });
-    }).toThrow(
-      error.INVALID_ACTION(),
-    );
+    }).toThrow(error.INVALID_ACTION());
     expect(() => {
       dispatch({ type: 'test/addAsync' });
-    }).toThrow(
-      error.INVALID_ACTION(),
-    );
+    }).toThrow(error.INVALID_ACTION());
     expect(() => {
       dispatch({ type: 'test/add', payload: {} });
-    }).toThrow(
-      error.INVALID_ACTION(),
-    );
+    }).toThrow(error.INVALID_ACTION());
     expect(() => {
       dispatch({ type: 'test/add', payload: [] });
     }).not.toThrow();

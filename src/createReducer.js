@@ -17,9 +17,7 @@ const createReducer = (name, model) => {
   const { state, reducers, actions } = model;
   if (!isObject(state)) {
     throw new Error(
-      state === undefined
-        ? error.NO_MODEL_KEY(name, 'state')
-        : error.NOT_OBJECT(name, 'state'),
+      state === undefined ? error.NO_MODEL_KEY(name, 'state') : error.NOT_OBJECT(name, 'state'),
     );
   }
   if (reducers !== undefined && !isObject(reducers)) {

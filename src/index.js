@@ -32,9 +32,7 @@ const createStore = (models, options = {}) => {
     throw new Error(error.NOT_ARRAY('options.plugins'));
   }
 
-  const asyncImport = Object.values(models).some(
-    model => typeof model === 'function',
-  );
+  const asyncImport = Object.values(models).some((model) => typeof model === 'function');
   const rootReducers = {};
 
   const getStore = () => {
@@ -79,7 +77,7 @@ const createStore = (models, options = {}) => {
       }
       return model;
     }),
-  ).then(modelList => {
+  ).then((modelList) => {
     modelList.forEach((model, index) => {
       const { async, name } = infoMap[index];
       if (async) {
@@ -105,9 +103,9 @@ const withStore = (...names) => {
     throw new Error(error.INVALID_MODEL_NAME());
   }
   return [
-    state => {
+    (state) => {
       let mergedState = { loading: {} };
-      names.forEach(name => {
+      names.forEach((name) => {
         if (typeof name !== 'string') {
           throw new Error(error.INVALID_MODEL_NAME());
         }
@@ -120,9 +118,9 @@ const withStore = (...names) => {
       });
       return mergedState;
     },
-    dispatch => {
+    (dispatch) => {
       let mergedMethods = {};
-      names.forEach(name => {
+      names.forEach((name) => {
         const modelMethods = dispatch[name];
         mergedMethods = { ...mergedMethods, ...modelMethods };
       });
