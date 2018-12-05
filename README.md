@@ -100,7 +100,7 @@ Well, only 3 steps, A simple Retalk demo is here: https://codesandbox.io/s/5l9mq
 
 #### createStore
 
-`createStore(models, options)`
+`createStore(models[, options])`
 
 ```js
 createStore(
@@ -131,18 +131,6 @@ connect(...withStore('modelA', 'modelB'))(Component);
 
 ```js
 this.setState({ value: 1 });
-```
-
-### reducer
-
-```js
-sum(state, a, b) {
-  const { value } = state;
-  return { ...state, value: value + a + b };
-}
-
-// Call reducer
-this.sum(1, 2);
 ```
 
 ### action
