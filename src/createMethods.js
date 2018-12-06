@@ -14,15 +14,16 @@ const createMethods = (store, name, model) => {
   // Reducers
   // ------------------------------------------------------------
 
-  const newReducers = {};
+  const newReducerCreators = {};
 
-  const setState = function reducer(partialState) {
-    dispatch({ type: `@${name}/SET_STATE`, partialState });
-  };
+  const setStateCreator = (actionName) =>
+    function reducer(partialState) {
+      dispatch({ type: `${name}/${actionName}/SET_STATE`, partialState });
+    };
 
   if (reducers === undefined) {
     // No `reducers` in model
-    newReducers.setState = setState;
+    newReducerCreators.setState = setStateCreator;
   } else {
     // Has `reducers` in model
     Object.entries(reducers).forEach(([reducerName, reducer]) => {
@@ -33,9 +34,10 @@ const createMethods = (store, name, model) => {
         throw new Error(error.METHODS_CONFLICT(name, reducerName));
       }
 
-      newReducers[reducerName] = function reducer(...payload) {
-        dispatch({ type: `${name}/${reducerName}`, payload });
-      };
+      newReducerCreators[reducerName] = () =>
+        function reducer(...payload) {
+          dispatch({ type: `${name}/${reducerName}`, payload });
+        };
     });
   }
 
@@ -45,15 +47,22 @@ const createMethods = (store, name, model) => {
   const newActions = {};
 
   const getContent = (actionName) => {
-    const { [actionName]: self, ...methods } = dispatch[name]; // eslint-disable-line
+    const { [actionName]: self, ...otherActions } = dispatch[name]; // eslint-disable-line
     return {
       state: getState()[name],
-      ...methods,
-      ...Object.entries(dispatch).reduce((root, [modelName, modelMethods]) => {
+      ...Object.entries(newReducerCreators).reduce(
+        (newReducers, [reducerName, newReducerCreator]) => {
+          newReducers[reducerName] = newReducerCreator(actionName);
+          return newReducers;
+        },
+        {},
+      ),
+      ...otherActions,
+      ...Object.entries(dispatch).reduce((root, [modelName, modelActions]) => {
         if (modelName !== name) {
           root[modelName] = {
             state: getState()[modelName],
-            ...modelMethods,
+            ...modelActions,
           };
         }
         return root;
@@ -63,14 +72,15 @@ const createMethods = (store, name, model) => {
 
   // Add `loading` state
   state.loading = {};
-  // Used to set `loading` state
-  const setLoading = (actionName, loading) => {
-    setState({
-      loading: { ...getState()[name].loading, [actionName]: loading },
-    });
-  };
 
   Object.entries(actions).forEach(([actionName, oldAction]) => {
+    // Used to set `loading` state
+    const setLoading = (actionName, actionLoadingState) => {
+      setStateCreator(actionName)({
+        loading: { ...getState()[name].loading, [actionName]: actionLoadingState },
+      });
+    };
+
     const newAction = function action(...args) {
       return oldAction.bind(getContent(actionName))(...args);
     };
@@ -91,8 +101,8 @@ const createMethods = (store, name, model) => {
     }
   });
 
-  // Assign model to `dispatch`
-  dispatch[name] = { ...newReducers, ...newActions };
+  // Assign actions to `dispatch`
+  dispatch[name] = newActions;
 };
 
 export default createMethods;

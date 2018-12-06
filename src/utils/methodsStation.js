@@ -7,20 +7,31 @@ import error from './error';
  * @returns {Function} middleware
  */
 const methodsStation = (models) => () => (next) => (action) => {
-  if (!isObject(action) || typeof action.type !== 'string' || !action.type.includes('/')) {
+  if (!isObject(action) || typeof action.type !== 'string') {
     throw new Error(error.INVALID_ACTION());
   }
-  const found = action.type.match(/^@(\w+)\/SET_STATE/);
-  if (found) {
+
+  const [modelName, methodName, setStateLabel] = action.type.split('/');
+  if (!modelName || !methodName) {
+    throw new Error(error.INVALID_ACTION());
+  }
+
+  if (setStateLabel === 'SET_STATE') {
     // No `reducers` in model
-    const name = found[1];
-    if (!(name in models) || !isObject(action.partialState)) {
+    if (
+      !(modelName in models) ||
+      !(methodName in models[modelName].actions) ||
+      !isObject(action.partialState)
+    ) {
       throw new Error(error.INVALID_ACTION());
     }
   } else {
     // Has `reducers` in model
-    const [name, key] = action.type.split('/');
-    if (!(name in models) || !(key in models[name].reducers) || !Array.isArray(action.payload)) {
+    if (
+      !(modelName in models) ||
+      !(methodName in models[modelName].reducers) ||
+      !Array.isArray(action.payload)
+    ) {
       throw new Error(error.INVALID_ACTION());
     }
   }

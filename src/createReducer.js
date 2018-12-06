@@ -32,12 +32,13 @@ const createReducer = (name, model) => {
   }
 
   return (currentState = state, action) => {
-    if (action.type === `@${name}/SET_STATE`) {
+    const [modelName, methodName, setStateLabel] = action.type.split('/');
+    if (modelName !== name) return currentState;
+
+    if (setStateLabel === 'SET_STATE') {
       return { ...currentState, ...action.partialState };
     }
-    const [namespace, reducerName] = action.type.split('/');
-    if (namespace !== name) return currentState;
-    return reducers[reducerName](currentState, ...action.payload);
+    return reducers[methodName](currentState, ...action.payload);
   };
 };
 
