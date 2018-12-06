@@ -18,7 +18,7 @@ const error = {
   METHODS_CONFLICT: (name, reducer) =>
     `Name duplicated in reducers and actions (${name}.${reducer})`,
   // utils/methodsStation
-  INVALID_ACTION: () => 'Please do not use dispatch in Retalk',
+  INVALID_ACTION: () => 'Invalid action',
 };
 
 export default error;
