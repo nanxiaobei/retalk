@@ -5,11 +5,11 @@ describe('createMethods', () => {
   const store = {
     dispatch: () => {},
     getState: () => ({
-      common: {},
+      basic: {},
       test: { loading: { addAsync: false } },
     }),
   };
-  store.dispatch.common = {};
+  store.dispatch.basic = {};
   const name = 'test';
 
   it('should throw error if reducer is an async function', () => {
@@ -39,37 +39,35 @@ describe('createMethods', () => {
     }).toThrow(error.METHODS_CONFLICT(name, 'add'));
   });
 
-  it("should have `setState` reducer in action's context if `reducers` does not exist", () => {
+  it('should have `setState` in context if `reducers` does not exist', () => {
     const model = {
       state: {},
       actions: {
         add() {
-          this.setState({});
-          return this;
-        },
-        async addAsync() {
-          this.setState({});
           return this;
         },
       },
     };
     createMethods(store, name, model);
-    const methods = store.dispatch[name];
-    expect(methods).toHaveProperty('setState');
-    expect(methods.addAsync()).resolves.toHaveProperty('setState');
+    const actions = store.dispatch[name];
+    expect(actions.add()).toHaveProperty('setState');
   });
 
-  it("should have `add` reducer in action's context if `reducers` exists", () => {
+  it('should have `add` in context if `reducers` exists', () => {
     const model = {
       state: {},
       reducers: {
         add() {},
       },
-      actions: {},
+      actions: {
+        async addAsync() {
+          this.add();
+          return this;
+        },
+      },
     };
     createMethods(store, name, model);
-    const methods = store.dispatch[name];
-    expect(methods).toHaveProperty('add');
-    expect(methods.add()).toBeUndefined();
+    const actions = store.dispatch[name];
+    expect(actions.addAsync()).resolves.toHaveProperty('add');
   });
 });

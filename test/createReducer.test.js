@@ -9,9 +9,6 @@ describe('createReducer', () => {
 
   it('should throw error if name or model is not valid', () => {
     expect(() => {
-      createReducer();
-    }).toThrow(error.NOT_STRING('name'));
-    expect(() => {
       createReducer(name);
     }).toThrow(error.NOT_OBJECT('model'));
     expect(() => {
@@ -29,21 +26,18 @@ describe('createReducer', () => {
     expect(() => {
       createReducer(name, { state: {}, reducers: [], actions: {} });
     }).toThrow(error.INVALID_REDUCERS(name));
-    expect(() => {
-      createReducer(name, { state: {}, actions: {} });
-    }).not.toThrow();
-    expect(() => {
-      createReducer(name, { state: {}, reducers: {}, actions: {} });
-    }).not.toThrow();
   });
 
-  it('should have only one action type `@test/SET_STATE` if `reducers` does not exist', () => {
+  it('should have only one action type `test/add/SET_STATE` if `reducers` does not exist', () => {
     model.reducers = undefined;
     model.actions = {
-      action() {},
+      add() {},
     };
     const reducer = createReducer(name, model);
-    const partialState = reducer(model.state, { type: '@test/SET_STATE', partialState: { a: 10 } });
+    const partialState = reducer(model.state, {
+      type: 'test/action/SET_STATE',
+      partialState: { a: 10 },
+    });
     expect(partialState).toEqual({ a: 10, b: 2 });
   });
 
@@ -54,9 +48,7 @@ describe('createReducer', () => {
         return state;
       },
     };
-    model.actions = {
-      action() {},
-    };
+    model.actions = {};
     const reducer = createReducer(name, model);
     const partialState = reducer(model.state, { type: 'test/add', payload: [1] });
     expect(partialState).toEqual({ a: 2, b: 2 });

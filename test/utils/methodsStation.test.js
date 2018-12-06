@@ -16,9 +16,6 @@ describe('methodsStation', () => {
     const dispatch = methodsStation(models)()(() => {});
 
     expect(() => {
-      dispatch('abc');
-    }).toThrow(error.INVALID_ACTION());
-    expect(() => {
       dispatch({ type: 123 });
     }).toThrow(error.INVALID_ACTION());
     expect(() => {
@@ -26,21 +23,12 @@ describe('methodsStation', () => {
     }).toThrow(error.INVALID_ACTION());
 
     expect(() => {
-      dispatch({ type: '@abc/SET_STATE' });
-    }).toThrow(error.INVALID_ACTION('@abc/SET_STATE', 'abc'));
-    expect(() => {
-      dispatch({ type: '@test/SET_STATE', partialState: [] });
+      dispatch({ type: 'test/addAsync/SET_STATE', partialState: [] });
     }).toThrow(error.INVALID_ACTION());
     expect(() => {
-      dispatch({ type: '@test/SET_STATE', partialState: {} });
+      dispatch({ type: 'test/addAsync/SET_STATE', partialState: {} });
     }).not.toThrow();
 
-    expect(() => {
-      dispatch({ type: 'abc/add' });
-    }).toThrow(error.INVALID_ACTION());
-    expect(() => {
-      dispatch({ type: 'test/addAsync' });
-    }).toThrow(error.INVALID_ACTION());
     expect(() => {
       dispatch({ type: 'test/add', payload: {} });
     }).toThrow(error.INVALID_ACTION());
