@@ -141,9 +141,9 @@ sum(1, 2)
 
 `this.setState(partialState)`
 
-_Note: Call it like `this.setState` in a React Component, but not the same API!_
-
 ```js
 // Call in an action
 this.setState({ value: 1 });
 ```
+
+_Note: Call it like `this.setState` in a React Component, but not the same API!_
