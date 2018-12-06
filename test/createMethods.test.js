@@ -6,7 +6,7 @@ describe('createMethods', () => {
     dispatch: () => {},
     getState: () => ({
       common: {},
-      test: { loading: { asyncAdd: false } },
+      test: { loading: { addAsync: false } },
     }),
   };
   store.dispatch.common = {};
@@ -47,7 +47,7 @@ describe('createMethods', () => {
           this.setState({});
           return this;
         },
-        async asyncAdd() {
+        async addAsync() {
           this.setState({});
           return this;
         },
@@ -56,7 +56,7 @@ describe('createMethods', () => {
     createMethods(store, name, model);
     const methods = store.dispatch[name];
     expect(methods).toHaveProperty('setState');
-    expect(methods.asyncAdd()).resolves.toHaveProperty('setState');
+    expect(methods.addAsync()).resolves.toHaveProperty('setState');
   });
 
   it("should have `add` reducer in action's context if `reducers` exists", () => {

@@ -17,7 +17,7 @@ Retalk is a best practice for Redux. just simple, smooth, and smart.
 
 ## Install
 
-#### Yarn
+#### yarn
 
 ```bash
 yarn add retalk
@@ -34,7 +34,9 @@ npm install retalk
 #### 1. Model
 
 ```js
-const count = {
+// demo/model.js
+
+const model = {
   state: {
     value: 0,
   },
@@ -43,24 +45,26 @@ const count = {
       const { value } = this.state;
       this.setState({ value: value + 1 });
     },
-    async asyncAdd() {
+    async addAsync() {
       await new Promise((resolve) => setTimeout(resolve, 1000));
       this.add();
     },
   },
 };
 
-export default count;
+export default model;
 ```
 
 #### 2. Store
 
 ```js
+// store.js
+
 import { createStore } from 'retalk';
-import count from './count';
+import demo from './demo/model';
 
 const store = createStore({
-  count,
+  demo,
 });
 
 export default store;
@@ -69,38 +73,30 @@ export default store;
 #### 3. View
 
 ```jsx
+// demo/index.jsx
+
 import React from 'react';
-import ReactDOM from 'react-dom';
-import { Provider, connect } from 'react-redux';
+import { connect } from 'react-redux';
 import { withStore } from 'retalk';
-import store from './store';
 
-const Count = ({ value, add, asyncAdd, loading }) => (
-  <>
-    <h3>Count: {value}</h3>
-    <button onClick={add}>+ 1</button>
-    <button onClick={asyncAdd}>async + 1 {loading.asyncAdd ? '...' : ''}</button>
-  </>
+const Demo = ({ value, add, addAsync, loading }) => (
+  <div>
+    <h4>Value: {value}</h4>
+    <button onClick={add}>+1</button>
+    <button onClick={addAsync}>+1 Async {loading.addAsync ? '...' : ''}</button>
+  </div>
 );
 
-const ConnectedCount = connect(...withStore('count'))(Count);
-
-const App = () => (
-  <Provider store={store}>
-    <ConnectedCount />
-  </Provider>
-);
-
-ReactDOM.render(<App />, document.getElementById('root'));
+export default connect(...withStore('demo'))(Demo);
 ```
 
-Well, only 3 steps, A simple Retalk demo is here: https://codesandbox.io/s/5l9mqnzvx.
+Well, only 3 steps, A simple Retalk demo is here. [https://codesandbox.io/s/5l9mqnzvx](https://codesandbox.io/s/5l9mqnzvx).
 
 ## API
 
 #### createStore
 
-`createStore(models[, options])`
+`createStore(models, options)`
 
 ```js
 createStore(
@@ -115,7 +111,7 @@ createStore(
 );
 ```
 
-_(Make sure Redux DevTools Extension's version [>= v2.15.3](https://github.com/reduxjs/redux/issues/2943) and [not v2.16.0](https://stackoverflow.com/a/53512072/6919133).)_
+_Make sure Redux DevTools Extension's version [>= v2.15.3](https://github.com/reduxjs/redux/issues/2943) and [not v2.16.0](https://stackoverflow.com/a/53512072/6919133)._
 
 #### withStore
 
@@ -123,14 +119,6 @@ _(Make sure Redux DevTools Extension's version [>= v2.15.3](https://github.com/r
 
 ```js
 connect(...withStore('modelA', 'modelB'))(Component);
-```
-
-#### this.setState
-
-`this.setState(partialState)`
-
-```js
-this.setState({ value: 1 });
 ```
 
 ### action
@@ -141,6 +129,19 @@ sum(a, b) {
   this.setState({ value: value + a + b });
 }
 
-// Call action
+// Call in another action
 this.sum(1, 2);
+
+// Call in a Component
+const { sum } = this.props;
+sum(1, 2)
+```
+
+#### this.setState
+
+`this.setState(partialState)`
+
+```js
+// Call in an action
+this.setState({ value: 1 });
 ```
