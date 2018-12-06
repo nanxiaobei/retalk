@@ -20,8 +20,14 @@ const createReducer = (name, model) => {
       state === undefined ? error.NO_MODEL_KEY(name, 'state') : error.NOT_OBJECT(name, 'state'),
     );
   }
-  if (reducers !== undefined && !isObject(reducers)) {
-    throw new Error(error.INVALID_REDUCERS(name));
+  if (reducers !== undefined) {
+    // eslint-disable-next-line
+    console.warn(
+      'Since Retalk now support different action types between "actions" in v1.2.1, "reducers" will be deprecated soon, please don\'t use it.',
+    );
+    if (!isObject(reducers)) {
+      throw new Error(error.INVALID_REDUCERS(name));
+    }
   }
   if (!isObject(actions)) {
     throw new Error(
