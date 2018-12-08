@@ -10,10 +10,10 @@ Retalk is a best practice for Redux. just simple, smooth, and smart.
 
 ## Features
 
-- **Simplest Redux**: Just `state` and `actions`, if you like.
+- **Simplest Redux**: Just `state` and `actions`, clear than ever before.
 - **Only two API**: `createStore` and `withStore`, no more annoying concepts.
-- **Async import model**: Now we can use code splitting for models.
-- **Auto `loading` state**: You request, we handle the loading state.
+- **Async import model**: Fully code splitting support for models.
+- **Auto `loading` state**: Just request, and loading state is ready to use.
 
 ## Install
 
