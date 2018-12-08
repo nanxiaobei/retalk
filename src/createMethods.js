@@ -46,28 +46,29 @@ const createMethods = (store, name, model) => {
 
   const newActions = {};
 
-  const getContent = (actionName) => {
-    const { [actionName]: self, ...otherActions } = dispatch[name]; // eslint-disable-line
-    return {
-      state: getState()[name],
-      ...Object.entries(newReducerCreators).reduce(
-        (newReducers, [reducerName, newReducerCreator]) => {
-          newReducers[reducerName] = newReducerCreator(actionName);
-          return newReducers;
-        },
-        {},
-      ),
-      ...otherActions,
-      ...Object.entries(dispatch).reduce((root, [modelName, modelActions]) => {
-        if (modelName !== name) {
-          root[modelName] = {
-            state: getState()[modelName],
-            ...modelActions,
-          };
-        }
-        return root;
-      }, {}),
-    };
+  // Get action's `this` context
+  let _this = null;
+  const getThis = (actionName) => {
+    if (!_this) {
+      // actions
+      _this = dispatch[name];
+      // reducers
+      Object.entries(newReducerCreators).forEach(([reducerName, newReducerCreator]) => {
+        _this[reducerName] = newReducerCreator(actionName);
+      });
+      // models' actions
+      Object.entries(dispatch).forEach(([modelName, modelActions]) => {
+        if (modelName !== name) _this[modelName] = modelActions;
+      });
+    }
+    // state
+    _this.state = getState()[name];
+    // models' state
+    Object.keys(dispatch).forEach((modelName) => {
+      if (modelName !== name) _this[modelName].state = getState()[modelName];
+    });
+
+    return _this;
   };
 
   // Add `loading` state
@@ -82,7 +83,7 @@ const createMethods = (store, name, model) => {
     };
 
     const newAction = function action(...args) {
-      return oldAction.bind(getContent(actionName))(...args);
+      return oldAction.bind(getThis(actionName))(...args);
     };
 
     if (!isAsyncFn(oldAction)) {
