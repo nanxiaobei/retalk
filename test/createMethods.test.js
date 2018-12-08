@@ -46,14 +46,18 @@ describe('createMethods', () => {
         add() {
           return this;
         },
+        sum() {
+          return this;
+        },
       },
     };
     createMethods(store, name, model);
     const actions = store.dispatch[name];
     expect(actions.add()).toHaveProperty('setState');
+    expect(actions.sum()).toHaveProperty('add');
   });
 
-  it('should have `add` in context if `reducers` exists', () => {
+  it('should have `[reducer]` in context if `reducers` exists', () => {
     const model = {
       state: {},
       reducers: {
