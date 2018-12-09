@@ -17,13 +17,13 @@ Retalk is a best practice for Redux. just simple, smooth, and smart.
 
 ## Install
 
-#### yarn
+**yarn**
 
 ```bash
 yarn add retalk
 ```
 
-#### npm
+**npm**
 
 ```bash
 npm install retalk
@@ -31,7 +31,7 @@ npm install retalk
 
 ## Usage
 
-#### 1. Model
+### 1. Model
 
 ```js
 // demo/model.js
@@ -55,7 +55,7 @@ const model = {
 export default model;
 ```
 
-#### 2. Store
+### 2. Store
 
 ```js
 // store.js
@@ -70,7 +70,7 @@ const store = createStore({
 export default store;
 ```
 
-#### 3. View
+### 3. View
 
 ```jsx
 // demo/index.jsx
