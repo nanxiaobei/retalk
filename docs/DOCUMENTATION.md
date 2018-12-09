@@ -145,13 +145,13 @@ Here is a `loadable-components` example.
 import React from 'react';
 import loadable from 'loadable-components';
 
-const AsyncBooks = loadable(async (store) => {
-  const [{ default: Books }, { default: books }] = await Promise.all([
-    import('./books/index.jsx'),
-    import('./books/model'),
+const AsyncDemo = loadable(async (store) => {
+  const [{ default: Demo }, { default: model }] = await Promise.all([
+    import('./demo/index.jsx'),
+    import('./demo/model'),
   ]);
-  store.addModel('books', books);
-  return (props) => <Books {...props} />;
+  store.addModel('demo', model);
+  return (props) => <Demo {...props} />;
 });
 ```
 
@@ -166,9 +166,9 @@ const mapState = ({ demo: { value } }) => ({
   value,
 });
 
-const mapActions = ({ demo: { increase, asyncIncrease } }) => ({
-  increase,
-  asyncIncrease,
+const mapActions = ({ demo: { add, asyncAdd } }) => ({
+  add,
+  asyncAdd,
 });
 // First param to `mapDispatchToProps` is `dispatch`, `dispatch` is a function,
 // but in above `mapActions`, we treat it like it's an object.
