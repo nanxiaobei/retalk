@@ -11,7 +11,7 @@ Retalk is a best practice for Redux. just simple, smooth, and smart.
 ## Features
 
 - **Simplest Redux**: Just `state` and `actions`, clear than ever before.
-- **Only two API**: `createStore` and `withStore`, no more annoying concepts.
+- **Two API totally**: `createStore` and `withStore`, no more annoying concepts.
 - **Async import model**: Fully code splitting support for models.
 - **Auto `loading` state**: Just request, and loading state is ready to use.
 
@@ -111,7 +111,7 @@ createStore(
 );
 ```
 
-_Make sure Redux DevTools Extension's version [>= v2.15.3](https://github.com/reduxjs/redux/issues/2943) and [not v2.16.0](https://stackoverflow.com/a/53512072/6919133)._
+> Make sure Redux DevTools Extension's version [>= v2.15.3](https://github.com/reduxjs/redux/issues/2943) and [not v2.16.0](https://stackoverflow.com/a/53512072/6919133).
 
 #### withStore
 
@@ -146,4 +146,4 @@ sum(1, 2)
 this.setState({ value: 1 });
 ```
 
-_Note: Call it like `this.setState` in a React Component, but not the same API!_
+> Like `this.setState` in a React Component, but not the same API!
