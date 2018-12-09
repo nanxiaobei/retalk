@@ -19,7 +19,7 @@
 
 ## Concepts
 
-#### Model
+### Model
 
 **model** brings `state` and `actions` together in one place. Typically, you will have several models.
 
@@ -70,13 +70,13 @@ actions: {
 }
 ```
 
-#### Store
+### Store
 
 **store** brings `models` together, can be connected to React components.
 
 Use [`createStore`](#createStore) to generate the one and only Redux store.
 
-#### View
+### View
 
 View is a React component.
 
@@ -86,7 +86,7 @@ Then you can use state and actions in a component.
 
 ## API
 
-#### createStore
+### createStore
 
 `createStore(models[, options])`
 
@@ -117,7 +117,7 @@ type: `Array`, default: `[]`
 
 > Pass middleware to store.
 
-#### withStore
+### withStore
 
 `withStore(...modelNames)`
 
@@ -131,7 +131,7 @@ Use `withStore(name)` to pass whole `model.state` and `model.actions` to a compo
 
 ## Guides
 
-#### Async import model
+### Async import model
 
 First, use `createStore` to initialize store.
 
@@ -157,7 +157,7 @@ const AsyncBooks = loadable(async (store) => {
 
 Use `store.addModel(name: string, model: Object)` to eject the async imported model to store.
 
-#### Customize state and actions
+### Customize state and actions
 
 You can pass `mapStateToProps` and `mapDispatchToProps` to `connect` when need some customization, without using `withStore`.
 
@@ -180,7 +180,7 @@ export default connect(
 )(Demo);
 ```
 
-#### Hot reloading with Redux
+### Hot reloading with Redux
 
 The key to achieving hot reloading with Redux is, put `Provider` inside `App.js`, not outside! then add code:
 
