@@ -80,9 +80,9 @@ Use [`createStore`](#createStore) to generate the one and only Redux store.
 
 View is a React component.
 
-Use `connect` (from [`react-redux`](https://github.com/reduxjs/react-redux)) and [`withStore`](#withStore) to connect **store** and **view**.
+Use [`connect`](https://react-redux.js.org/introduction/quick-start#provider-and-connect) (from `react-redux`) and [`withStore`](#withStore) to connect **store** and **view**.
 
-Then you can use state and actions in a component.
+Then you can use all `model.state` and `model.actions` in a component.
 
 ## API
 
