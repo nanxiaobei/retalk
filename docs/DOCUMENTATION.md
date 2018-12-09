@@ -93,8 +93,8 @@ Then you can use state and actions in a component.
 ```js
 createStore(
   {
-    modelA,
-    modelB,
+    modelA: { state, actions },
+    modelB: { state, actions },
   },
   {
     useDevTools: true,
@@ -102,8 +102,6 @@ createStore(
   },
 );
 ```
-
-`model` to `models` must be an object or an `() => import()` function.
 
 **options.useDevTools**
 
