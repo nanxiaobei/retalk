@@ -42,12 +42,12 @@ const model = {
   },
   actions: {
     add() {
-      const { value } = this.state;
-      this.setState({ value: value + 1 });
+      const { value } = this.state; // Use `this.state` to get state
+      this.setState({ value: value + 1 }); // Use `this.setState` to set state
     },
-    async addAsync() {
+    async asyncAdd() {
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      this.add();
+      this.add(); // Use `this[actionName]` to call other actions
     },
   },
 };
@@ -79,11 +79,12 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { withStore } from 'retalk';
 
-const Demo = ({ value, add, addAsync, loading }) => (
+// Automatically `loading[asyncAction]` is ready to use
+const Demo = ({ value, add, asyncAdd, loading }) => (
   <div>
     <h4>Value: {value}</h4>
     <button onClick={add}>+1</button>
-    <button onClick={addAsync}>+1 Async {loading.addAsync ? '...' : ''}</button>
+    <button onClick={asyncAdd}>Async +1 {loading.asyncAdd ? '...' : ''}</button>
   </div>
 );
 
@@ -92,58 +93,10 @@ export default connect(...withStore('demo'))(Demo);
 
 Well, only 3 steps, A simple Retalk demo is here. [https://codesandbox.io/s/5l9mqnzvx](https://codesandbox.io/s/5l9mqnzvx).
 
-## API
+## Documentation
 
-#### createStore
+See more details in the [documentation](./docs/DOCUMENTATION.md).
 
-`createStore(models, options)`
+## Changelog
 
-```js
-createStore(
-  {
-    modelA,
-    modelB,
-  },
-  {
-    useDevTools: true, // type: boolean, default: false
-    plugins: [logger], // type: Array, default: []
-  },
-);
-```
-
-> Make sure Redux DevTools Extension's version [>= v2.15.3](https://github.com/reduxjs/redux/issues/2943) and [not v2.16.0](https://stackoverflow.com/a/53512072/6919133).
-
-#### withStore
-
-`withStore(...modelNames)`
-
-```js
-connect(...withStore('modelA', 'modelB'))(Component);
-```
-
-### action
-
-```js
-sum(a, b) {
-  const { value } = this.state;
-  this.setState({ value: value + a + b });
-}
-
-// Call in another action
-this.sum(1, 2);
-
-// Call in a Component
-const { sum } = this.props;
-sum(1, 2)
-```
-
-#### this.setState
-
-`this.setState(partialState)`
-
-```js
-// Call in an action
-this.setState({ value: 1 });
-```
-
-> Like `this.setState` in a React Component, but not the same API!
+See what's new in the [changelog](./CHANGELOG.md).
