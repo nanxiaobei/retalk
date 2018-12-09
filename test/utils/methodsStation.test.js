@@ -9,7 +9,7 @@ describe('methodsStation', () => {
           add() {},
         },
         actions: {
-          async addAsync() {},
+          async asyncAdd() {},
         },
       },
     };
@@ -23,10 +23,10 @@ describe('methodsStation', () => {
     }).toThrow(error.INVALID_ACTION());
 
     expect(() => {
-      dispatch({ type: 'test/addAsync/SET_STATE', partialState: [] });
+      dispatch({ type: 'test/asyncAdd/SET_STATE', partialState: [] });
     }).toThrow(error.INVALID_ACTION());
     expect(() => {
-      dispatch({ type: 'test/addAsync/SET_STATE', partialState: {} });
+      dispatch({ type: 'test/asyncAdd/SET_STATE', partialState: {} });
     }).not.toThrow();
 
     expect(() => {

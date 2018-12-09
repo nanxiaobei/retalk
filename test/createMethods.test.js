@@ -6,7 +6,7 @@ describe('createMethods', () => {
     dispatch: () => {},
     getState: () => ({
       basic: {},
-      test: { loading: { addAsync: false } },
+      test: { loading: { asyncAdd: false } },
     }),
   };
   store.dispatch.basic = {};
@@ -64,7 +64,7 @@ describe('createMethods', () => {
         add() {},
       },
       actions: {
-        async addAsync() {
+        async asyncAdd() {
           this.add();
           return this;
         },
@@ -72,6 +72,6 @@ describe('createMethods', () => {
     };
     createMethods(store, name, model);
     const actions = store.dispatch[name];
-    expect(actions.addAsync()).resolves.toHaveProperty('add');
+    expect(actions.asyncAdd()).resolves.toHaveProperty('add');
   });
 });
