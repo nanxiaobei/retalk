@@ -23,7 +23,7 @@
 
 **model** brings `state` and `actions` together in one place. Typically, you will have several models.
 
-**`model.state`**
+#### `model.state`
 
 type: `Object`
 
@@ -41,7 +41,7 @@ state: {
 }
 ```
 
-**`model.actions`**
+#### `model.actions`
 
 type: `Object`
 
@@ -103,7 +103,7 @@ createStore(
 );
 ```
 
-**options.useDevTools**
+#### options.useDevTools
 
 type: `boolean`, default: `false`
 
@@ -111,7 +111,7 @@ type: `boolean`, default: `false`
 >
 > Make sure Redux DevTools Extension's version [>= v2.15.3](https://github.com/reduxjs/redux/issues/2943) and [not v2.16.0](https://stackoverflow.com/a/53512072/6919133).
 
-**options.plugins**
+#### options.plugins
 
 type: `Array`, default: `[]`
 
