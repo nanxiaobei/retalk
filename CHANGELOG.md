@@ -1,3 +1,7 @@
+# Changelog
+
+English | [简体中文](./CHANGELOG.zh-CN.md)
+
 ## 1.2.2 (12.8, 2018)
 
 - Add cache to action's context to improving performance.
