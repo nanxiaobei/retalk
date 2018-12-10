@@ -2,6 +2,11 @@
 
 English | [简体中文](./CHANGELOG.zh-CN.md)
 
+## 1.2.3 (12.10, 2018)
+
+- Add `@babel/runtime` to `peerDependencies`.
+- Add zh-CN Readme, Changelog and Documentation.
+
 ## 1.2.2 (12.8, 2018)
 
 - Add cache to action's context to improving performance.
