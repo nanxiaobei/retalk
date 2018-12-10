@@ -1,10 +1,12 @@
 # Documentation
 
+English | [简体中文](./DOCUMENTATION.zh-CN.md)
+
 - [Concepts](#concepts)
   - [Model](#model)
   - [Store](#store)
   - [View](#view)
-- [API](#concepts)
+- [API](#api)
   - [createStore](#createstore)
   - [withStore](#withstore)
 - [Guides](#guides)

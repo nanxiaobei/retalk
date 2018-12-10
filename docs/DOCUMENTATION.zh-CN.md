@@ -1,10 +1,12 @@
 # 文档
 
+[English](./DOCUMENTATION.md) | 简体中文
+
 - [概念](#概念)
   - [Model](#model)
   - [Store](#store)
   - [View](#view)
-- [API](#concepts)
+- [API](#api)
   - [createStore](#createstore)
   - [withStore](#withstore)
 - [指南](#指南)
@@ -168,7 +170,7 @@ const mapActions = ({ demo: { add, asyncAdd } }) => ({
   asyncAdd,
 });
 // `mapDispatchToProps` 的第一个参数是 `dispatch`。
-// `dispatch` 是一个函数，但在上面的 `mapActions` 中，我们把它当成了一个对象来使用。
+// `dispatch` 是一个函数，但在上面的 `mapActions` 中，我们把它当做一个对象来使用。
 // Retalk 做了一些处理，它确实是 `dispatch` 函数，但在它上面绑定了所有的 model。
 
 export default connect(

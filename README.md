@@ -8,7 +8,7 @@ Retalk is a best practice for Redux. just simple, smooth, and smart.
 [![npm downloads](https://img.shields.io/npm/dt/retalk.svg?style=flat-square)](http://www.npmtrends.com/retalk)
 [![license](https://img.shields.io/github/license/nanxiaobei/retalk.svg?style=flat-square)](https://github.com/nanxiaobei/retalk/blob/master/LICENSE)
 
-English | [简体中文](./README.zh_CN.md)
+English | [简体中文](./README.zh-CN.md)
 
 ## Features
 

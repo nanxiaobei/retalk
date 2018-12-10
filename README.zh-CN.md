@@ -12,7 +12,7 @@ Retalk 是 Redux 的一个最佳实践，简单、流畅而智慧。
 
 ## 特性
 
-- **最简单的 Redux**：只需要 `state` 和 `actions`，简洁清晰。
+- **极简 Redux 实践**：只需要 `state` 和 `actions`，简洁清晰。
 - **只有两个 API**：`createStore` 与 `withStore`，再无其它繁杂概念。
 - **异步引入 model**：对 models 进行代码分隔的完整支持。
 - **自动 `loading` 处理**：发送请求，接着使用自动的 loading 状态即可。
@@ -97,8 +97,8 @@ export default connect(...withStore('demo'))(Demo);
 
 ## 文档
 
-查看 [文档](./docs/DOCUMENTATION.zh-CN.md) 了解更多详细信息。
+查看[文档](./docs/DOCUMENTATION.zh-CN.md)了解更多详细信息。
 
 ## 更新
 
-查看 [更新日志](./CHANGELOG.md) 获取最新动态。
+查看[更新日志](./CHANGELOG.md)获取最新动态。
