@@ -97,8 +97,8 @@ export default connect(...withStore('demo'))(Demo);
 
 ## 文档
 
-查看[文档](./docs/DOCUMENTATION.zh-CN.md)了解更多详细信息。
+查看 [文档](./docs/DOCUMENTATION.zh-CN.md) 了解更多详细信息。
 
 ## 更新
 
-查看[更新日志](./CHANGELOG.md)获取最新动态。
+查看 [更新日志](./CHANGELOG.md) 获取最新动态。
