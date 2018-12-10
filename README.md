@@ -8,6 +8,8 @@ Retalk is a best practice for Redux. just simple, smooth, and smart.
 [![npm downloads](https://img.shields.io/npm/dt/retalk.svg?style=flat-square)](http://www.npmtrends.com/retalk)
 [![license](https://img.shields.io/github/license/nanxiaobei/retalk.svg?style=flat-square)](https://github.com/nanxiaobei/retalk/blob/master/LICENSE)
 
+English | [简体中文](./README.zh_CN.md)
+
 ## Features
 
 - **Simplest Redux**: Just `state` and `actions`, clear than ever before.
@@ -43,7 +45,7 @@ const model = {
   actions: {
     add() {
       const { value } = this.state; // Use `this.state` to get state
-      this.setState({ value: value + 1 }); // Use `this.setState` to set state
+      this.setState({ value: value + 1 }); // Use `this.setState` to update state
     },
     async asyncAdd() {
       await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -91,7 +93,7 @@ const Demo = ({ value, add, asyncAdd, loading }) => (
 export default connect(...withStore('demo'))(Demo);
 ```
 
-Well, only 3 steps, A simple Retalk demo is here. [https://codesandbox.io/s/5l9mqnzvx](https://codesandbox.io/s/5l9mqnzvx).
+Well, only 3 steps, A simple Retalk demo is here. [https://codesandbox.io/s/5l9mqnzvx](https://codesandbox.io/s/5l9mqnzvx)
 
 ## Documentation
 

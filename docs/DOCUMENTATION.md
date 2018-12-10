@@ -40,9 +40,9 @@ state: {
 
 type: `Object`
 
-An action is a function, it can be sync or async.
+A single action is a function, it can be sync or async.
 
-In an action, use `this.state` to get state, `this.setState` to set state.
+In an action, use `this.state` to get state, `this.setState` to update state.
 
 Like the syntax in a React component, but remember they are not the same.
 
@@ -60,7 +60,7 @@ actions: {
   },
   async asyncAdd() {
     // Use `async / await` syntax to define an async action
-    // Use automatically `loading.asyncAdd`
+    // Automatically `loading.asyncAdd` can be use
   }
 }
 ```
@@ -86,6 +86,8 @@ Then you can use all `state` and `actions` in the component.
 `createStore(models[, options])`
 
 ```js
+import { createStore } from 'retalk';
+
 createStore(
   {
     modelA: { state, actions },
@@ -117,10 +119,12 @@ type: `Array`, default: `[]`
 `withStore(...modelNames)`
 
 ```js
+import { withStore } from 'retalk';
+
 connect(...withStore('modelA', 'modelB'))(component);
 ```
 
-Use `withStore(name)` to pass all `state` and `actions` to a component, you can pass more than one model.
+Use `withStore` to eject all `state` and `actions` to a component's props, you can eject more than one model.
 
 `withStore` must be passed in [rest parameter](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/rest_parameters) syntax to `connect`.
 
@@ -132,7 +136,7 @@ First, use `createStore` to initialize store.
 
 Then use libraries like [react-loadable](https://github.com/jamiebuilds/react-loadable#loading-multiple-resources) or [loadable-components](https://github.com/smooth-code/loadable-components/#loading-multiple-resources-in-parallel) to dynamic import both component and model.
 
-Here is a `loadable-components` example.
+Here is a `loadable-components` example:
 
 ```jsx
 import React from 'react';
