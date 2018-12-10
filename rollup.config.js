@@ -4,7 +4,11 @@ import babel from 'rollup-plugin-babel';
 import pkg from './package.json';
 
 const { NODE_ENV } = process.env;
-const dependencies = Object.keys(pkg.dependencies);
+
+const dependencies = {
+  ...Object.keys(pkg.peerDependencies),
+  ...Object.keys(pkg.dependencies),
+};
 
 const config = {
   input: 'src/index.js',

@@ -29,6 +29,9 @@
     "test": "jest",
     "coverage": "codecov"
   },
+  "peerDependencies": {
+    "@babel/runtime": "^7.2.0"
+  },
   "dependencies": {
     "redux": "^4.0.1"
   },
@@ -36,7 +39,6 @@
     "@babel/core": "^7.2.0",
     "@babel/plugin-transform-runtime": "^7.2.0",
     "@babel/preset-env": "^7.2.0",
-    "@babel/runtime": "^7.2.0",
     "babel-core": "^7.0.0-bridge",
     "babel-eslint": "^10.0.1",
     "babel-jest": "^23.6.0",
