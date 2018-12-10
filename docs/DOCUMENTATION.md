@@ -1,18 +1,13 @@
 # Documentation
 
 - [Concepts](#concepts)
-
   - [Model](#model)
   - [Store](#store)
   - [View](#view)
-
 - [API](#concepts)
-
   - [createStore](#createstore)
   - [withStore](#withstore)
-
 - [Guides](#guides)
-
   - [Async import model](#async-import-model)
   - [Customize state and actions](#customize-state-and-actions)
   - [Hot reloading with Redux](#hot-reloading-with-redux)
@@ -21,13 +16,13 @@
 
 ### Model
 
-**model** brings `state` and `actions` together in one place. Typically, you will have several models.
+Model brings `state` and `actions` together in one place. Typically, you will have several models.
 
-#### `model.state`
+#### `state`
 
 type: `Object`
 
-Retalk will automatically add `loading: Object` to `model.state`.
+Retalk will automatically add `loading: Object` to `state`.
 
 ```js
 // state.loading
@@ -41,7 +36,7 @@ state: {
 }
 ```
 
-#### `model.actions`
+#### `actions`
 
 type: `Object`
 
@@ -49,7 +44,7 @@ An action is a function, it can be sync or async.
 
 In an action, use `this.state` to get state, `this.setState` to set state.
 
-Like the syntax in a React component, but remember they're not the same.
+Like the syntax in a React component, but remember they are not the same.
 
 ```js
 actions: {
@@ -64,25 +59,25 @@ actions: {
     // this[modelName][actionName]
   },
   async asyncAdd() {
-    // `loading.asyncAdd` can be used
     // Use `async / await` syntax to define an async action
+    // Use automatically `loading.asyncAdd`
   }
 }
 ```
 
 ### Store
 
-**store** brings `models` together, can be connected to React components.
+Store brings `models` together, it's the bridge between model and view.
 
-Use [`createStore`](#createStore) to generate the one and only Redux store.
+Use [`createStore`](#createstore) to generate the one and only Redux store.
 
 ### View
 
 View is a React component.
 
-Use [`connect`](https://react-redux.js.org/introduction/quick-start#provider-and-connect) (from `react-redux`) and [`withStore`](#withStore) to connect **store** and **view**.
+Use [`connect`](https://react-redux.js.org/introduction/quick-start#provider-and-connect) (from `react-redux`) and [`withStore`](#withstore) to connect store and view.
 
-Then you can use all `model.state` and `model.actions` in a component.
+Then you can use all `state` and `actions` in the component.
 
 ## API
 
@@ -109,13 +104,13 @@ type: `boolean`, default: `false`
 
 > Enable [Redux DevTools Extension](https://github.com/zalmoxisus/redux-devtools-extension).
 >
-> Make sure Redux DevTools Extension's version [>= v2.15.3](https://github.com/reduxjs/redux/issues/2943) and [not v2.16.0](https://stackoverflow.com/a/53512072/6919133).
+> Make sure the extension's version [>= v2.15.3](https://github.com/reduxjs/redux/issues/2943) and [not v2.16.0](https://stackoverflow.com/a/53512072/6919133).
 
 #### options.plugins
 
 type: `Array`, default: `[]`
 
-> Pass middleware to store.
+> Pass middleware to `[applymiddleware](https://redux.js.org/api/applymiddleware)` when creating store.
 
 ### withStore
 
@@ -125,7 +120,7 @@ type: `Array`, default: `[]`
 connect(...withStore('modelA', 'modelB'))(component);
 ```
 
-Use `withStore(name)` to pass whole `model.state` and `model.actions` to a component, you can pass more than one model.
+Use `withStore(name)` to pass all `state` and `actions` to a component, you can pass more than one model.
 
 `withStore` must be passed in [rest parameter](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/rest_parameters) syntax to `connect`.
 
@@ -135,9 +130,7 @@ Use `withStore(name)` to pass whole `model.state` and `model.actions` to a compo
 
 First, use `createStore` to initialize store.
 
-When enter a page, then load page's model. We need some help to achieve this goal.
-
-You can use code splitting libraries like [react-loadable](https://github.com/jamiebuilds/react-loadable#loading-multiple-resources) and [loadable-components](https://github.com/smooth-code/loadable-components/#loading-multiple-resources-in-parallel) to dynamic import component and model.
+Then use libraries like [react-loadable](https://github.com/jamiebuilds/react-loadable#loading-multiple-resources) or [loadable-components](https://github.com/smooth-code/loadable-components/#loading-multiple-resources-in-parallel) to dynamic import both component and model.
 
 Here is a `loadable-components` example.
 
@@ -159,7 +152,7 @@ Use `store.addModel(name: string, model: Object)` to eject the async imported mo
 
 ### Customize state and actions
 
-You can pass `mapStateToProps` and `mapDispatchToProps` to `connect` when need some customization, without using `withStore`.
+Use [`mapStateToProps` and `mapDispatchToProps`](https://github.com/reduxjs/react-redux/blob/master/docs/api.md#arguments) when you need some customization, without using `withStore`.
 
 ```jsx
 const mapState = ({ demo: { value } }) => ({
@@ -170,9 +163,9 @@ const mapActions = ({ demo: { add, asyncAdd } }) => ({
   add,
   asyncAdd,
 });
-// First param to `mapDispatchToProps` is `dispatch`, `dispatch` is a function,
-// but in above `mapActions`, we treat it like it's an object.
-// Yes, Retalk did some tricks here, it's `dispatch` function, but bound models on it.
+// First parameter to `mapDispatchToProps` is `dispatch`.
+// `dispatch` is a function, but in `mapActions` above, we treat it like an object.
+// Retalk did some tricks here, it's the `dispatch` function, but bound models on it.
 
 export default connect(
   mapState,
@@ -182,7 +175,7 @@ export default connect(
 
 ### Hot reloading with Redux
 
-The key to achieving hot reloading with Redux is, put `Provider` inside `App.js`, not outside! then add code:
+The key to hot reloading with Redux is, put `Provider` inside `App.js`, not outside! then add code:
 
 ```js
 if (module.hot) {
