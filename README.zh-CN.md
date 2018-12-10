@@ -101,4 +101,4 @@ export default connect(...withStore('demo'))(Demo);
 
 ## 更新
 
-查看 [更新日志](./CHANGELOG.md) 获取最新动态。
+查看 [更新日志](./CHANGELOG.zh-CN.md) 获取最新动态。
