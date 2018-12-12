@@ -114,7 +114,7 @@ type: `boolean`, default: `false`
 
 type: `Array`, default: `[]`
 
-> Pass middleware to `[applymiddleware](https://redux.js.org/api/applymiddleware)` when creating store.
+> Add middleware to [`applymiddleware`](https://redux.js.org/api/applymiddleware).
 
 ### withStore
 
@@ -138,7 +138,9 @@ First, use `createStore` to initialize store.
 
 Then use libraries like [react-loadable](https://github.com/jamiebuilds/react-loadable#loading-multiple-resources) or [loadable-components](https://github.com/smooth-code/loadable-components/#loading-multiple-resources-in-parallel) to dynamic import both component and model.
 
-Here is a `loadable-components` example:
+Then use `store.addModel(name: string, model: Object)` to eject the async imported model to store.
+
+Here is a loadable-components example:
 
 ```jsx
 import React from 'react';
@@ -149,12 +151,10 @@ const AsyncDemo = loadable(async (store) => {
     import('./demo/index.jsx'),
     import('./demo/model'),
   ]);
-  store.addModel('demo', model);
+  store.addModel('demo', model); // Key to import async model
   return (props) => <Demo {...props} />;
 });
 ```
-
-Use `store.addModel(name: string, model: Object)` to eject the async imported model to store.
 
 ### Customize state and actions
 

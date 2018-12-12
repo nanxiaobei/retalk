@@ -106,15 +106,15 @@ createStore(
 
 类型：`boolean`，默认：`false`
 
-> 启用 [Redux DevTools Extension](https://github.com/zalmoxisus/redux-devtools-extension).
+> 启用 [Redux DevTools Extension](https://github.com/zalmoxisus/redux-devtools-extension)。
 >
-> 务必确保插件的版本 [>= v2.15.3](https://github.com/reduxjs/redux/issues/2943) 且[不是 v2.16.0](https://stackoverflow.com/a/53512072/6919133)。
+> 务必确保插件的版本 [>= v2.15.3](https://github.com/reduxjs/redux/issues/2943) 且 [不是 v2.16.0](https://stackoverflow.com/a/53512072/6919133)。
 
 #### options.plugins
 
 类型：`Array`，默认：`[]`
 
-> 传递中间件到 `[applymiddleware](https://redux.js.org/api/applymiddleware)` 中。
+> 将中间件添加到 [`applymiddleware`](https://redux.js.org/api/applymiddleware) 中。
 
 ### withStore
 
@@ -138,7 +138,9 @@ connect(...withStore('modelA', 'modelB'))(component);
 
 接着使用 [react-loadable](https://github.com/jamiebuilds/react-loadable#loading-multiple-resources) 或 [loadable-components](https://github.com/smooth-code/loadable-components/#loading-multiple-resources-in-parallel) 去动态引入组件与 model。
 
-使用 `loadable-components` 示例：
+最后使用 `store.addModel(name: string, model: Object)` 将异步引入的 model 注入 store。
+
+一个使用 loadable-components 的示例：
 
 ```jsx
 import React from 'react';
@@ -149,12 +151,10 @@ const AsyncDemo = loadable(async (store) => {
     import('./demo/index.jsx'),
     import('./demo/model'),
   ]);
-  store.addModel('demo', model);
+  store.addModel('demo', model); // 将异步引入的 model 注入 store
   return (props) => <Demo {...props} />;
 });
 ```
-
-使用 `store.addModel(name: string, model: Object)` 将异步引入的 model 注入 store。
 
 ### 自定义 state 与 actions
 
