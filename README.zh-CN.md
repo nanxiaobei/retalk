@@ -81,7 +81,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { withStore } from 'retalk';
 
-// Automatically `loading[asyncAction]` is ready to use
+// 自动注入的 `loading[asyncAction]` 可供使用
 const Demo = ({ value，add，asyncAdd，loading }) => (
   <div>
     <h4>Value: {value}</h4>
