@@ -114,7 +114,7 @@ createStore(
 
 类型：`Array`，默认：`[]`
 
-> 将中间件添加到 [`applymiddleware`](https://redux.js.org/api/applymiddleware) 中。
+> 将中间件以数组各项的形式，依次添加到 [`applymiddleware`](https://redux.js.org/api/applymiddleware) 中。
 
 ### withStore
 
@@ -128,7 +128,7 @@ connect(...withStore('modelA', 'modelB'))(component);
 
 使用 `withStore` 将所有的 `state` 和 `actions` 注入组件的 props 中，可以注入多个 model。
 
-`withStore` 比如使用 [rest parameter](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/rest_parameters) 语法传递给 `connect`。
+`withStore` 必须使用 [rest parameter](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/rest_parameters) 语法传递给 `connect`。
 
 ## 指南
 
