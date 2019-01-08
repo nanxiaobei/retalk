@@ -31,7 +31,7 @@ yarn add retalk
 npm install retalk
 ```
 
-## 示例
+## 使用
 
 #### 1. Model
 
