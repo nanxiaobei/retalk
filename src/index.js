@@ -8,6 +8,7 @@ import createReducer from './createReducer';
 import createMethods from './createMethods';
 import methodsStation from './utils/methodsStation';
 import isObject from './utils/isObject';
+import checkSameKey from './utils/checkSameKey';
 import error from './utils/error';
 
 /**
@@ -95,21 +96,34 @@ const createStore = (models, options = {}) => {
 
 /**
  * withStore
- * @param {...string} names - 'modelA', 'modelB', ...
+ * @param {string[]} names - 'modelA', 'modelB', ...
  * @returns {Array} [mapState, mapMethods]
  */
 const withStore = (...names) => {
   if (names.length === 0) {
     throw new Error(error.INVALID_MODEL_NAME());
   }
+
+  const namesLength = names.length;
+  let stateCount = 0;
+  let actionsCount = 0;
+
+  let mergedState = { loading: {} };
+  let mergedActions = {};
+
   return [
     (state) => {
-      let mergedState = { loading: {} };
       names.forEach((name) => {
-        if (typeof name !== 'string') {
-          throw new Error(error.INVALID_MODEL_NAME());
-        }
         const modelState = state[name];
+
+        if (stateCount < namesLength) {
+          if (typeof name !== 'string') {
+            throw new Error(error.INVALID_MODEL_NAME());
+          }
+          checkSameKey(name, 'state', modelState, mergedState);
+          stateCount += 1;
+        }
+
         mergedState = {
           ...mergedState,
           ...modelState,
@@ -119,12 +133,17 @@ const withStore = (...names) => {
       return mergedState;
     },
     (dispatch) => {
-      let mergedMethods = {};
       names.forEach((name) => {
-        const modelMethods = dispatch[name];
-        mergedMethods = { ...mergedMethods, ...modelMethods };
+        const modelActions = dispatch[name];
+
+        if (actionsCount < namesLength) {
+          checkSameKey(name, 'action', modelActions, mergedActions);
+          actionsCount += 1;
+        }
+
+        mergedActions = { ...mergedActions, ...modelActions };
       });
-      return mergedMethods;
+      return mergedActions;
     },
   ];
 };
