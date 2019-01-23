@@ -4,12 +4,14 @@ import {
   compose,
   applyMiddleware,
 } from 'redux';
+
+import isObject from './utils/isObject';
+import error from './utils/error';
+import methodsStation from './utils/methodsStation';
+import checkSameKey from './utils/checkSameKey';
+
 import createReducer from './createReducer';
 import createMethods from './createMethods';
-import methodsStation from './utils/methodsStation';
-import isObject from './utils/isObject';
-import checkSameKey from './utils/checkSameKey';
-import error from './utils/error';
 
 /**
  * createStore
