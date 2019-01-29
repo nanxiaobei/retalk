@@ -1,3 +1,5 @@
+<div align="center">
+
 <img src="./logo/logo-title.png" height="100" width="300" alt="Retalk">
 
 Retalk 是 Redux 的一个最佳实践，简单、流畅而智慧。
@@ -10,7 +12,11 @@ Retalk 是 Redux 的一个最佳实践，简单、流畅而智慧。
 
 [English](./README.md) | 简体中文
 
-> 请注意：自 v2.0.0 起 `reducers' 已被废弃
+</div>
+
+---
+
+> 请注意：自 v2.0.0 起 `reducers` 已被废弃。
 
 ## 特性
 
@@ -83,7 +89,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { withStore } from 'retalk';
 
-// `loading[asyncAction]` 可供使用
+// `loading[asyncAction]` -> 展示加载中
 const Demo = ({ value，add，asyncAdd，loading }) => (
   <div>
     <h4>Value: {value}</h4>

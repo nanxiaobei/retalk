@@ -1,3 +1,5 @@
+<div align="center">
+
 <img src="./logo/logo-title.png" height="100" width="300" alt="Retalk">
 
 Retalk is a best practice for Redux. just simple, smooth, and smart.
@@ -10,7 +12,11 @@ Retalk is a best practice for Redux. just simple, smooth, and smart.
 
 English | [简体中文](./README.zh-CN.md)
 
-> BREAKING CHANGES: `reducers` was deprecated since v2.0.0
+</div>
+
+---
+
+> BREAKING CHANGES: `reducers` was deprecated since v2.0.0.
 
 ## Features
 
@@ -83,7 +89,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { withStore } from 'retalk';
 
-// `loading[asyncAction]` is ready to use
+// `loading[asyncAction]` -> show loading
 const Demo = ({ value, add, asyncAdd, loading }) => (
   <div>
     <h4>Value: {value}</h4>
