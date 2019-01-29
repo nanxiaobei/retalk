@@ -2,6 +2,13 @@
 
 [English](./CHANGELOG.md) | 简体中文
 
+## 2.0.0 (1.29, 2019)
+
+- 升级核心代码，简化逻辑。
+- 移除 `reducers` 支持。
+- 使用 Proxy 大幅提升性能。
+- 增加更全的检测覆盖。
+
 ## 1.2.3 (12.10, 2018)
 
 - 增加 `@babel/runtime` 到 `peerDependencies`。
