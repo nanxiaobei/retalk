@@ -4,109 +4,102 @@ import {
   compose,
   applyMiddleware,
 } from 'redux';
-
-import isObject from './utils/isObject';
-import error from './utils/error';
-import methodsStation from './utils/methodsStation';
-import checkSameKey from './utils/checkSameKey';
-
 import createReducer from './createReducer';
-import createMethods from './createMethods';
+import createActions from './createActions';
+import { ERR, isObject, checkModel, createHandler, checkDuplicate } from './utils';
 
 /**
- * createStore
- * @param {Object} models
- * @param {Object} options
- * @returns {Object} Store or Promise
+ * Create the Redux store
+ *
+ * @param {object} models
+ * @param {object} options
+ * @return {object} Store
  */
 const createStore = (models, options = {}) => {
-  if (!isObject(models)) {
-    throw new Error(error.NOT_OBJECT('models'));
-  }
-  if (!isObject(options)) {
-    throw new Error(error.NOT_OBJECT('options'));
-  }
-
+  // Check params
+  if (!isObject(models)) throw new Error(ERR.NOT_OBJECT('models'));
+  if (!isObject(options)) throw new Error(ERR.NOT_OBJECT('options'));
   const { useDevTools = false, plugins = [] } = options;
-  if (typeof useDevTools !== 'undefined' && typeof useDevTools !== 'boolean') {
-    throw new Error(error.NOT_BOOLEAN('options.useDevTools'));
-  }
-  if (typeof plugins !== 'undefined' && !Array.isArray(plugins)) {
-    throw new Error(error.NOT_ARRAY('options.plugins'));
-  }
+  if (typeof useDevTools !== 'undefined' && typeof useDevTools !== 'boolean')
+    throw new Error(ERR.NOT_BOOLEAN('options.useDevTools'));
 
-  const asyncImport = Object.values(models).some((model) => typeof model === 'function');
+  if (typeof plugins !== 'undefined' && !Array.isArray(plugins))
+    throw new Error(ERR.NOT_ARRAY('options.plugins'));
+
+  const modelEntries = Object.entries(models);
+
+  // Check model, get action names
+  let actionNames = [];
+  modelEntries.forEach(([name, model]) => {
+    checkModel(name, model);
+    actionNames = [...actionNames, ...Object.keys(model.actions)];
+  });
+  actionNames = [...new Set(actionNames)];
+
+  // Check model name, create reducer
   const rootReducers = {};
+  modelEntries.forEach(([name, model]) => {
+    if (actionNames.includes(name)) throw new Error(ERR.MODEL_NAME(name));
+    rootReducers[name] = createReducer(name, model.state);
+  });
 
-  const getStore = () => {
-    const composeEnhancers =
-      useDevTools === true && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
-        ? window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
-        : compose;
+  // Create store
+  const composeEnhancers =
+    useDevTools === true && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
+      ? window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
+      : compose;
 
-    const store = theRealCreateStore(
-      combineReducers(rootReducers),
-      composeEnhancers(applyMiddleware(methodsStation(models), ...plugins)),
-    );
+  const store = theRealCreateStore(
+    combineReducers(rootReducers),
+    composeEnhancers(applyMiddleware(...plugins)),
+  );
 
-    Object.entries(models).forEach(([name, model]) => {
-      createMethods(store, name, model);
-    });
-    store.addModel = (name, model) => {
-      if (name in rootReducers) return;
-      rootReducers[name] = createReducer(name, model);
-      store.replaceReducer(combineReducers(rootReducers));
-      createMethods(store, name, model);
-    };
-    return store;
+  const theRealDispatch = store.dispatch;
+  store.dispatch = () => {
+    throw new Error(ERR.DISPATCH());
+  };
+  const { getState, dispatch } = store;
+
+  // Format actions
+  const modelsProxy = {};
+  modelEntries.forEach(([name]) => {
+    modelsProxy[name] = new Proxy({}, createHandler(name, getState, dispatch));
+  });
+  modelEntries.forEach(([name, model]) => {
+    const thisProxy = new Proxy({}, createHandler(name, getState, dispatch, modelsProxy));
+    createActions(name, model, getState, dispatch, theRealDispatch, thisProxy);
+  });
+
+  // store.addModel
+  store.addModel = (name, model) => {
+    if (name in rootReducers) return;
+
+    checkModel(name, model);
+    actionNames = [...new Set([...actionNames, ...Object.keys(model.actions)])];
+
+    if (actionNames.includes(name)) throw new Error(ERR.MODEL_NAME(name));
+    rootReducers[name] = createReducer(name, model.state);
+
+    store.replaceReducer(combineReducers(rootReducers));
+
+    modelsProxy[name] = new Proxy({}, createHandler(name, getState, dispatch));
+    const thisProxy = new Proxy({}, createHandler(name, getState, dispatch, modelsProxy));
+    createActions(name, model, getState, dispatch, theRealDispatch, thisProxy);
   };
 
-  // Static import
-  if (!asyncImport) {
-    Object.entries(models).forEach(([name, model]) => {
-      rootReducers[name] = createReducer(name, model);
-    });
-    return getStore();
-  }
-
-  // Dynamic import
-  const infoMap = [];
-  return Promise.all(
-    Object.entries(models).map(([name, model], index) => {
-      infoMap[index] = { name };
-      if (typeof model === 'function') {
-        infoMap[index].async = true;
-        model = model(); // eslint-disable-line
-      }
-      return model;
-    }),
-  ).then((modelList) => {
-    modelList.forEach((model, index) => {
-      const { async, name } = infoMap[index];
-      if (async) {
-        if (!isObject(model) || !isObject(model.default)) {
-          throw new Error(error.INVALID_IMPORTER(name));
-        }
-        model = model.default; // eslint-disable-line
-        models[name] = model;
-      }
-      rootReducers[name] = createReducer(name, model);
-    });
-    return getStore();
-  });
+  return store;
 };
 
 /**
- * withStore
- * @param {string[]} names - 'modelA', 'modelB', ...
- * @returns {Array} [mapState, mapMethods]
+ * Get mapState and mapActions for connect
+ *
+ * @param {string[]} names
+ * @return {function[]} [mapState, mapActions]
  */
 const withStore = (...names) => {
-  if (names.length === 0) {
-    throw new Error(error.INVALID_MODEL_NAME());
-  }
-
   const namesLength = names.length;
+  if (namesLength === 0) throw new Error(ERR.WITH_STORE());
+
   let stateCount = 0;
   let actionsCount = 0;
 
@@ -119,10 +112,10 @@ const withStore = (...names) => {
         const modelState = state[name];
 
         if (stateCount < namesLength) {
-          if (typeof name !== 'string') {
-            throw new Error(error.INVALID_MODEL_NAME());
+          if (typeof name !== 'string' || !(name in state)) throw new Error(ERR.WITH_STORE());
+          if (namesLength > 1) {
+            checkDuplicate(name, 'state', modelState, mergedState);
           }
-          checkSameKey(name, 'state', modelState, mergedState);
           stateCount += 1;
         }
 
@@ -138,8 +131,8 @@ const withStore = (...names) => {
       names.forEach((name) => {
         const modelActions = dispatch[name];
 
-        if (actionsCount < namesLength) {
-          checkSameKey(name, 'action', modelActions, mergedActions);
+        if (namesLength > 1 && actionsCount < namesLength) {
+          checkDuplicate(name, 'action', modelActions, mergedActions);
           actionsCount += 1;
         }
 
@@ -150,7 +143,4 @@ const withStore = (...names) => {
   ];
 };
 
-/**
- * exports
- */
 export { createStore, withStore };
