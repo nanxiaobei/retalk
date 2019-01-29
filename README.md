@@ -1,4 +1,4 @@
-# <img src="./logo/logo-title.png" height="100" width="300" alt="Retalk">
+<img src="./logo/logo-title.png" height="100" width="300" alt="Retalk">
 
 Retalk is a best practice for Redux. just simple, smooth, and smart.
 
@@ -9,6 +9,8 @@ Retalk is a best practice for Redux. just simple, smooth, and smart.
 [![license](https://img.shields.io/github/license/nanxiaobei/retalk.svg?style=flat-square)](https://github.com/nanxiaobei/retalk/blob/master/LICENSE)
 
 English | [简体中文](./README.zh-CN.md)
+
+> BREAKING CHANGES: `reducers` was deprecated since v2.0.0
 
 ## Features
 
@@ -44,12 +46,12 @@ const model = {
   },
   actions: {
     add() {
-      const { value } = this.state; // Use `this.state` to get state
-      this.setState({ value: value + 1 }); // Use `this.setState` to update state
+      const { value } = this.state; // `this.state` -> get state
+      this.setState({ value: value + 1 }); // `this.setState` -> update state
     },
     async asyncAdd() {
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      this.add(); // Use `this[actionName]` to call other actions
+      this.add(); // `this[actionName]` -> call action
     },
   },
 };
@@ -81,7 +83,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { withStore } from 'retalk';
 
-// Automatically `loading[asyncAction]` is ready to use
+// `loading[asyncAction]` is ready to use
 const Demo = ({ value, add, asyncAdd, loading }) => (
   <div>
     <h4>Value: {value}</h4>

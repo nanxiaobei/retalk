@@ -1,4 +1,4 @@
-# <img src="./logo/logo-title.png" height="100" width="300" alt="Retalk">
+<img src="./logo/logo-title.png" height="100" width="300" alt="Retalk">
 
 Retalk 是 Redux 的一个最佳实践，简单、流畅而智慧。
 
@@ -9,6 +9,8 @@ Retalk 是 Redux 的一个最佳实践，简单、流畅而智慧。
 [![license](https://img.shields.io/github/license/nanxiaobei/retalk.svg?style=flat-square)](https://github.com/nanxiaobei/retalk/blob/master/LICENSE)
 
 [English](./README.md) | 简体中文
+
+> 请注意：自 v2.0.0 起 `reducers' 已被废弃
 
 ## 特性
 
@@ -44,12 +46,12 @@ const model = {
   },
   actions: {
     add() {
-      const { value } = this.state; // 使用 `this.state` 获取 state
-      this.setState({ value: value + 1 }); // 使用 `this.setState` 更新 state
+      const { value } = this.state; // `this.state` -> 获取 state
+      this.setState({ value: value + 1 }); // `this.setState` -> 更新 state
     },
     async asyncAdd() {
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      this.add(); // 使用 `this[actionName]` 调用其它 action
+      this.add(); // `this[actionName]` -> 调用 action
     },
   },
 };
@@ -81,7 +83,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { withStore } from 'retalk';
 
-// 自动注入的 `loading[asyncAction]` 可供使用
+// `loading[asyncAction]` 可供使用
 const Demo = ({ value，add，asyncAdd，loading }) => (
   <div>
     <h4>Value: {value}</h4>
