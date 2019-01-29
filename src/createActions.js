@@ -32,10 +32,16 @@ const createActions = (name, model, getState, dispatch, theRealDispatch, thisPro
       newActions[actionName] = newAction;
     } else {
       state.loading[actionName] = false;
+      const setLoading = (actionName, actionLoading) => {
+        theRealDispatch({
+          type: `${name}/${actionName}/SET_LOADING`,
+          partialState: { loading: { ...getState()[name].loading, [actionName]: actionLoading } },
+        });
+      };
       newActions[actionName] = async function asyncAction(...args) {
-        setState({ loading: { ...getState()[name].loading, [actionName]: true } });
+        setLoading(actionName, true);
         const result = await newAction(...args);
-        setState({ loading: { ...getState()[name].loading, [actionName]: false } });
+        setLoading(actionName, false);
         return result;
       };
     }
