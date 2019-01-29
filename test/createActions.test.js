@@ -33,9 +33,11 @@ describe('createActions', () => {
   });
   it("should have 'this' context in action", () => {
     const testModel = {
-      state: { loading: {} },
+      state: { loading: {}, value: 1 },
       actions: {
         add() {
+          const { value } = this.state;
+          this.setState({ value: value + 1 });
           return this;
         },
         async asyncAdd() {
@@ -46,7 +48,6 @@ describe('createActions', () => {
     createActions('testModel', testModel, getState, dispatch, theRealDispatch, thisProxy);
     const testActions = dispatch.testModel;
     const thisContext = testActions.add();
-    expect(thisContext).toHaveProperty('setState');
     expect(thisContext).toHaveProperty('asyncAdd');
     expect(thisContext).toHaveProperty('testModel2');
     expect(thisContext.testAction).toBeUndefined();
