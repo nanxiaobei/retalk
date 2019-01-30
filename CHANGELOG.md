@@ -2,6 +2,11 @@
 
 English | [简体中文](./CHANGELOG.zh-CN.md)
 
+## 2.1.0 (1.30, 2019)
+
+- Enable Redux DevTools by default.
+- Add unique action type for loading state updating action.
+
 ## 2.0.0 (1.29, 2019)
 
 - Upgrade core code, simplify logic.
