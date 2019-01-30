@@ -96,7 +96,7 @@ createStore(
     modelB: { state, actions },
   },
   {
-    useDevTools: true,
+    useDevTools: false,
     plugins: [logger],
   },
 );
@@ -104,7 +104,7 @@ createStore(
 
 #### options.useDevTools
 
-类型：`boolean`，默认：`false`
+类型：`boolean`，默认：`true`
 
 > 启用 [Redux DevTools Extension](https://github.com/zalmoxisus/redux-devtools-extension)。
 >

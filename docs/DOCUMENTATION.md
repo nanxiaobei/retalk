@@ -96,7 +96,7 @@ createStore(
     modelB: { state, actions },
   },
   {
-    useDevTools: true,
+    useDevTools: false,
     plugins: [logger],
   },
 );
@@ -104,11 +104,11 @@ createStore(
 
 #### options.useDevTools
 
-type: `boolean`, default: `false`
+type: `boolean`, default: `true`
 
 > Enable [Redux DevTools Extension](https://github.com/zalmoxisus/redux-devtools-extension).
 >
-> Make sure the extension's version [>= v2.15.3](https://github.com/reduxjs/redux/issues/2943) and [not v2.16.0](https://stackoverflow.com/a/53512072/6919133).
+> Make sure the extension's version should [>= v2.15.3](https://github.com/reduxjs/redux/issues/2943) and [not v2.16.0](https://stackoverflow.com/a/53512072/6919133).
 
 #### options.plugins
 

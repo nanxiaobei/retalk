@@ -19,10 +19,9 @@ const createStore = (models, options = {}) => {
   // Check params
   if (!isObject(models)) throw new Error(ERR.NOT_OBJECT('models'));
   if (!isObject(options)) throw new Error(ERR.NOT_OBJECT('options'));
-  const { useDevTools = false, plugins = [] } = options;
+  const { useDevTools = true, plugins = [] } = options;
   if (typeof useDevTools !== 'undefined' && typeof useDevTools !== 'boolean')
     throw new Error(ERR.NOT_BOOLEAN('options.useDevTools'));
-
   if (typeof plugins !== 'undefined' && !Array.isArray(plugins))
     throw new Error(ERR.NOT_ARRAY('options.plugins'));
 
