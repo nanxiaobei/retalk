@@ -10,7 +10,7 @@ const createReducer = (name, state) => {
   return (currentState = state, action) => {
     const [modelName] = action.type.split('/');
     if (modelName !== name) return currentState;
-    return { ...currentState, ...action.partialState };
+    return { ...currentState, ...action.payload };
   };
 };
 

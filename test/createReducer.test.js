@@ -11,7 +11,7 @@ describe('createReducer', () => {
     const testReducer = createReducer('testModel', testModel.state);
     const nextState = testReducer(testModel.state, {
       type: 'testModel/add',
-      partialState: { a: 10 },
+      payload: { a: 10 },
     });
     expect(nextState).toEqual({ a: 10, b: 2, loading: {} });
   });

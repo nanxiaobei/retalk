@@ -19,8 +19,8 @@ const createActions = (name, model, getState, dispatch, theRealDispatch, thisPro
     if (forbiddenNames.includes(actionName)) throw new Error(ERR.ACTION_NAME(name, actionName));
     if (typeof oldAction !== 'function') throw new Error(ERR.ACTION(name, actionName));
 
-    const setState = function reducer(partialState) {
-      theRealDispatch({ type: `${name}/${actionName}`, partialState });
+    const setState = function reducer(payload) {
+      return theRealDispatch({ type: `${name}/${actionName}`, payload });
     };
 
     const newAction = function action(...args) {
@@ -32,10 +32,10 @@ const createActions = (name, model, getState, dispatch, theRealDispatch, thisPro
       newActions[actionName] = newAction;
     } else {
       state.loading[actionName] = false;
-      const setLoading = (actionName, actionLoading) => {
-        theRealDispatch({
+      const setLoading = function reducer(actionName, actionLoading) {
+        return theRealDispatch({
           type: `${name}/${actionName}/SET_LOADING`,
-          partialState: { loading: { ...getState()[name].loading, [actionName]: actionLoading } },
+          payload: { loading: { ...getState()[name].loading, [actionName]: actionLoading } },
         });
       };
       newActions[actionName] = async function asyncAction(...args) {
