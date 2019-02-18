@@ -114,7 +114,7 @@ createStore(
 
 类型：`Array`，默认：`[]`
 
-> 将中间件以数组各项的形式，依次添加到 [`applymiddleware`](https://redux.js.org/api/applymiddleware) 中。
+> 将中间件以数组各项的形式，依次添加到 [`applyMiddleware`](https://redux.js.org/api/applymiddleware) 中。
 
 ### withStore
 

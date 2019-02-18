@@ -114,7 +114,7 @@ type: `boolean`, default: `true`
 
 type: `Array`, default: `[]`
 
-> Add middleware as an item in an array, passed to [`applymiddleware`](https://redux.js.org/api/applymiddleware).
+> Add middleware as an item in an array, passed to [`applyMiddleware`](https://redux.js.org/api/applymiddleware).
 
 ### withStore
 
