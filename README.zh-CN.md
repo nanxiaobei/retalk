@@ -16,8 +16,6 @@ Retalk 是 Redux 的一个最佳实践，简单、流畅而智慧。
 
 ---
 
-> 请注意：自 v2.0.0 起 `reducers` 已被废弃。
-
 ## 特性
 
 - **极简 Redux 实践**：只需要 `state` 和 `actions`，简洁清晰。
@@ -44,20 +42,18 @@ npm install retalk
 #### 1. Model
 
 ```js
-// demo/model.js
-
 const model = {
   state: {
     value: 0,
   },
   actions: {
     add() {
-      const { value } = this.state; // `this.state` -> 获取 state
-      this.setState({ value: value + 1 }); // `this.setState` -> 更新 state
+      const { value } = this.state; // this.state -> 获取 state
+      this.setState({ value: value + 1 }); // this.setState -> 更新 state
     },
     async asyncAdd() {
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      this.add(); // `this[actionName]` -> 调用 action
+      this.add(); // this[actionName] -> 调用 action
     },
   },
 };
@@ -68,8 +64,6 @@ export default model;
 #### 2. Store
 
 ```js
-// store.js
-
 import { createStore } from 'retalk';
 import demo from './demo/model';
 
@@ -83,13 +77,10 @@ export default store;
 #### 3. View
 
 ```jsx
-// demo/index.jsx
-
 import React from 'react';
 import { connect } from 'react-redux';
 import { withStore } from 'retalk';
 
-// `loading[asyncAction]` -> 展示加载中
 const Demo = ({ value，add，asyncAdd，loading }) => (
   <div>
     <h4>Value: {value}</h4>
@@ -97,6 +88,7 @@ const Demo = ({ value，add，asyncAdd，loading }) => (
     <button onClick={asyncAdd}>Async +1 {loading.asyncAdd ? '...' ：''}</button>
   </div>
 );
+// loading[asyncAction] -> 异步 action 的 loading 状态
 
 export default connect(...withStore('demo'))(Demo);
 ```

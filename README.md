@@ -16,8 +16,6 @@ English | [简体中文](./README.zh-CN.md)
 
 ---
 
-> BREAKING CHANGES: `reducers` was deprecated since v2.0.0.
-
 ## Features
 
 - **Simplest Redux**: Just `state` and `actions`, clear than ever before.
@@ -44,20 +42,18 @@ npm install retalk
 #### 1. Model
 
 ```js
-// demo/model.js
-
 const model = {
   state: {
     value: 0,
   },
   actions: {
     add() {
-      const { value } = this.state; // `this.state` -> get state
-      this.setState({ value: value + 1 }); // `this.setState` -> update state
+      const { value } = this.state; // this.state -> Get state
+      this.setState({ value: value + 1 }); // this.setState -> Set state
     },
     async asyncAdd() {
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      this.add(); // `this[actionName]` -> call action
+      this.add(); // this[actionName] -> Call action
     },
   },
 };
@@ -68,8 +64,6 @@ export default model;
 #### 2. Store
 
 ```js
-// store.js
-
 import { createStore } from 'retalk';
 import demo from './demo/model';
 
@@ -83,13 +77,10 @@ export default store;
 #### 3. View
 
 ```jsx
-// demo/index.jsx
-
 import React from 'react';
 import { connect } from 'react-redux';
 import { withStore } from 'retalk';
 
-// `loading[asyncAction]` -> show loading
 const Demo = ({ value, add, asyncAdd, loading }) => (
   <div>
     <h4>Value: {value}</h4>
@@ -97,6 +88,7 @@ const Demo = ({ value, add, asyncAdd, loading }) => (
     <button onClick={asyncAdd}>Async +1 {loading.asyncAdd ? '...' : ''}</button>
   </div>
 );
+// loading[asyncAction] -> Async action's loading status
 
 export default connect(...withStore('demo'))(Demo);
 ```
