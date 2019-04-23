@@ -16,31 +16,45 @@ import { ERR, isObject, checkModel, createHandler, checkDuplicate } from './util
  * @return {object} Store
  */
 const createStore = (models, options = {}) => {
-  // Check params
-  if (!isObject(models)) throw new Error(ERR.NOT_OBJECT('models'));
-  if (!isObject(options)) throw new Error(ERR.NOT_OBJECT('options'));
+  const isEnvDevelopment = process.env.NODE_ENV === 'development';
+
   const { useDevTools = true, plugins = [] } = options;
-  if (typeof useDevTools !== 'undefined' && typeof useDevTools !== 'boolean')
-    throw new Error(ERR.NOT_BOOLEAN('options.useDevTools'));
-  if (typeof plugins !== 'undefined' && !Array.isArray(plugins))
-    throw new Error(ERR.NOT_ARRAY('options.plugins'));
-
-  const modelEntries = Object.entries(models);
-
-  // Check model, get action names
+  let modelEntries = [];
   let actionNames = [];
-  modelEntries.forEach(([name, model]) => {
-    checkModel(name, model);
-    actionNames = [...actionNames, ...Object.keys(model.actions)];
-  });
-  actionNames = [...new Set(actionNames)];
-
-  // Check model name, create reducer
   const rootReducers = {};
-  modelEntries.forEach(([name, model]) => {
-    if (actionNames.includes(name)) throw new Error(ERR.MODEL_NAME(name));
-    rootReducers[name] = createReducer(name, model.state);
-  });
+
+  if (isEnvDevelopment) {
+    // Check params
+    if (!isObject(models)) throw new Error(ERR.NOT_OBJECT('models'));
+    if (!isObject(options)) throw new Error(ERR.NOT_OBJECT('options'));
+    if (typeof useDevTools !== 'undefined' && typeof useDevTools !== 'boolean')
+      throw new Error(ERR.NOT_BOOLEAN('options.useDevTools'));
+    if (typeof plugins !== 'undefined' && !Array.isArray(plugins))
+      throw new Error(ERR.NOT_ARRAY('options.plugins'));
+
+    modelEntries = Object.entries(models);
+
+    // Check model, collect action names for model name check
+    modelEntries.forEach(([name, model]) => {
+      checkModel(name, model);
+      const { actions } = model;
+      actionNames = [...actionNames, ...Object.keys(actions)];
+    });
+    actionNames = [...new Set(actionNames)];
+
+    // Check model name, create reducer
+    modelEntries.forEach(([name, { state }]) => {
+      if (actionNames.includes(name)) throw new Error(ERR.MODEL_NAME(name));
+      rootReducers[name] = createReducer(name, state);
+    });
+  } else {
+    modelEntries = Object.entries(models);
+
+    // Create reducer
+    modelEntries.forEach(([name, { state }]) => {
+      rootReducers[name] = createReducer(name, state);
+    });
+  }
 
   // Create store
   const composeEnhancers =
@@ -72,13 +86,15 @@ const createStore = (models, options = {}) => {
   // store.addModel
   store.addModel = (name, model) => {
     if (name in rootReducers) return;
+    const { state, actions } = model;
 
-    checkModel(name, model);
-    actionNames = [...new Set([...actionNames, ...Object.keys(model.actions)])];
+    if (isEnvDevelopment) {
+      checkModel(name, model);
+      actionNames = [...new Set([...actionNames, ...Object.keys(actions)])];
+      if (actionNames.includes(name)) throw new Error(ERR.MODEL_NAME(name));
+    }
 
-    if (actionNames.includes(name)) throw new Error(ERR.MODEL_NAME(name));
-    rootReducers[name] = createReducer(name, model.state);
-
+    rootReducers[name] = createReducer(name, state);
     store.replaceReducer(combineReducers(rootReducers));
 
     modelsProxy[name] = new Proxy({}, createHandler(name, getState, dispatch));
@@ -96,50 +112,78 @@ const createStore = (models, options = {}) => {
  * @return {function[]} [mapState, mapActions]
  */
 const withStore = (...names) => {
-  const namesLength = names.length;
-  if (namesLength === 0) throw new Error(ERR.WITH_STORE());
+  const isEnvDevelopment = process.env.NODE_ENV === 'development';
 
-  let stateCount = 0;
-  let actionsCount = 0;
+  if (isEnvDevelopment) {
+    const namesLength = names.length;
+    if (namesLength === 0) throw new Error(ERR.WITH_STORE());
 
-  let mergedState = { loading: {} };
-  let mergedActions = {};
+    let stateCount = 0;
+    let actionsCount = 0;
 
-  return [
-    (state) => {
-      names.forEach((name) => {
-        const modelState = state[name];
+    let mergedState = { loading: {} };
+    let mergedActions = {};
 
-        if (stateCount < namesLength) {
-          if (typeof name !== 'string' || !(name in state)) throw new Error(ERR.WITH_STORE());
-          if (namesLength > 1) {
-            checkDuplicate(name, 'state', modelState, mergedState);
+    return [
+      (state) => {
+        names.forEach((name) => {
+          const modelState = state[name];
+
+          if (stateCount < namesLength) {
+            if (typeof name !== 'string' || !(name in state)) throw new Error(ERR.WITH_STORE());
+            if (namesLength > 1) {
+              checkDuplicate(name, 'state', modelState, mergedState);
+            }
+            stateCount += 1;
           }
-          stateCount += 1;
-        }
 
-        mergedState = {
-          ...mergedState,
-          ...modelState,
-          ...{ loading: { ...mergedState.loading, ...modelState.loading } },
-        };
-      });
-      return mergedState;
-    },
-    (dispatch) => {
-      names.forEach((name) => {
-        const modelActions = dispatch[name];
+          mergedState = {
+            ...mergedState,
+            ...modelState,
+            ...{ loading: { ...mergedState.loading, ...modelState.loading } },
+          };
+        });
+        return mergedState;
+      },
+      (dispatch) => {
+        names.forEach((name) => {
+          const modelActions = dispatch[name];
 
-        if (namesLength > 1 && actionsCount < namesLength) {
-          checkDuplicate(name, 'action', modelActions, mergedActions);
-          actionsCount += 1;
-        }
+          if (namesLength > 1 && actionsCount < namesLength) {
+            checkDuplicate(name, 'action', modelActions, mergedActions);
+            actionsCount += 1;
+          }
 
-        mergedActions = { ...mergedActions, ...modelActions };
-      });
-      return mergedActions;
-    },
-  ];
+          mergedActions = { ...mergedActions, ...modelActions };
+        });
+        return mergedActions;
+      },
+    ];
+  } else {
+    let mergedState = { loading: {} };
+    let mergedActions = {};
+
+    return [
+      (state) => {
+        names.forEach((name) => {
+          const modelState = state[name];
+          mergedState = {
+            ...mergedState,
+            ...modelState,
+            ...{ loading: { ...mergedState.loading, ...modelState.loading } },
+          };
+        });
+        return mergedState;
+      },
+      (dispatch) => {
+        names.forEach((name) => {
+          const modelActions = dispatch[name];
+          mergedActions = { ...mergedActions, ...modelActions };
+        });
+        return mergedActions;
+      },
+    ];
+  }
 };
 
 export { createStore, withStore };

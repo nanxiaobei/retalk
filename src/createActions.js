@@ -11,14 +11,12 @@ import { ERR, isAsyncFn } from './utils';
  * @param {object} thisProxy
  */
 const createActions = (name, model, getState, dispatch, theRealDispatch, thisProxy) => {
+  const isEnvDevelopment = process.env.NODE_ENV === 'development';
+
   const { state, actions } = model;
-  const forbiddenNames = ['state', 'setState', ...Object.keys(state)];
-
   const newActions = {};
-  Object.entries(actions).forEach(([actionName, oldAction]) => {
-    if (forbiddenNames.includes(actionName)) throw new Error(ERR.ACTION_NAME(name, actionName));
-    if (typeof oldAction !== 'function') throw new Error(ERR.ACTION(name, actionName));
 
+  const formatAction = (actionName, oldAction) => {
     const setState = function reducer(payload) {
       return theRealDispatch({ type: `${name}/${actionName}`, payload });
     };
@@ -45,7 +43,22 @@ const createActions = (name, model, getState, dispatch, theRealDispatch, thisPro
         return result;
       };
     }
-  });
+  };
+
+  if (isEnvDevelopment) {
+    const forbiddenNames = ['state', 'setState', ...Object.keys(state)];
+
+    Object.entries(actions).forEach(([actionName, oldAction]) => {
+      if (forbiddenNames.includes(actionName)) throw new Error(ERR.ACTION_NAME(name, actionName));
+      if (typeof oldAction !== 'function') throw new Error(ERR.ACTION(name, actionName));
+
+      formatAction(actionName, oldAction);
+    });
+  } else {
+    Object.entries(actions).forEach(([actionName, oldAction]) => {
+      formatAction(actionName, oldAction);
+    });
+  }
 
   dispatch[name] = newActions;
 };
