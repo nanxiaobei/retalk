@@ -21,7 +21,7 @@ English | [简体中文](./README.zh-CN.md)
 - **Simplest Redux**: Just `state` and `actions`, clear than ever before.
 - **Two API totally**: `createStore` and `withStore`, no more annoying concepts.
 - **Async import model**: Fully code splitting support for models.
-- **Auto `loading` state**: Just request, and loading state is ready to use.
+- **Auto `loading` state**: Send request, and loading state is ready to use.
 
 ## Install
 
