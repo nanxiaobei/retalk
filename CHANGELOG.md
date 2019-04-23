@@ -2,6 +2,11 @@
 
 English | [简体中文](./CHANGELOG.zh-CN.md)
 
+## 2.2.0 (4.24, 2019)
+
+- Remove error checks in 'production' mode to improve performance. (Only check when `process.env.NODE_ENV === 'development'`)
+- Upgrade dependencies
+
 ## 2.1.0 (1.30, 2019)
 
 - Enable Redux DevTools by default.

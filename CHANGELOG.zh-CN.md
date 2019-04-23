@@ -2,6 +2,11 @@
 
 [English](./CHANGELOG.md) | 简体中文
 
+## 2.2.0 (4.24, 2019)
+
+- 移除 'production' 环境时的错误检查以提升性能。（只在 `process.env.NODE_ENV === 'development'` 时检查）
+- 升级依赖模块
+
 ## 2.1.0 (1.30, 2019)
 
 - 默认启用 Redux DevTools。
