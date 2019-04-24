@@ -20,7 +20,8 @@ export const ERR = {
   DUPLICATE: (name, type, key) =>
     `withStore: Duplicate '${key}' ${type} in ${name} and another model`,
   // withStore
-  WITH_STORE: () => 'Illegal model name passed to withStore',
+  EMPTY_PARAM: () => 'Empty model name passed to withStore',
+  PARAM: () => `Illegal model name passed to withStore`,
 };
 
 /**
@@ -90,7 +91,7 @@ export const createHandler = (name, getState, dispatch, modelsProxy) => ({
 });
 
 /**
- * 6. Check duplicate keys
+ * 6. Check duplicate state or action keys in withStore
  *
  * @param {string} name
  * @param {string} type
