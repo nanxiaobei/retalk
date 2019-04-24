@@ -92,13 +92,13 @@ describe('withStore', () => {
     process.env.NODE_ENV = 'development';
     expect(() => {
       connect(...withStore());
-    }).toThrow(ERR.WITH_STORE());
+    }).toThrow(ERR.EMPTY_PARAM());
     expect(() => {
       connect(...withStore(['testModel']));
-    }).toThrow(ERR.WITH_STORE());
+    }).toThrow(ERR.PARAM());
     expect(() => {
       connect(...withStore('testModel', 123));
-    }).toThrow(ERR.WITH_STORE());
+    }).toThrow(ERR.PARAM());
     sharedEnvTests();
 
     process.env.NODE_ENV = 'production';
