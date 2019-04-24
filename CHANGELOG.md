@@ -2,6 +2,10 @@
 
 English | [简体中文](./CHANGELOG.zh-CN.md)
 
+## 2.2.1 (4.24, 2019)
+
+- Refine `withStore`
+
 ## 2.2.0 (4.24, 2019)
 
 - Remove error checks in 'production' mode to improve performance. (Only check when `process.env.NODE_ENV === 'development'`)
