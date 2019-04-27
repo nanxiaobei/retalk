@@ -2,14 +2,17 @@
 
 English | [简体中文](./CHANGELOG.zh-CN.md)
 
+## 2.2.2 (4.27, 2019)
+
+- Refine `withStore` logic.
+
 ## 2.2.1 (4.24, 2019)
 
-- Refine `withStore`
+- Fix `withStore` error message bug in 'development' mode.
 
 ## 2.2.0 (4.24, 2019)
 
 - Remove error checks in 'production' mode to improve performance. (Only check when `process.env.NODE_ENV === 'development'`)
-- Upgrade dependencies
 
 ## 2.1.0 (1.30, 2019)
 

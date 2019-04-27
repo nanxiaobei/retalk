@@ -2,14 +2,17 @@
 
 [English](./CHANGELOG.md) | 简体中文
 
+## 2.2.2 (4.27, 2019)
+
+- 优化 `withStore` 逻辑。
+
 ## 2.2.1 (4.24, 2019)
 
-- 优化 `withStore`
+- 修复 `withStore` 'development' 环境时的错误提示信息 bug。
 
 ## 2.2.0 (4.24, 2019)
 
 - 移除 'production' 环境时的错误检查以提升性能。（只在 `process.env.NODE_ENV === 'development'` 时检查）
-- 升级依赖模块
 
 ## 2.1.0 (1.30, 2019)
 
