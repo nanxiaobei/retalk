@@ -114,53 +114,48 @@ const createStore = (models, options = {}) => {
 const withStore = (...names) => {
   const isEnvDevelopment = process.env.NODE_ENV === 'development';
 
-  let mergedState = { loading: {} };
-  let mergedActions = {};
+  let allState = { loading: {} };
+  let allActions = {};
 
   if (isEnvDevelopment) {
-    const modelsNum = names.length;
-    if (modelsNum === 0) throw new Error(ERR.EMPTY_PARAM());
+    if (names.length === 0) throw new Error(ERR.EMPTY_PARAM());
 
-    let errModalName = false;
-
-    let stateCheckedNum = 0;
-    let actionsCheckedNum = 1;
+    let stateChecked = false;
+    let actionsChecked = false;
 
     return [
       (state) => {
         names.forEach((name, index) => {
-          const modelState = state[name];
+          const partState = state[name];
 
-          if (stateCheckedNum < modelsNum) {
-            if (typeof name !== 'string' || !(name in state)) errModalName = name;
-            if (errModalName !== false) throw new Error(ERR.PARAM());
-
-            if (modelsNum > 1 && index > 0) {
-              checkDuplicate(name, 'state', modelState, mergedState);
-            }
-            stateCheckedNum += 1;
+          if (!stateChecked) {
+            if (typeof name !== 'string' || !(name in state)) throw new Error(ERR.PARAM());
+            if (index > 0) checkDuplicate(name, 'state', partState, allState);
           }
 
-          mergedState = {
-            ...mergedState,
-            ...modelState,
-            ...{ loading: { ...mergedState.loading, ...modelState.loading } },
+          allState = {
+            ...allState,
+            ...partState,
+            ...{ loading: { ...allState.loading, ...partState.loading } },
           };
         });
-        return mergedState;
+        if (!stateChecked) stateChecked = true;
+
+        return allState;
       },
       (dispatch) => {
         names.forEach((name, index) => {
-          const modelActions = dispatch[name];
+          const partActions = dispatch[name];
 
-          if (modelsNum > 1 && index > 0 && actionsCheckedNum < modelsNum) {
-            checkDuplicate(name, 'action', modelActions, mergedActions);
-            actionsCheckedNum += 1;
+          if (!actionsChecked) {
+            if (index > 0) checkDuplicate(name, 'action', partActions, allActions);
           }
 
-          mergedActions = { ...mergedActions, ...modelActions };
+          allActions = { ...allActions, ...partActions };
         });
-        return mergedActions;
+        if (!actionsChecked) actionsChecked = true;
+
+        return allActions;
       },
     ];
   }
@@ -168,21 +163,21 @@ const withStore = (...names) => {
   return [
     (state) => {
       names.forEach((name) => {
-        const modelState = state[name];
-        mergedState = {
-          ...mergedState,
-          ...modelState,
-          ...{ loading: { ...mergedState.loading, ...modelState.loading } },
+        const partState = state[name];
+        allState = {
+          ...allState,
+          ...partState,
+          ...{ loading: { ...allState.loading, ...partState.loading } },
         };
       });
-      return mergedState;
+      return allState;
     },
     (dispatch) => {
       names.forEach((name) => {
-        const modelActions = dispatch[name];
-        mergedActions = { ...mergedActions, ...modelActions };
+        const partActions = dispatch[name];
+        allActions = { ...allActions, ...partActions };
       });
-      return mergedActions;
+      return allActions;
     },
   ];
 };
