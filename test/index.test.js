@@ -106,8 +106,9 @@ describe('withStore', () => {
   });
 
   it('should throw error if state or actions are duplicated when merge', () => {
+    const add = () => {};
     const state = { testModel: { value: 1 }, testModel2: { value: 1 }, testModel3: {} };
-    const dispatch = { testModel: {}, testModel2: { add() {} }, testModel3: { add() {} } };
+    const dispatch = { testModel: {}, testModel2: { add }, testModel3: { add } };
     const connect = (mapState, mapActions) => {
       mapState(state);
       mapActions(dispatch);
@@ -123,6 +124,7 @@ describe('withStore', () => {
         ),
       ).toEqual({});
       expect(mapState(state)).toEqual({ loading: {}, value: 1 });
+      expect(mapActions(dispatch)).toEqual({ add });
     };
 
     process.env.NODE_ENV = 'development';
