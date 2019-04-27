@@ -41,6 +41,7 @@ describe('checkModel', () => {
       checkModel('testModel', { state: {}, actions: [] });
     }).toThrow(ERR.MODEL('testModel'));
   });
+
   it("should show 'reducers' deprecation warning", () => {
     const testModel = {
       state: { a: 1, b: 2 },
