@@ -25,13 +25,13 @@ Retalk 是 Redux 的一个最佳实践，简单、流畅而智慧。
 
 ## 安装
 
-#### Yarn
+### Yarn
 
 ```bash
 yarn add retalk
 ```
 
-#### npm
+### npm
 
 ```bash
 npm install retalk
@@ -39,7 +39,7 @@ npm install retalk
 
 ## 使用
 
-#### 1. Model
+### 1. Model
 
 ```js
 const model = {
@@ -61,7 +61,7 @@ const model = {
 export default model;
 ```
 
-#### 2. Store
+### 2. Store
 
 ```js
 import { createStore } from 'retalk';
@@ -74,7 +74,7 @@ const store = createStore({
 export default store;
 ```
 
-#### 3. View
+### 3. View
 
 ```jsx
 import React from 'react';
@@ -98,6 +98,8 @@ export default connect(...withStore('demo'))(Demo);
 ## 文档
 
 查看 [文档](./docs/DOCUMENTATION.zh-CN.md) 了解更多详细信息。
+
+> Retalk 中使用了 `Proxy`，如果老版本浏览器不支持，请尝试 [proxy-polyfill](https://github.com/GoogleChrome/proxy-polyfill)。
 
 ## 更新
 

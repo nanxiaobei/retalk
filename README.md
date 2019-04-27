@@ -25,13 +25,13 @@ English | [简体中文](./README.zh-CN.md)
 
 ## Install
 
-#### Yarn
+### Yarn
 
 ```bash
 yarn add retalk
 ```
 
-#### npm
+### npm
 
 ```bash
 npm install retalk
@@ -39,7 +39,7 @@ npm install retalk
 
 ## Usage
 
-#### 1. Model
+### 1. Model
 
 ```js
 const model = {
@@ -61,7 +61,7 @@ const model = {
 export default model;
 ```
 
-#### 2. Store
+### 2. Store
 
 ```js
 import { createStore } from 'retalk';
@@ -74,7 +74,7 @@ const store = createStore({
 export default store;
 ```
 
-#### 3. View
+### 3. View
 
 ```jsx
 import React from 'react';
@@ -98,6 +98,8 @@ Well, only 3 steps, A simple Retalk demo is here. [https://codesandbox.io/s/5l9m
 ## Documentation
 
 See more details in the [documentation](./docs/DOCUMENTATION.md).
+
+> Retalk uses `Proxy`, if old browsers not support, please try [proxy-polyfill](https://github.com/GoogleChrome/proxy-polyfill).
 
 ## Changelog
 
