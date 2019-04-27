@@ -44,25 +44,23 @@ state: {
 
 单个 action 是一个函数，可以是同步函数也可以是异步函数。
 
-在 action 中，使用 `this.state` 获取 state，使用 `this.setState` 更新 state。
-
-同 React 组件中的语法一致， 但需注意它们是不同的东西。
+`this.state` 与 `this.setState`，同 React 组件中的语法一致，但需注意它们是不同的东西。
 
 ```js
 actions: {
   add() {
     // `this` 中有些什么？
 
-    // this.state
-    // this.setState
-    // this[actionName]
+    // this.state -> 获取 state
+    // this.setState -> 更新 state
+    // this[actionName] -> 调用 action
 
-    // this[modelName].state
-    // this[modelName][actionName]
+    // this[modelName].state -> 获取其它 model 的 state
+    // this[modelName][actionName] -> 调用其它 model 的 action
   },
   async asyncAdd() {
     // 使用 `async / await` 语法定义一个异步 action
-    // 自动添加的 `loading.asyncAdd` 可供使用
+    // 自动处理的 `loading.asyncAdd` 可供使用
   }
 }
 ```

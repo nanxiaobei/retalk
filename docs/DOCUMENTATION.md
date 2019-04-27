@@ -44,21 +44,19 @@ type: `Object`
 
 A single action is a function, it can be sync or async.
 
-In an action, use `this.state` to get state, `this.setState` to update state.
-
-Like the syntax in a React component, but remember they are not the same.
+`this.state` and `this.setState`, like the syntax in a React component, but remember they are not the same.
 
 ```js
 actions: {
   add() {
     // What's in `this` context?
 
-    // this.state
-    // this.setState
-    // this[actionName]
+    // this.state -> Get state
+    // this.setState -> Set state
+    // this[actionName] -> Call action
 
-    // this[modelName].state
-    // this[modelName][actionName]
+    // this[modelName].state -> Get another model's state
+    // this[modelName][actionName] -> Call another model's action
   },
   async asyncAdd() {
     // Use `async / await` syntax to define an async action
