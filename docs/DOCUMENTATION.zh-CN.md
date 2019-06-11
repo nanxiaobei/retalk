@@ -44,7 +44,7 @@ state: {
 
 单个 action 是一个函数，可以是同步函数也可以是异步函数。
 
-`this.state` 与 `this.setState`，同 React 组件中的语法一致，但需注意它们是不同的东西。
+在一个 action 中，你可以使用 `this.state` 与 `this.setState()`，同 React 组件中的 API 一致。
 
 ```js
 actions: {
@@ -52,15 +52,15 @@ actions: {
     // `this` 中有些什么？
 
     // this.state -> 获取 state
-    // this.setState -> 更新 state
-    // this[actionName] -> 调用 action
+    // this.setState() -> 更新 state
+    // this[actionName]() -> 调用 action
 
     // this[modelName].state -> 获取其它 model 的 state
-    // this[modelName][actionName] -> 调用其它 model 的 action
+    // this[modelName][actionName]() -> 调用其它 model 的 action
   },
   async asyncAdd() {
     // 使用 `async / await` 语法定义一个异步 action
-    // 自动处理的 `loading.asyncAdd` 可供使用
+    // 自动添加的 `loading.asyncAdd` 可供使用
   }
 }
 ```
@@ -126,7 +126,7 @@ connect(...withStore('modelA', 'modelB'))(component);
 
 使用 `withStore` 将所有的 `state` 和 `actions` 注入组件的 props 中，可以注入多个 model。
 
-`withStore` 必须使用 [rest parameter](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/rest_parameters) 语法传递给 `connect`。
+`withStore` 必须使用 [剩余参数](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Functions/Rest_parameters) 语法传递给 `connect`。
 
 ## 指南
 
@@ -134,7 +134,7 @@ connect(...withStore('modelA', 'modelB'))(component);
 
 首先，使用 `createStore` 初始化 store。
 
-接着使用 [react-loadable](https://github.com/jamiebuilds/react-loadable#loading-multiple-resources) 或 [loadable-components](https://github.com/smooth-code/loadable-components/#loading-multiple-resources-in-parallel) 去动态引入组件与 model。
+接着使用 [react-loadable](https://github.com/jamiebuilds/react-loadable#loading-multiple-resources)（或 [loadable-components](https://github.com/smooth-code/loadable-components/#loading-multiple-resources-in-parallel)）去动态引入组件与 model。
 
 最后使用 `store.addModel(name: string, model: Object)` 将异步引入的 model 注入 store。
 

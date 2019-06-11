@@ -44,7 +44,7 @@ type: `Object`
 
 A single action is a function, it can be sync or async.
 
-`this.state` and `this.setState`, like the syntax in a React component, but remember they are not the same.
+In an action, you can use `this.state` and `this.setState()`, just like APIs in a React component.
 
 ```js
 actions: {
@@ -52,11 +52,11 @@ actions: {
     // What's in `this` context?
 
     // this.state -> Get state
-    // this.setState -> Set state
-    // this[actionName] -> Call action
+    // this.setState() -> Set state
+    // this[actionName]() -> Call action
 
     // this[modelName].state -> Get another model's state
-    // this[modelName][actionName] -> Call another model's action
+    // this[modelName][actionName]() -> Call another model's action
   },
   async asyncAdd() {
     // Use `async / await` syntax to define an async action
@@ -126,7 +126,7 @@ connect(...withStore('modelA', 'modelB'))(component);
 
 Use `withStore` to eject all `state` and `actions` to a component's props, you can eject more than one model.
 
-`withStore` must be passed in [rest parameter](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/rest_parameters) syntax to `connect`.
+`withStore` must be passed in [rest parameters](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/rest_parameters) syntax to `connect`.
 
 ## Guides
 
@@ -134,7 +134,7 @@ Use `withStore` to eject all `state` and `actions` to a component's props, you c
 
 First, use `createStore` to initialize store.
 
-Then use libraries like [react-loadable](https://github.com/jamiebuilds/react-loadable#loading-multiple-resources) or [loadable-components](https://github.com/smooth-code/loadable-components/#loading-multiple-resources-in-parallel) to dynamic import both component and model.
+Then use libraries like [react-loadable](https://github.com/jamiebuilds/react-loadable#loading-multiple-resources) (or [loadable-components](https://github.com/smooth-code/loadable-components/#loading-multiple-resources-in-parallel)) to dynamic import both component and model.
 
 Then use `store.addModel(name: string, model: Object)` to eject the async imported model to store.
 
