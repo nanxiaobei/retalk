@@ -29,29 +29,27 @@
     "test": "jest",
     "coverage": "codecov"
   },
-  "peerDependencies": {
-    "@babel/runtime": "^7.4.4"
-  },
   "dependencies": {
-    "redux": "^4.0.1"
+    "@babel/runtime": "^7.5.3",
+    "redux": "^4.0.3"
   },
   "devDependencies": {
-    "@babel/core": "^7.4.4",
-    "@babel/plugin-transform-runtime": "^7.4.4",
-    "@babel/preset-env": "^7.4.4",
+    "@babel/core": "^7.5.0",
+    "@babel/plugin-transform-runtime": "^7.5.0",
+    "@babel/preset-env": "^7.5.3",
     "babel-core": "^7.0.0-bridge",
-    "babel-eslint": "^10.0.1",
-    "babel-jest": "^24.7.1",
-    "codecov": "^3.3.0",
+    "babel-eslint": "^10.0.2",
+    "babel-jest": "^24.8.0",
+    "codecov": "^3.5.0",
     "cross-env": "^5.2.0",
-    "husky": "^2.1.0",
-    "jest": "^24.7.1",
-    "lint-staged": "^8.1.5",
-    "prettier": "^1.17.0",
+    "husky": "^3.0.0",
+    "jest": "^24.8.0",
+    "lint-staged": "^9.1.0",
+    "prettier": "^1.18.2",
     "rimraf": "^2.6.2",
-    "rollup": "^1.10.1",
-    "rollup-plugin-babel": "^4.0.3",
-    "rollup-plugin-eslint": "^5.1.0"
+    "rollup": "^1.16.7",
+    "rollup-plugin-babel": "^4.3.3",
+    "rollup-plugin-eslint": "^7.0.0"
   },
   "husky": {
     "hooks": {
