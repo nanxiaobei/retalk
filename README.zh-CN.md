@@ -67,9 +67,7 @@ export default model;
 import { createStore } from 'retalk';
 import demo from './demo/model';
 
-const store = createStore({
-  demo,
-});
+const store = createStore({ demo });
 
 export default store;
 ```
@@ -82,11 +80,11 @@ import { connect } from 'react-redux';
 import { withStore } from 'retalk';
 
 const Demo = ({ value，add，asyncAdd，loading }) => (
-  <div>
+  <>
     <h4>Value: {value}</h4>
     <button onClick={add}>+1</button>
     <button onClick={asyncAdd}>Async +1 {loading.asyncAdd ? '...' ：''}</button>
-  </div>
+  </>
 );
 // loading[asyncAction] -> 异步 action 的 loading 状态
 
