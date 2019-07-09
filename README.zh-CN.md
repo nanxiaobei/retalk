@@ -49,11 +49,11 @@ const model = {
   actions: {
     add() {
       const { value } = this.state; // this.state -> 获取 state
-      this.setState({ value: value + 1 }); // this.setState -> 更新 state
+      this.setState({ value: value + 1 }); // this.setState() -> 更新 state
     },
     async asyncAdd() {
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      this.add(); // this[actionName] -> 调用 action
+      this.add(); // this[actionName]() -> 调用 action
     },
   },
 };

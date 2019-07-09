@@ -49,11 +49,11 @@ const model = {
   actions: {
     add() {
       const { value } = this.state; // this.state -> Get state
-      this.setState({ value: value + 1 }); // this.setState -> Set state
+      this.setState({ value: value + 1 }); // this.setState() -> Set state
     },
     async asyncAdd() {
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      this.add(); // this[actionName] -> Call action
+      this.add(); // this[actionName]() -> Call action
     },
   },
 };
