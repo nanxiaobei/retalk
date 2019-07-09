@@ -18,16 +18,18 @@
 
 ### Model
 
-Model 将 `state` 和 `actions` 集合于一处。通常，你会有多个 model。
+Model 将 `state` 和 `actions` 集合于一处。通常会有多个 model。
 
 #### `state`
 
-类型：`Object`
+类型：`object`
 
-Retalk 会自动添加 `loading` 对象到 `state` 中。
+在此处设置 model 的初始 state。
+
+Retalk 会自动添加 `loading` 对象到 `state` 中，结构如下：
 
 ```js
-// state.loading
+// 直接使用 `state.loading` 对象，无需手动添加
 
 state: {
   loading: {
@@ -40,11 +42,11 @@ state: {
 
 #### `actions`
 
-类型：`Object`
+类型：`object`
 
 单个 action 是一个函数，可以是同步函数也可以是异步函数。
 
-在一个 action 中，你可以使用 `this.state` 与 `this.setState()`，同 React 组件中的 API 一致。
+在一个 action 中，可以使用 `this.state` 与 `this.setState()`，同 React 组件中的 API 一致。
 
 ```js
 actions: {
@@ -83,21 +85,12 @@ View 是一个 React 组件。
 
 ### createStore
 
-`createStore(models[, options])`
+`createStore(models: object, options?: object)`
 
 ```js
 import { createStore } from 'retalk';
 
-createStore(
-  {
-    modelA: { state, actions },
-    modelB: { state, actions },
-  },
-  {
-    useDevTools: false,
-    plugins: [logger],
-  },
-);
+createStore({ modelA, modelB }, { useDevTools: false, plugins: [logger] });
 ```
 
 #### options.useDevTools
@@ -110,7 +103,7 @@ createStore(
 
 #### options.plugins
 
-类型：`Array`，默认：`[]`
+类型：`array`，默认：`[]`
 
 > 将中间件以数组各项的形式，依次添加到 [`applyMiddleware`](https://redux.js.org/api/applymiddleware) 中。
 
@@ -136,7 +129,7 @@ connect(...withStore('modelA', 'modelB'))(component);
 
 接着使用 [react-loadable](https://github.com/jamiebuilds/react-loadable#loading-multiple-resources)（或 [loadable-components](https://github.com/smooth-code/loadable-components/#loading-multiple-resources-in-parallel)）去动态引入组件与 model。
 
-最后使用 `store.addModel(name: string, model: Object)` 将异步引入的 model 注入 store。
+最后使用 `store.addModel(name: string, model: object)` 将异步引入的 model 注入 store。
 
 一个使用 loadable-components 的示例：
 

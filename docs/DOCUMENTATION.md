@@ -22,12 +22,14 @@ Model brings `state` and `actions` together in one place. Typically, you will ha
 
 #### `state`
 
-type: `Object`
+type: `object`
 
-Retalk will automatically add `loading: Object` to `state`.
+Set the initial state of model here.
+
+Retalk will add `loading: object` to `state` automatically, structure is like this:
 
 ```js
-// state.loading
+// Use state.loading directly, no need to add manually
 
 state: {
   loading: {
@@ -40,7 +42,7 @@ state: {
 
 #### `actions`
 
-type: `Object`
+type: `object`
 
 A single action is a function, it can be sync or async.
 
@@ -83,21 +85,12 @@ Then you can use all `state` and `actions` in the component.
 
 ### createStore
 
-`createStore(models[, options])`
+`createStore(models: object, options?: object)`
 
 ```js
 import { createStore } from 'retalk';
 
-createStore(
-  {
-    modelA: { state, actions },
-    modelB: { state, actions },
-  },
-  {
-    useDevTools: false,
-    plugins: [logger],
-  },
-);
+createStore({ modelA, modelB }, { useDevTools: false, plugins: [logger] });
 ```
 
 #### options.useDevTools
@@ -110,7 +103,7 @@ type: `boolean`, default: `true`
 
 #### options.plugins
 
-type: `Array`, default: `[]`
+type: `array`, default: `[]`
 
 > Add middleware as an item in an array, passed to [`applyMiddleware`](https://redux.js.org/api/applymiddleware).
 
@@ -136,7 +129,7 @@ First, use `createStore` to initialize store.
 
 Then use libraries like [react-loadable](https://github.com/jamiebuilds/react-loadable#loading-multiple-resources) (or [loadable-components](https://github.com/smooth-code/loadable-components/#loading-multiple-resources-in-parallel)) to dynamic import both component and model.
 
-Then use `store.addModel(name: string, model: Object)` to eject the async imported model to store.
+Then use `store.addModel(name: string, model: object)` to eject the async imported model to store.
 
 Here is a loadable-components example:
 
