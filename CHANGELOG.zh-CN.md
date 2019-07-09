@@ -42,8 +42,8 @@
 
 ## 1.2.0 (12.5, 2018)
 
-- 更改 `createStore(models: Object, useReduxDevTools: boolean)` 为 `createStore(models: Object, options: Object)`。
+- 更改 `createStore(models: object, useReduxDevTools: boolean)` 为 `createStore(models: object, options: object)`。
 - 添加 `options.useDevTools: boolean`。
-- 添加 `options.plugins: Array`。[#3](https://github.com/nanxiaobei/retalk/issues/3) [@he5050](https://github.com/he5050)
+- 添加 `options.plugins: array`。[#3](https://github.com/nanxiaobei/retalk/issues/3) [@he5050](https://github.com/he5050)
 - 简化 README。
 - 优化代码。

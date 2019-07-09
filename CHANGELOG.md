@@ -42,8 +42,8 @@ English | [简体中文](./CHANGELOG.zh-CN.md)
 
 ## 1.2.0 (12.5, 2018)
 
-- Change `createStore(models: Object, useReduxDevTools: boolean)` to `createStore(models: Object, options: Object)`.
+- Change `createStore(models: object, useReduxDevTools: boolean)` to `createStore(models: object, options: object)`.
 - Add `options.useDevTools: boolean`.
-- Add `options.plugins: Array`. ([#3](https://github.com/nanxiaobei/retalk/issues/3) by [@he5050](https://github.com/he5050))
+- Add `options.plugins: array`. ([#3](https://github.com/nanxiaobei/retalk/issues/3) by [@he5050](https://github.com/he5050))
 - Simplify README.
 - Refine code.
