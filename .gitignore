@@ -1,9 +1,5 @@
-.git
-.idea
-
-node_modules
-coverage
-lib
-es
+/node_modules
+/coverage
+/dist
 
 yarn-error.log
