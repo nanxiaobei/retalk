@@ -18,87 +18,208 @@ Retalk 是 Redux 的一个最佳实践，简单、流畅而智慧。
 
 ## 特性
 
-- **极简 Redux 实践**：只需要 `state` 和 `actions`，简洁清晰。
-- **只有两个 API**：`createStore` 与 `withStore`，再无其它繁杂概念。
-- **异步引入 model**：对 models 进行代码分隔的完整支持。
-- **自动 `loading` 处理**：发送请求，接着使用自动的 loading 状态即可。
+- **极简 Redux 实践：** 只需要 `state` 和 `actions`，简洁清晰。
+- **只有两个 API：** `createStore` 与 `withStore`，再无其它繁杂概念。
+- **异步引入 model：** 对 models 进行代码分隔的完整支持。
+- **自动 `loading` 处理：** 发送请求，接着使用自动的 loading 状态即可。
 
 ## 安装
 
-### Yarn
-
-```bash
+```sh
 yarn add retalk
 ```
 
-### npm
+或
 
-```bash
+```sh
 npm install retalk
 ```
 
 ## 使用
 
-### 1. Model
+```jsx harmony
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { Provider, connect } from 'react-redux';
+import { createStore, withStore } from 'retalk';
 
-```js
-const model = {
+// 1. Model
+const counter = {
   state: {
-    value: 0,
+    count: 0,
   },
   actions: {
-    add() {
-      const { value } = this.state; // this.state -> 获取 state
-      this.setState({ value: value + 1 }); // this.setState() -> 更新 state
+    increment() {
+      const { count } = this.state;
+      this.setState({ count: count + 1 });
     },
-    async asyncAdd() {
+    async incrementAsync() {
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      this.add(); // this[actionName]() -> 调用 action
+      this.increment();
     },
   },
 };
 
-export default model;
+// 2. View
+const Counter = connect(...withStore('counter'))(
+  ({ count, increment, incrementAsync, loading }) => (
+    <div>
+      {count}
+      <button onClick={increment}>+</button>
+      <button onClick={incrementAsync}>+ Async{loading.incrementAsync && '...'}</button>
+    </div>
+  ),
+);
+
+// 3. Store
+const store = createStore({ counter });
+
+const App = () => (
+  <Provider store={store}>
+    <Counter />
+  </Provider>
+);
+
+ReactDOM.render(<App />, document.getElementById('root'));
 ```
 
-### 2. Store
+## 示例
+
+[![Edit retalk](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/retalk-5l9mqnzvx?fontsize=14)
+
+## API
+
+### createStore()
+
+`createStore(models[, options])`
 
 ```js
-import { createStore } from 'retalk';
-import demo from './demo/model';
-
-const store = createStore({ demo });
-
-export default store;
+const store = createStore({ modelA, modelB }, { useDevTools: false, plugins: [logger] });
 ```
 
-### 3. View
+#### options.useDevTools
 
-```jsx
+类型：`boolean`，默认：`true`。启用 [Redux DevTools Extension](https://github.com/zalmoxisus/redux-devtools-extension)，务必确保插件版本 [>= v2.15.3](https://github.com/reduxjs/redux/issues/2943) 且 [不是 v2.16.0](https://stackoverflow.com/a/53512072/6919133)。
+
+#### options.plugins
+
+类型：`array`，默认：`[]`。将中间件以数组各项的形式，传入 [`applyMiddleware`](https://redux.js.org/api/applymiddleware) 中去。
+
+### withStore()
+
+`withStore(...modelNames)`
+
+```js
+const DemoConnected = connect(...withStore('modelA', 'modelB'))(Demo);
+```
+
+使用 `withStore` 将 model 中所有的 state 和 action 注入组件的 props 中，可以注入多个 model。
+
+`withStore` 必须以 [剩余参数](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Functions/Rest_parameters) 的语法传入 `connect()`。
+
+### action
+
+```js
+actions: {
+  someAction() {
+    // action 的 `this` 中有些什么？
+
+    // this.state -> 获取 state
+    // this.setState() -> 更新 state
+    // this.someOtherAction() -> 调用 action
+
+    // this.someModel.state -> 获取其它 model 的 state
+    // this.someModel.someAction() -> 调用其它 model 的 action
+  },
+  async someAsyncAction() {
+    // 自动添加的 `loading.someAsyncAction` 可供使用
+  }
+}
+```
+
+## FAQ
+
+### 异步引入 model？
+
+`createStore` 初始化 store，接着使用 [loadable-components](https://github.com/smooth-code/loadable-components/#loading-multiple-resources-in-parallel) 去动态引入组件与 model。
+
+然后使用 `store.addModel(name, model)` 将异步引入的 model 注入 store。
+
+一个使用 loadable-components 的示例：
+
+```jsx harmony
 import React from 'react';
-import { connect } from 'react-redux';
-import { withStore } from 'retalk';
+import loadable from 'loadable-components';
 
-const Demo = ({ value，add，asyncAdd，loading }) => (
-  <>
-    <h4>Value: {value}</h4>
-    <button onClick={add}>+1</button>
-    <button onClick={asyncAdd}>Async +1 {loading.asyncAdd ? '...' ：''}</button>
-  </>
-);
-// loading[asyncAction] -> 异步 action 的 loading 状态
-
-export default connect(...withStore('demo'))(Demo);
+const AsyncCounter = loadable(async (store) => {
+  const [{ default: Counter }, { default: model }] = await Promise.all([
+    import('./counter/index.jsx'),
+    import('./counter/model'),
+  ]);
+  store.addModel('counter', model); // 将异步引入的 model 注入 store
+  return (props) => <Counter {...props} />;
+});
 ```
 
-只需要 3 步，一个简单的 Retalk 示例就呈现在眼前了。[https://codesandbox.io/s/5l9mqnzvx](https://codesandbox.io/s/5l9mqnzvx)
+### 自定义 state 与 actions？
 
-## 文档
+需要对注入组件的 props 进行定制时，可使用 [`mapStateToProps` 与 `mapDispatchToProps`](https://github.com/reduxjs/react-redux/blob/master/docs/api.md#arguments) 来替代 `withStore`。
 
-查看 [文档](./docs/DOCUMENTATION.zh-CN.md) 了解更多详细信息。
+```jsx harmony
+const mapState = ({ counter: { value } }) => ({
+  value,
+});
 
-> Retalk 中使用了 `Proxy`，如果老版本浏览器不支持，请尝试 [proxy-polyfill](https://github.com/GoogleChrome/proxy-polyfill)。
+const mapActions = ({ counter: { increment, incrementAsync } }) => ({
+  increment,
+  incrementAsync,
+});
+// `mapDispatchToProps` 的第一个参数是 `dispatch`。
+// `dispatch` 是一个函数，但在上面的 `mapActions` 中，我们把它当做一个对象来使用。
+// Retalk 做了一些处理，它确实是 `dispatch` 函数，但在它上面绑定了所有的 model。
 
-## 更新
+export default connect(
+  mapState,
+  mapActions,
+)(Counter);
+```
 
-查看 [更新日志](./CHANGELOG.zh-CN.md) 获取最新动态。
+### 支持热更新？
+
+例如将`index.js` 改为：
+
+```jsx harmony
+if (module.hot) {
+  module.hot.accept('./App', () => {
+    render();
+  });
+}
+```
+
+则 `Provider` 必须在 `App` 组件内：
+
+```jsx harmony
+const App = () => (
+  <Provider store={store}>
+    <Counter />
+  </Provider>
+);
+```
+
+如果想保持 store，将 `store.js` 改为：
+
+```js
+if (!window.store) {
+  window.store = createStore({ ... });
+}
+
+export default window.store;
+```
+
+### Proxy 报错?
+
+Retalk 中使用了 `Proxy`，如果老版本浏览器不支持，请尝试 [proxy-polyfill](https://github.com/GoogleChrome/proxy-polyfill)。
+
+## 协议
+
+[MIT License](https://github.com/nanxiaobei/retalk/blob/master/LICENSE) (c) [nanxiaobei](https://mrlee.me/)

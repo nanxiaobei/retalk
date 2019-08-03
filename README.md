@@ -18,87 +18,208 @@ English | [简体中文](./README.zh-CN.md)
 
 ## Features
 
-- **Simplest Redux**: Just `state` and `actions`, clear than ever before.
-- **Two API totally**: `createStore` and `withStore`, no more annoying concepts.
-- **Async import model**: Fully code splitting support for models.
-- **Auto `loading` state**: Send request, and loading state is ready to use.
+- **Simplest Redux:** Just `state` and `actions`, clear than ever before.
+- **Two API totally:** `createStore` and `withStore`, no more annoying concepts.
+- **Async import model:** Fully code splitting support for models.
+- **Auto `loading` state:** Send request, and loading state is ready to use.
 
 ## Install
 
-### Yarn
-
-```bash
+```sh
 yarn add retalk
 ```
 
-### npm
+or
 
-```bash
+```sh
 npm install retalk
 ```
 
 ## Usage
 
-### 1. Model
+```jsx harmony
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { Provider, connect } from 'react-redux';
+import { createStore, withStore } from 'retalk';
 
-```js
-const model = {
+// 1. Model
+const counter = {
   state: {
-    value: 0,
+    count: 0,
   },
   actions: {
-    add() {
-      const { value } = this.state; // this.state -> Get state
-      this.setState({ value: value + 1 }); // this.setState() -> Set state
+    increment() {
+      const { count } = this.state;
+      this.setState({ count: count + 1 });
     },
-    async asyncAdd() {
+    async incrementAsync() {
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      this.add(); // this[actionName]() -> Call action
+      this.increment();
     },
   },
 };
 
-export default model;
+// 2. View
+const Counter = connect(...withStore('counter'))(
+  ({ count, increment, incrementAsync, loading }) => (
+    <div>
+      {count}
+      <button onClick={increment}>+</button>
+      <button onClick={incrementAsync}>+ Async{loading.incrementAsync && '...'}</button>
+    </div>
+  ),
+);
+
+// 3. Store
+const store = createStore({ counter });
+
+const App = () => (
+  <Provider store={store}>
+    <Counter />
+  </Provider>
+);
+
+ReactDOM.render(<App />, document.getElementById('root'));
 ```
 
-### 2. Store
+## Demo
+
+[![Edit retalk](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/retalk-5l9mqnzvx?fontsize=14)
+
+## API
+
+### createStore()
+
+`createStore(models[, options])`
 
 ```js
-import { createStore } from 'retalk';
-import demo from './demo/model';
-
-const store = createStore({ demo });
-
-export default store;
+const store = createStore({ modelA, modelB }, { useDevTools: false, plugins: [logger] });
 ```
 
-### 3. View
+#### options.useDevTools
 
-```jsx
+type: `boolean`, default: `true`. Enable [Redux DevTools](https://github.com/zalmoxisus/redux-devtools-extension), make sure the extension's version [>= v2.15.3](https://github.com/reduxjs/redux/issues/2943) and [not v2.16.0](https://stackoverflow.com/a/53512072/6919133).
+
+#### options.plugins
+
+type: `array`, default: `[]`. Add one middleware as an item to this array, passed to [`applyMiddleware`](https://redux.js.org/api/applymiddleware).
+
+### withStore()
+
+`withStore(...modelNames)`
+
+```js
+const DemoConnected = connect(...withStore('modelA', 'modelB'))(Demo);
+```
+
+Use `withStore` to eject all state and actions of a model to a component's props, you can eject more than one model.
+
+`withStore` must be passed in [rest parameters](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/rest_parameters) syntax to `connect()`.
+
+### action
+
+```js
+actions: {
+  someAction() {
+    // What's in an action's `this` context?
+
+    // this.state -> Get state
+    // this.setState() -> Set state
+    // this.someOtherAction() -> Call actions
+
+    // this.someModel.state -> Get another model's state
+    // this.someModel.someAction() -> Call another model's actions
+  },
+  async someAsyncAction() {
+    // Automatically `loading.someAsyncAction` can be use
+  }
+}
+```
+
+## FAQ
+
+### Async import model?
+
+Use `createStore` to initalize the store, then use libraries like [loadable-components](https://github.com/smooth-code/loadable-components/#loading-multiple-resources-in-parallel) to dynamic import both the component and model.
+
+Then use `store.addModel(name, model)` to eject the async imported model to store.
+
+Here is a loadable-components example:
+
+```jsx harmony
 import React from 'react';
-import { connect } from 'react-redux';
-import { withStore } from 'retalk';
+import loadable from 'loadable-components';
 
-const Demo = ({ value, add, asyncAdd, loading }) => (
-  <>
-    <h4>Value: {value}</h4>
-    <button onClick={add}>+1</button>
-    <button onClick={asyncAdd}>Async +1 {loading.asyncAdd ? '...' : ''}</button>
-  </>
-);
-// loading[asyncAction] -> Async action's loading status
-
-export default connect(...withStore('demo'))(Demo);
+const AsyncCounter = loadable(async (store) => {
+  const [{ default: Counter }, { default: model }] = await Promise.all([
+    import('./counter/index.jsx'),
+    import('./counter/model'),
+  ]);
+  store.addModel('counter', model); // Key to import async model
+  return (props) => <Counter {...props} />;
+});
 ```
 
-Well, only 3 steps, A simple Retalk demo is here. [https://codesandbox.io/s/5l9mqnzvx](https://codesandbox.io/s/5l9mqnzvx)
+### Customize state and actions?
 
-## Documentation
+Use [`mapStateToProps` and `mapDispatchToProps`](https://github.com/reduxjs/react-redux/blob/master/docs/api.md#arguments) when need some customization, without using `withStore`.
 
-See more details in the [documentation](./docs/DOCUMENTATION.md).
+```jsx harmony
+const mapState = ({ counter: { count } }) => ({
+  count,
+});
 
-> Retalk uses `Proxy`, if old browsers not support, please try [proxy-polyfill](https://github.com/GoogleChrome/proxy-polyfill).
+const mapActions = ({ counter: { increment, incrementAsync } }) => ({
+  increment,
+  incrementAsync,
+});
+// First parameter to `mapDispatchToProps` is `dispatch`.
+// `dispatch` is a function, but in `mapActions` above, we treat it like an object.
+// Retalk did some tricks here, it's the `dispatch` function, but bound models on it.
 
-## Changelog
+export default connect(
+  mapState,
+  mapActions,
+)(Counter);
+```
 
-See what's new in the [changelog](./CHANGELOG.md).
+### Support HMR?
+
+For example change `index.js` to:
+
+```jsx harmony
+if (module.hot) {
+  module.hot.accept('./App', () => {
+    render();
+  });
+}
+```
+
+Then `Provider` must inside the `App` component:
+
+```jsx harmony
+const App = () => (
+  <Provider store={store}>
+    <Counter />
+  </Provider>
+);
+```
+
+If want to keep the store, change `store.js` to:
+
+```js
+if (!window.store) {
+  window.store = createStore({ ... });
+}
+
+export default window.store;
+```
+
+### Proxy error?
+
+Retalk uses `Proxy`, if old browsers not support, please try [proxy-polyfill](https://github.com/GoogleChrome/proxy-polyfill).
+
+## License
+
+[MIT License](https://github.com/nanxiaobei/retalk/blob/master/LICENSE) (c) [nanxiaobei](https://mrlee.me/)
