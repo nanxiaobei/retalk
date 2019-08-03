@@ -1,5 +1,5 @@
 /**
- * Create model's reducer
+ * Create the reducer for a model
  *
  * @param {string} name
  * @param {object} state

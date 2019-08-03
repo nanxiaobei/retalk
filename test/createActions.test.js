@@ -35,45 +35,45 @@ describe('createActions', () => {
     const testModel = {
       state: { loading: {} },
       actions: {
-        add: 123,
+        increment: 123,
       },
     };
 
     process.env.NODE_ENV = 'development';
     expect(() => {
       createActions('testModel', testModel, getState, dispatch, theRealDispatch, thisProxy);
-    }).toThrow(ERR.ACTION('testModel', 'add'));
+    }).toThrow(ERR.ACTION('testModel', 'increment'));
   });
 
   it("should have 'this' context in action", () => {
     const testModel = {
       state: { loading: {}, value: 1 },
       actions: {
-        add() {
+        increment() {
           const { value } = this.state;
           this.setState({ value: value + 1 });
           return this;
         },
-        async asyncAdd() {
+        async incrementAsync() {
           return this.state;
         },
       },
     };
 
-    const sharedEnvTests = () => {
+    const runSharedTests = () => {
       createActions('testModel', testModel, getState, dispatch, theRealDispatch, thisProxy);
       const testActions = dispatch.testModel;
-      const thisContext = testActions.add();
-      expect(thisContext).toHaveProperty('asyncAdd');
+      const thisContext = testActions.increment();
+      expect(thisContext).toHaveProperty('incrementAsync');
       expect(thisContext).toHaveProperty('testModel2');
       expect(thisContext.testAction).toBeUndefined();
-      expect(testActions.asyncAdd()).resolves.toHaveProperty('loading');
+      expect(testActions.incrementAsync()).resolves.toHaveProperty('loading');
     };
 
     process.env.NODE_ENV = 'development';
-    sharedEnvTests();
+    runSharedTests();
 
     process.env.NODE_ENV = 'production';
-    sharedEnvTests();
+    runSharedTests();
   });
 });

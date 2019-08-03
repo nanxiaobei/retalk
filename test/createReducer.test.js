@@ -5,12 +5,12 @@ describe('createReducer', () => {
     const testModel = {
       state: { a: 1, b: 2 },
       actions: {
-        add() {},
+        increment() {},
       },
     };
     const testReducer = createReducer('testModel', testModel.state);
     const nextState = testReducer(testModel.state, {
-      type: 'testModel/add',
+      type: 'testModel/increment',
       payload: { a: 10 },
     });
     expect(nextState).toEqual({ a: 10, b: 2, loading: {} });

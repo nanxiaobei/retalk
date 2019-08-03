@@ -9,7 +9,7 @@ import createActions from './createActions';
 import { ERR, isObject, checkModel, createHandler, checkDuplicate } from './utils';
 
 /**
- * Create the Redux store
+ * Create the store
  *
  * @param {object} models
  * @param {object} options
@@ -24,7 +24,7 @@ const createStore = (models, options = {}) => {
   const rootReducers = {};
 
   if (isEnvDevelopment) {
-    // Check params
+    // Check the arguments
     if (!isObject(models)) throw new Error(ERR.NOT_OBJECT('models'));
     if (!isObject(options)) throw new Error(ERR.NOT_OBJECT('options'));
     if (typeof useDevTools !== 'undefined' && typeof useDevTools !== 'boolean')
@@ -34,7 +34,7 @@ const createStore = (models, options = {}) => {
 
     modelEntries = Object.entries(models);
 
-    // Check model, collect action names for model name check
+    // Check the models, collect the names of actions in models
     modelEntries.forEach(([name, model]) => {
       checkModel(name, model);
       const { actions } = model;
@@ -42,7 +42,7 @@ const createStore = (models, options = {}) => {
     });
     actionNames = [...new Set(actionNames)];
 
-    // Check model name, create reducer
+    // Check the names of models, create the reducers for models
     modelEntries.forEach(([name, { state }]) => {
       if (actionNames.includes(name)) throw new Error(ERR.MODEL_NAME(name));
       rootReducers[name] = createReducer(name, state);
@@ -50,13 +50,13 @@ const createStore = (models, options = {}) => {
   } else {
     modelEntries = Object.entries(models);
 
-    // Create reducer
+    // Create the reducers for models
     modelEntries.forEach(([name, { state }]) => {
       rootReducers[name] = createReducer(name, state);
     });
   }
 
-  // Create store
+  // Create the Redux store
   const composeEnhancers =
     useDevTools === true && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
       ? window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
@@ -73,7 +73,7 @@ const createStore = (models, options = {}) => {
   };
   const { getState, dispatch } = store;
 
-  // Format actions
+  // Format the actions of models
   const modelsProxy = {};
   modelEntries.forEach(([name]) => {
     modelsProxy[name] = new Proxy({}, createHandler(name, getState, dispatch));
@@ -83,7 +83,6 @@ const createStore = (models, options = {}) => {
     createActions(name, model, getState, dispatch, theRealDispatch, thisProxy);
   });
 
-  // store.addModel
   store.addModel = (name, model) => {
     if (name in rootReducers) return;
     const { state, actions } = model;
@@ -106,7 +105,7 @@ const createStore = (models, options = {}) => {
 };
 
 /**
- * Get mapState and mapActions for connect
+ * Create the mapState and mapActions
  *
  * @param {string[]} names
  * @return {function[]} [mapState, mapActions]

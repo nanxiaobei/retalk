@@ -1,7 +1,7 @@
 import { ERR, isAsyncFn } from './utils';
 
 /**
- * Format model's actions
+ * Format the actions of a model
  *
  * @param {string} name
  * @param {object} model

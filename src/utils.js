@@ -1,5 +1,5 @@
 /**
- * 1. Error types
+ * Get the error types
  */
 export const ERR = {
   // common
@@ -11,7 +11,6 @@ export const ERR = {
   DISPATCH: () => "Please do not use 'dispatch' directly in Retalk",
   MODEL_NAME: (name) => `Illegal model name '${name}', duplicated with an action name`,
   // createReducer
-  DEPRECATED: () => "BREAKING CHANGES: 'reducers' was deprecated since v2.0.0, please don't use it",
   MODEL: (name) => `'${name}' model must be { state: Object, actions: Object }`,
   // createActions
   ACTION_NAME: (name, action) => `Illegal action name '${action}' in ${name} model`,
@@ -25,7 +24,7 @@ export const ERR = {
 };
 
 /**
- * 2. Detect an object
+ * Detect an object
  *
  * @param {any} obj
  * @return {boolean}
@@ -33,7 +32,7 @@ export const ERR = {
 export const isObject = (obj) => typeof obj === 'object' && obj !== null && !Array.isArray(obj);
 
 /**
- * 3. Detect an async function
+ * Detect an async function
  *
  * @param {any} fn
  * @return {boolean}
@@ -49,7 +48,7 @@ export const isAsyncFn = (fn) => {
 };
 
 /**
- * 4. Check model
+ * Check a model
  *
  * @param {string} name
  * @param {object} model
@@ -58,15 +57,14 @@ export const checkModel = (name, model) => {
   if (typeof name !== 'string') throw new Error(ERR.NOT_STRING('name'));
   if (!isObject(model)) throw new Error(ERR.NOT_OBJECT('model'));
 
-  const { reducers, state, actions } = model;
-  if (reducers !== undefined) throw new Error(ERR.DEPRECATED());
+  const { state, actions } = model;
   if (!(Object.keys(model).length === 2 && isObject(state) && isObject(actions))) {
     throw new Error(ERR.MODEL(name));
   }
 };
 
 /**
- * 5. Create Proxy's handler
+ * Create the handler for a proxy
  *
  * @param {string} name
  * @param {function} getState
@@ -91,7 +89,7 @@ export const createHandler = (name, getState, dispatch, modelsProxy) => ({
 });
 
 /**
- * 6. Check duplicate state or action keys in withStore
+ * Check duplicate state or action keys within withStore
  *
  * @param {string} name
  * @param {string} type
