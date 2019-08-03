@@ -1,31 +1,17 @@
-import { eslint } from 'rollup-plugin-eslint';
 import babel from 'rollup-plugin-babel';
+import pkg from './package.json';
 
-import { dependencies } from './package.json';
+const input = 'src/index.js';
+const deps = Object.keys(pkg.dependencies);
+const external = (id) => deps.includes(id) || id.includes('@babel/runtime');
+const plugins = (useESModules) => [
+  babel({
+    plugins: [['@babel/plugin-transform-runtime', { useESModules }]],
+    runtimeHelpers: true,
+  }),
+];
 
-const { NODE_ENV } = process.env;
-
-const depKeys = Object.keys(dependencies);
-
-const config = {
-  input: 'src/index.js',
-  output: { format: NODE_ENV, indent: false },
-  external: (id) => {
-    if (depKeys.includes(id)) return true;
-    if (id.includes('@babel/runtime/')) return true;
-  },
-  plugins: [
-    eslint({
-      throwOnError: true,
-      throwOnWarning: true,
-      include: ['src/**/*.js'],
-      exclude: ['node_modules/**'],
-    }),
-    babel({
-      exclude: 'node_modules/**',
-      runtimeHelpers: true,
-    }),
-  ],
-};
-
-export default config;
+export default [
+  { input, output: { file: pkg.main, format: 'cjs' }, external, plugins: plugins(false) },
+  { input, output: { file: pkg.module, format: 'es' }, external, plugins: plugins(true) },
+];
