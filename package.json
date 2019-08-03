@@ -13,59 +13,38 @@
   "homepage": "https://github.com/nanxiaobei/retalk",
   "repository": "github:nanxiaobei/retalk",
   "bugs": "https://github.com/nanxiaobei/retalk/issues",
-  "main": "lib/index.js",
-  "module": "es/index.js",
+  "main": "dist/retalk.cjs.js",
+  "module": "dist/retalk.esm.js",
   "files": [
-    "lib",
-    "es",
+    "dist",
     "src"
   ],
   "scripts": {
-    "pretty": "prettier --write '{src,test}/**/*.js' .babelrc.js rollup.config.js '**/*.md'",
-    "clean": "rimraf lib es",
-    "build:commonjs": "cross-env NODE_ENV=cjs rollup -c -o lib/index.js",
-    "build:es": "cross-env NODE_ENV=esm rollup -c -o es/index.js",
-    "build": "npm run clean && npm run build:commonjs && npm run build:es",
     "test": "jest",
-    "coverage": "codecov"
+    "codecov": "codecov",
+    "build": "rimraf coverage dist && rollup -c"
   },
   "dependencies": {
-    "@babel/runtime": "^7.5.3",
-    "redux": "^4.0.3"
+    "@babel/runtime": "^7.5.5",
+    "redux": "^4.0.4"
   },
   "devDependencies": {
-    "@babel/core": "^7.5.0",
-    "@babel/plugin-transform-runtime": "^7.5.0",
-    "@babel/preset-env": "^7.5.3",
-    "babel-core": "^7.0.0-bridge",
-    "babel-eslint": "^10.0.2",
-    "babel-jest": "^24.8.0",
+    "@babel/core": "^7.5.5",
+    "@babel/plugin-transform-runtime": "^7.5.5",
+    "@babel/preset-env": "^7.5.5",
     "codecov": "^3.5.0",
-    "cross-env": "^5.2.0",
-    "husky": "^3.0.0",
+    "eslint": "^6.1.0",
+    "eslint-config-prettier": "^6.0.0",
+    "eslint-plugin-prettier": "^3.1.0",
     "jest": "^24.8.0",
-    "lint-staged": "^9.1.0",
     "prettier": "^1.18.2",
-    "rimraf": "^2.6.2",
-    "rollup": "^1.16.7",
-    "rollup-plugin-babel": "^4.3.3",
-    "rollup-plugin-eslint": "^7.0.0"
+    "rollup": "^1.18.0",
+    "rollup-plugin-babel": "^4.3.3"
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
-  },
-  "lint-staged": {
-    "{src,test}/**/*.js": [
-      "prettier --write",
-      "git add"
-    ]
-  },
+  "eslintIgnore": [
+    "dist"
+  ],
   "jest": {
-    "testURL": "http://localhost",
-    "testRegex": "(/test/.*\\.test.js)$",
-    "coverageDirectory": "./coverage/",
     "collectCoverage": true
   }
 }
