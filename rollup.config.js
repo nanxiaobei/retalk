@@ -3,7 +3,7 @@ import pkg from './package.json';
 
 const input = 'src/index.js';
 const deps = Object.keys(pkg.dependencies);
-const external = (id) => deps.includes(id) || id.includes('@babel/runtime');
+const external = (id) => deps.includes(id) || id.includes('@babel/runtime/');
 const plugins = (useESModules) => [
   babel({
     plugins: [['@babel/plugin-transform-runtime', { useESModules }]],
