@@ -103,6 +103,7 @@ Use `<Provider>` to provide the store to your app.
 
 ```jsx harmony
 import ReactDOM from 'react-dom';
+import { Provider } from 'retalk';
 
 const App = () => (
   <Provider store={store}>
@@ -151,7 +152,7 @@ Wrap your app with it to access the store.
 
 ### 1. Async import model?
 
-Setup the store with `setStore()`, then use libraries like [`loadable-components`](https://github.com/smooth-code/loadable-components/#loading-multiple-resources-in-parallel) to import components and models.
+Setup the store with `setStore()`, then use ibraries like [`loadable-components`](https://github.com/smooth-code/loadable-components/#loading-multiple-resources-in-parallel) to import components and models.
 
 Then, use `store.add(models)` to eject models to store.
 
@@ -217,6 +218,59 @@ const App = () => (
     <Counter />
   </Provider>
 );
+```
+
+## Migrate from v2 to v3
+
+### 1. Models
+
+```diff
+- const counter = {
++ class CounterModel {
+-   state: {},
++   state = {};
+-   actions: {
+-     increment() {
+-       const home = this.home; // Get other models
+-     },
+-   },
++   increment() {
++     const { home } = this.models; // Get other models
++   }
+- };
++ }
+```
+
+### 2. Store
+
+```diff
+- import { createStore } from 'retalk';
++ import { setStore } from 'retalk';
+
+- const store = createStore({ counter }, { plugins: [logger] });
++ const store = setStore({ counter: CounterModel }, [logger]);
+```
+
+### 3. Views
+
+```diff
+- import { connect } from 'react-redux';
+
+- const Counter = ({ incrementAsync, loading }) => (
++ const Counter = ({ incrementAsync }) => (
+-   <button onClick={incrementAsync}>+ Async{loading.incrementAsync && '...'}</button>
++   <button onClick={incrementAsync}>+ Async{incrementAsync.loading && '...'}</button>
+  );
+
+- const CounterWrapper = connect(...withStore('counter'))(Counter);
++ const CounterWrapper = withStore('counter')(Counter);
+```
+
+### 4. App
+
+```diff
+- import { Provider } from 'react-redux';
++ import { Provider } from 'retalk';
 ```
 
 ## License
