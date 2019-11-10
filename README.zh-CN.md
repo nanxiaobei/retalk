@@ -15,7 +15,7 @@
 
 ## 简介
 
-- **极简 Redux** - 会写 React？那就已经一切就绪。
+- **极简 Redux** - 在用 React？那就已经一切就绪。
 - **共 3 个 API** - `setStore()`、`withStore()`、`<Provider>`。
 - **异步 model** - models 代码分隔的完美支持。
 - **自动 loading** - 异步 action 的自动 loading state。
