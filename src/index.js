@@ -1,184 +1,198 @@
-import {
-  createStore as theRealCreateStore,
-  combineReducers,
-  compose,
-  applyMiddleware,
-} from 'redux';
-import createReducer from './createReducer';
-import createActions from './createActions';
-import { ERR, isObject, checkModel, createHandler, checkDuplicate } from './utils';
+import { createStore, combineReducers, compose, applyMiddleware } from 'redux';
+import { connect } from 'react-redux';
+
+export let setStore;
+export let withStore;
+export { Provider } from 'react-redux';
 
 /**
- * Create the store
+ * Utils
+ */
+const ERR = {
+  NOT_STRING: (name) => `'${name}' must be a string`,
+  NOT_ARRAY: (name) => `'${name}' must be an array`,
+  NOT_OBJECT: (name) => `'${name}' must be an object`,
+  NOT_CLASS: (name) => `'${name}' must be a class`,
+
+  NO_DISPATCH: () => "Please don't use 'dispatch' directly in Retalk",
+
+  NOT_EXIST: (name) => `'${name}' Model dose not exist`,
+};
+
+const isObject = (obj) => typeof obj === 'object' && obj !== null && !Array.isArray(obj);
+
+/**
+ * Add a model, create the model's reducer
  *
+ * @param {string} name
+ * @param {class} Model
  * @param {object} models
- * @param {object} options
+ * @param {object} reducers
+ */
+const createReducer = (name, Model, models, reducers) => {
+  const model = new Model();
+  models[name] = model;
+  reducers[name] = (currentState = model.state || null, action) => {
+    const [modelName] = action.type.split('/');
+    if (modelName === name) return { ...currentState, ...action.payload };
+    return currentState;
+  };
+};
+
+/**
+ * Format a model's actions
+ *
+ * @param {string} name
+ * @param {class} Model
+ * @param {object} models
+ * @param {function} newDispatch
+ * @param {function} realDispatch
+ */
+const createActions = (name, Model, models, newDispatch, realDispatch) => {
+  const model__proto__ = Model.prototype;
+  model__proto__.models = models;
+  const model = models[name];
+
+  newDispatch[name] = {};
+  const setStateMap = {};
+
+  Object.getOwnPropertyNames(model__proto__).forEach((actionName) => {
+    if (actionName === 'constructor' || actionName === 'models') return;
+
+    setStateMap[actionName] = function reducer(payload) {
+      model.state = { ...model.state, ...payload };
+      return realDispatch({ type: `${name}/${actionName}`, payload });
+    };
+    const setLoading = (type, loading) => {
+      model__proto__[actionName].loading = loading;
+      return realDispatch({
+        type: `${name}/${actionName}/${type}_LOADING`,
+        payload: { loading },
+      });
+    };
+
+    const oldAction = model__proto__[actionName].bind(model);
+    const newAction = function action(...args) {
+      model__proto__.setState = setStateMap[actionName];
+      const result = oldAction(...args);
+      if (!result || typeof result.then !== 'function') {
+        delete model__proto__.setState;
+        return result;
+      }
+      return new Promise((resolve, reject) => {
+        setLoading('START', true);
+        result
+          .then(resolve)
+          .catch(reject)
+          .finally(() => {
+            setLoading('STOP', false);
+            delete model__proto__.setState;
+          });
+      });
+    };
+
+    newDispatch[name][actionName] = newAction;
+    model__proto__[actionName] = newAction;
+  });
+};
+
+/**
+ * Initialize all models
+ *
+ * @param {object} initialModels
+ * @param {array} middleware
  * @return {object} Store
  */
-const createStore = (models, options = {}) => {
-  const isEnvDevelopment = process.env.NODE_ENV === 'development';
+setStore = (initialModels = {}, middleware = []) => {
+  const __DEV__ = process.env.NODE_ENV !== 'production';
 
-  const { useDevTools = true, plugins = [] } = options;
-  let modelEntries = [];
-  let actionNames = [];
-  const rootReducers = {};
+  if (__DEV__) {
+    if (!isObject(initialModels)) throw new Error(ERR.NOT_OBJECT('initialModels'));
+    if (!Array.isArray(middleware)) throw new Error(ERR.NOT_ARRAY('middleware'));
+  }
 
-  if (isEnvDevelopment) {
-    // Check the arguments
-    if (!isObject(models)) throw new Error(ERR.NOT_OBJECT('models'));
-    if (!isObject(options)) throw new Error(ERR.NOT_OBJECT('options'));
-    if (typeof useDevTools !== 'undefined' && typeof useDevTools !== 'boolean')
-      throw new Error(ERR.NOT_BOOLEAN('options.useDevTools'));
-    if (typeof plugins !== 'undefined' && !Array.isArray(plugins))
-      throw new Error(ERR.NOT_ARRAY('options.plugins'));
+  const models = {};
+  const reducers = {};
+  const initialModelList = Object.entries(initialModels);
 
-    modelEntries = Object.entries(models);
-
-    // Check the models, collect the names of actions in models
-    modelEntries.forEach(([name, model]) => {
-      checkModel(name, model);
-      const { actions } = model;
-      actionNames = [...actionNames, ...Object.keys(actions)];
-    });
-    actionNames = [...new Set(actionNames)];
-
-    // Check the names of models, create the reducers for models
-    modelEntries.forEach(([name, { state }]) => {
-      if (actionNames.includes(name)) throw new Error(ERR.MODEL_NAME(name));
-      rootReducers[name] = createReducer(name, state);
+  // Reducers
+  if (__DEV__) {
+    initialModelList.forEach(([name, Model]) => {
+      if (typeof Model !== 'function') throw new Error(ERR.NOT_CLASS('Model'));
+      createReducer(name, Model, models, reducers);
     });
   } else {
-    modelEntries = Object.entries(models);
-
-    // Create the reducers for models
-    modelEntries.forEach(([name, { state }]) => {
-      rootReducers[name] = createReducer(name, state);
+    initialModelList.forEach(([name, Model]) => {
+      createReducer(name, Model, models, reducers);
     });
   }
 
-  // Create the Redux store
-  const composeEnhancers =
-    useDevTools === true && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
-      ? window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
-      : compose;
+  // Store
+  const __COMPOSE__ = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__;
+  const newCompose = __DEV__ && __COMPOSE__ ? __COMPOSE__ : compose;
 
-  const store = theRealCreateStore(
-    combineReducers(rootReducers),
-    composeEnhancers(applyMiddleware(...plugins)),
-  );
-
-  const theRealDispatch = store.dispatch;
-  store.dispatch = () => {
-    throw new Error(ERR.DISPATCH());
+  const store = createStore(combineReducers(reducers), newCompose(applyMiddleware(...middleware)));
+  const realDispatch = store.dispatch;
+  const newDispatch = () => {
+    throw new Error(ERR.NO_DISPATCH());
   };
-  const { getState, dispatch } = store;
+  store.dispatch = newDispatch;
 
-  // Format the actions of models
-  const modelsProxy = {};
-  modelEntries.forEach(([name]) => {
-    modelsProxy[name] = new Proxy({}, createHandler(name, getState, dispatch));
-  });
-  modelEntries.forEach(([name, model]) => {
-    const thisProxy = new Proxy({}, createHandler(name, getState, dispatch, modelsProxy));
-    createActions(name, model, getState, dispatch, theRealDispatch, thisProxy);
+  // Actions
+  initialModelList.forEach(([name, Model]) => {
+    createActions(name, Model, models, newDispatch, realDispatch);
   });
 
-  store.addModel = (name, model) => {
-    if (name in rootReducers) return;
-    const { state, actions } = model;
+  // store.add
+  store.add = (initialModelsToAdd) => {
+    if (__DEV__) {
+      if (!isObject(initialModelsToAdd)) throw new Error(ERR.NOT_OBJECT('initialModels'));
 
-    if (isEnvDevelopment) {
-      checkModel(name, model);
-      actionNames = [...new Set([...actionNames, ...Object.keys(actions)])];
-      if (actionNames.includes(name)) throw new Error(ERR.MODEL_NAME(name));
+      Object.entries(initialModelsToAdd).forEach(([name, Model]) => {
+        if (name in models) return;
+        if (typeof Model !== 'function') throw new Error(ERR.NOT_CLASS('Model'));
+        createReducer(name, Model, models, reducers);
+        store.replaceReducer(combineReducers(reducers));
+        createActions(name, Model, models, newDispatch, realDispatch);
+      });
+    } else {
+      Object.entries(initialModelsToAdd).forEach(([name, Model]) => {
+        if (name in models) return;
+        createReducer(name, Model, models, reducers);
+        store.replaceReducer(combineReducers(reducers));
+        createActions(name, Model, models, newDispatch, realDispatch);
+      });
     }
-
-    rootReducers[name] = createReducer(name, state);
-    store.replaceReducer(combineReducers(rootReducers));
-
-    modelsProxy[name] = new Proxy({}, createHandler(name, getState, dispatch));
-    const thisProxy = new Proxy({}, createHandler(name, getState, dispatch, modelsProxy));
-    createActions(name, model, getState, dispatch, theRealDispatch, thisProxy);
   };
 
   return store;
 };
 
 /**
- * Create the mapState and mapActions
+ * Eject some models to a component
  *
  * @param {string[]} names
- * @return {function[]} [mapState, mapActions]
+ * @return {function} Higher-order component
  */
-const withStore = (...names) => {
-  const isEnvDevelopment = process.env.NODE_ENV === 'development';
-
-  let allState = { loading: {} };
-  let allActions = {};
-
-  if (isEnvDevelopment) {
-    if (names.length === 0) throw new Error(ERR.EMPTY_PARAM());
-
-    let stateChecked = false;
-    let actionsChecked = false;
-
-    return [
-      (state) => {
-        names.forEach((name, index) => {
-          const partState = state[name];
-
-          if (!stateChecked) {
-            if (typeof name !== 'string' || !(name in state)) throw new Error(ERR.PARAM());
-            if (index > 0) checkDuplicate(name, 'state', partState, allState);
-          }
-
-          allState = {
-            ...allState,
-            ...partState,
-            ...{ loading: { ...allState.loading, ...partState.loading } },
-          };
-        });
-        if (!stateChecked) stateChecked = true;
-
-        return allState;
-      },
-      (dispatch) => {
-        names.forEach((name, index) => {
-          const partActions = dispatch[name];
-
-          if (!actionsChecked) {
-            if (index > 0) checkDuplicate(name, 'action', partActions, allActions);
-          }
-
-          allActions = { ...allActions, ...partActions };
-        });
-        if (!actionsChecked) actionsChecked = true;
-
-        return allActions;
-      },
-    ];
+withStore = (...names) => {
+  if (typeof names[0] !== 'string') {
+    return connect(...names);
   }
 
-  return [
-    (state) => {
-      names.forEach((name) => {
-        const partState = state[name];
-        allState = {
-          ...allState,
-          ...partState,
-          ...{ loading: { ...allState.loading, ...partState.loading } },
-        };
-      });
-      return allState;
-    },
-    (dispatch) => {
-      names.forEach((name) => {
-        const partActions = dispatch[name];
-        allActions = { ...allActions, ...partActions };
-      });
-      return allActions;
-    },
-  ];
-};
+  const __DEV__ = process.env.NODE_ENV !== 'production';
+  const mapStore = (store) => names.reduce((merged, name) => ({ ...merged, ...store[name] }), {});
 
-export { createStore, withStore };
+  let mapState;
+  if (__DEV__) {
+    mapState = (state) =>
+      names.reduce((merged, name) => {
+        if (typeof name !== 'string') throw new Error(ERR.NOT_STRING('name'));
+        const partState = state[name];
+        if (typeof partState === 'undefined') throw new Error(ERR.NOT_EXIST(name));
+        return { ...merged, ...partState };
+      }, {});
+  } else {
+    mapState = mapStore;
+  }
+  return connect(mapState, mapStore);
+};
