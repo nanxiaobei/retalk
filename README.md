@@ -15,10 +15,10 @@ English | [简体中文](./README.zh-CN.md)
 
 ## Why
 
-- **Simplest Redux** - Write React? then everything is ok.
+- **Simplest Redux** - Same syntax as a React component.
 - **Only 3 API** - `setStore()`, `withStore()`, `<Provider>`.
-- **Async model** - Fully code splitting support for models.
-- **Auto loading** - Auto loading state for async methods.
+- **Async models** - Fully code splitting support for models.
+- **Auto loading** - Auto loading state for async actions.
 
 ## Install
 
@@ -36,7 +36,7 @@ npm install retalk
 
 ### 1. Models
 
-Usually we split our app into several routes, one model for one route.
+Usually we'll set several routes in our app, one route with one model, so we'll have several models.
 
 Write the model like a React component, just without the lifecycle methods.
 
@@ -48,7 +48,7 @@ class CounterModel {
   increment() {
     // this.state -> Get own model's state
     // this.setState() -> Set own model's state
-    // this.someOtherAction() -> Call own model's actions
+    // this.someAction() -> Call own model's actions
 
     // this.models.someModel.state -> Get other models' state
     // this.models.someModel.someAction() -> Call other models' actions
@@ -150,11 +150,11 @@ Wrap your app with it to access the store.
 
 ## FAQ
 
-### 1. Async import model?
+### 1. Async import models?
 
 Setup the store with `setStore()`, then use ibraries like [`loadable-components`](https://github.com/smooth-code/loadable-components/#loading-multiple-resources-in-parallel) to import components and models.
 
-Then, use `store.add(models)` to eject models to store.
+Then, use `store.add(models)` to eject the imported models to the store.
 
 Here is an example with `loadable-components`:
 
@@ -167,14 +167,14 @@ const AsyncCounter = loadable(async (store) => {
     import('./Counter/index.jsx'),
     import('./Counter/Model'),
   ]);
-  store.add({ counter: CounterModel }); // Pass `models` to `store.add()`, like `setStore()`
+  store.add({ counter: CounterModel }); // Use `store.add(models)`, like `setStore(models)`
   return (props) => <Counter {...props} />;
 });
 ```
 
 ### 2. Customize state and actions?
 
-Use [`mapStateToProps` and `mapDispatchToProps`](https://github.com/reduxjs/react-redux/blob/master/docs/api.md#arguments) when need some customization, without passing model names to `withStore()`.
+Pass [`mapStateToProps` and `mapDispatchToProps`](https://github.com/reduxjs/react-redux/blob/master/docs/api.md#arguments) to `withStore()`, when you need to customize the ejected props, without passing models' names to `withStore()`.
 
 ```jsx harmony
 const mapState = ({ counter: { count } }) => ({
@@ -210,7 +210,7 @@ if (module.hot) {
 }
 ```
 
-`<Provider>` must be inside the `<App>` component:
+Make sure that `<Provider>` is inside the `<App>` component:
 
 ```jsx harmony
 const App = () => (

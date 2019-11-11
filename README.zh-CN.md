@@ -13,12 +13,12 @@
 
 ---
 
-## 简介
+## 特性
 
-- **极简 Redux** - 在用 React？那就已经一切就绪。
-- **共 3 个 API** - `setStore()`、`withStore()`、`<Provider>`。
-- **异步 model** - models 代码分隔的完美支持。
-- **自动 loading** - 异步 action 的自动 loading state。
+- **极简 Redux** - 与 React 组件相同的语法。
+- **只有 3 个 API** - `setStore()`、`withStore()`、`<Provider>`。
+- **异步 model** - 对 model 进行代码分割的完整支持。
+- **自动 loading** - 自动生成异步 action 的 loading state。
 
 ## 安装
 
@@ -36,9 +36,9 @@ npm install retalk
 
 ### 1. Models
 
-通常我们会在 app 内划分多个路由，一个路由就对应一个 model。
+通常我们会在 app 内设置多个路由，一个路由对应一个 model，所以将会有多个 model。
 
-像写 React 组件一样来写 model，只是没有了生命周期而已。
+像写一个 React 组件一样来写 model，只是没有了生命周期而已。
 
 ```js
 class CounterModel {
@@ -48,16 +48,16 @@ class CounterModel {
   increment() {
     // this.state -> 获取自身 model 的 state
     // this.setState() -> 更新自身 model 的 state
-    // this.someOtherAction() -> 调用自身 model 的 actions
+    // this.someAction() -> 调用自身 model 的 action
 
     // this.models.someModel.state -> 获取其它 model 的 state
-    // this.models.someModel.someAction() -> 调用其它 model 的 actions
+    // this.models.someModel.someAction() -> 调用其它 model 的 action
 
     const { count } = this.state;
     this.setState({ count: count + 1 });
   }
   async incrementAsync() {
-    // 自动的 `someAsyncAction.loading` 可供使用
+    // 自动生成的 `someAsyncAction.loading` state 可供使用
 
     await new Promise((resolve) => setTimeout(resolve, 1000));
     this.increment();
@@ -74,13 +74,13 @@ import { setStore } from 'retalk';
 
 const store = setStore({
   counter: CounterModel,
-  // Other models...
+  // 其它 model...
 });
 ```
 
 ### 3. Views
 
-使用 `withStore()`来连接 models 与组件。
+使用 `withStore()` 来连接 model 与组件。
 
 ```jsx harmony
 import React from 'react';
@@ -130,7 +130,7 @@ const store = setStore({ a: AModel, b: BModel }, [middleware1, middleware2]);
 
 生成唯一的 store。
 
-自 `3.0.0` 起，在 `development`模式下，[Redux DevTools](https://github.com/zalmoxisus/redux-devtools-extension) 将默认启用，请确保其版本 [>= v2.15.3](https://github.com/reduxjs/redux/issues/2943) 且 [不是 v2.16.0](https://stackoverflow.com/a/53512072/6919133)。
+自 `3.0.0` 起，在 `development` 模式下，[Redux DevTools](https://github.com/zalmoxisus/redux-devtools-extension) 将默认启用，请确保其版本 [>= v2.15.3](https://github.com/reduxjs/redux/issues/2943) 且 [不是 v2.16.0](https://stackoverflow.com/a/53512072/6919133)。
 
 ### 2. withStore()
 
@@ -140,7 +140,7 @@ const store = setStore({ a: AModel, b: BModel }, [middleware1, middleware2]);
 const DemoWrapper = withStore('a', 'b')(Demo);
 ```
 
-将一个或多个 model 的 state 与 actions 注入一个组件的 props。
+将一个或多个 model 的 state 与 action 注入组件的 props。
 
 ### 3. \<Provider>
 
@@ -152,9 +152,9 @@ const DemoWrapper = withStore('a', 'b')(Demo);
 
 ### 1. 异步引入 model？
 
-使用 `setStore()` 初始化 store，接着使用像 [`loadable-components`](https://github.com/smooth-code/loadable-components/#loading-multiple-resources-in-parallel) 这样的库引入组件与 models。
+使用 `setStore()` 初始化 store，接着用像 [`loadable-components`](https://github.com/smooth-code/loadable-components/#loading-multiple-resources-in-parallel) 这样的库引入组件与 model。
 
-然后，使用 `store.add(models)` 将 models 注入 store。
+然后，使用 `store.add(models)` 将引入的 model 注入 store。
 
 一个使用 `loadable-components` 的示例：
 
@@ -167,14 +167,14 @@ const AsyncCounter = loadable(async (store) => {
     import('./Counter/index.jsx'),
     import('./Counter/Model'),
   ]);
-  store.add({ counter: CounterModel }); // 将 `models` 传入 `store.add()`，像 `_setStore_()` 一样
+  store.add({ counter: CounterModel }); // 使用 `store.add(models)`，就像 `setStore(models)` 一样
   return (props) => <Counter {...props} />;
 });
 ```
 
-### 2. 自定义 state 与 actions？
+### 2. 自定义 state 与 action？
 
-如需对注入组件的 props 进行定制，可传入 [`mapStateToProps` 与 `mapDispatchToProps`](https://github.com/reduxjs/react-redux/blob/master/docs/api.md#arguments)，而不是传入 model 名称至 `withStore()`。
+如需对注入组件的 props 进行定制，可将 [`mapStateToProps` 与 `mapDispatchToProps`](https://github.com/reduxjs/react-redux/blob/master/docs/api.md#arguments) 传入 `withStore()`，而不是将 model 名称传入 `withStore()`。
 
 ```jsx harmony
 const mapState = ({ counter: { count } }) => ({
@@ -210,7 +210,7 @@ if (module.hot) {
 }
 ```
 
-`<Provider>` 必须在 `<App>` 组件内：
+请确保 `<Provider>` 需在 `<App>` 组件内：
 
 ```jsx harmony
 const App = () => (
@@ -231,11 +231,11 @@ const App = () => (
 +   state = {};
 -   actions: {
 -     increment() {
--       const home = this.home; // Get other models
+-       const home = this.home; // 获取其它 model
 -     },
 -   },
 +   increment() {
-+     const { home } = this.models; // Get other models
++     const { home } = this.models; // 获取其它 model
 +   }
 - };
 + }
