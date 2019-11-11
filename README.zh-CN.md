@@ -130,7 +130,7 @@ const store = setStore({ a: AModel, b: BModel }, [middleware1, middleware2]);
 
 生成唯一的 store。
 
-自 `3.0.0` 起，在 `development` 模式下，[Redux DevTools](https://github.com/zalmoxisus/redux-devtools-extension) 将默认启用，请确保其版本 [>= v2.15.3](https://github.com/reduxjs/redux/issues/2943) 且 [不是 v2.16.0](https://stackoverflow.com/a/53512072/6919133)。
+`development` 模式下，[Redux DevTools](https://github.com/zalmoxisus/redux-devtools-extension) 将默认启用，请确保其版本 [>= v2.15.3](https://github.com/reduxjs/redux/issues/2943) 且 [不是 v2.16.0](https://stackoverflow.com/a/53512072/6919133)。
 
 ### 2. withStore()
 
@@ -165,7 +165,7 @@ import loadable from 'loadable-components';
 const AsyncCounter = loadable(async (store) => {
   const [{ default: Counter }, { default: CounterModel }] = await Promise.all([
     import('./Counter/index.jsx'),
-    import('./Counter/Model'),
+    import('./Counter/Model.js'),
   ]);
   store.add({ counter: CounterModel }); // 使用 `store.add(models)`，就像 `setStore(models)` 一样
   return (props) => <Counter {...props} />;

@@ -130,7 +130,7 @@ const store = setStore({ a: AModel, b: BModel }, [middleware1, middleware2]);
 
 Setup the one and only store.
 
-Since `3.0.0`, In `development` mode, [Redux DevTools](https://github.com/zalmoxisus/redux-devtools-extension) will be enabled by default, make sure its version [>= v2.15.3](https://github.com/reduxjs/redux/issues/2943) and [not v2.16.0](https://stackoverflow.com/a/53512072/6919133).
+In `development` mode, [Redux DevTools](https://github.com/zalmoxisus/redux-devtools-extension) will be enabled by default, make sure its version [>= v2.15.3](https://github.com/reduxjs/redux/issues/2943) and [not v2.16.0](https://stackoverflow.com/a/53512072/6919133).
 
 ### 2. withStore()
 
@@ -165,7 +165,7 @@ import loadable from 'loadable-components';
 const AsyncCounter = loadable(async (store) => {
   const [{ default: Counter }, { default: CounterModel }] = await Promise.all([
     import('./Counter/index.jsx'),
-    import('./Counter/Model'),
+    import('./Counter/Model.js'),
   ]);
   store.add({ counter: CounterModel }); // Use `store.add(models)`, like `setStore(models)`
   return (props) => <Counter {...props} />;
