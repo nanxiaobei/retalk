@@ -14,8 +14,8 @@ const ERR = {
   NOT_OBJECT: (name) => `'${name}' must be an object`,
   NOT_CLASS: (name) => `'${name}' must be a class`,
 
+  NO_SET_STATE: (name) => `${name}.setState() is not allowed outside of ${name} model`,
   NO_DISPATCH: () => "Please don't use 'dispatch' directly in Retalk",
-
   NOT_EXIST: (name) => `'${name}' Model dose not exist`,
 };
 
@@ -32,10 +32,10 @@ const isObject = (obj) => typeof obj === 'object' && obj !== null && !Array.isAr
 const createReducer = (name, Model, models, reducers) => {
   const model = new Model();
   models[name] = model;
-  reducers[name] = (currentState = model.state || null, action) => {
+  reducers[name] = (state = model.state || null, action) => {
     const [modelName] = action.type.split('/');
-    if (modelName === name) return { ...currentState, ...action.payload };
-    return currentState;
+    if (modelName === name) return action.state;
+    return state;
   };
 };
 
@@ -50,43 +50,54 @@ const createReducer = (name, Model, models, reducers) => {
  */
 const createActions = (name, Model, models, newDispatch, realDispatch) => {
   const model__proto__ = Model.prototype;
-  model__proto__.models = models;
   const model = models[name];
 
+  const setState = (payload) => {
+    if (createActions.currentModel !== name) {
+      console.error(ERR.NO_SET_STATE(name));
+      return;
+    }
+    model.state = { ...model.state, ...payload };
+  };
+
+  model__proto__.models = models;
+  model__proto__.setState = setState;
+
   newDispatch[name] = {};
-  const setStateMap = {};
+  const skipList = ['constructor', 'models', 'setState'];
 
   Object.getOwnPropertyNames(model__proto__).forEach((actionName) => {
-    if (actionName === 'constructor' || actionName === 'models') return;
+    if (skipList.includes(actionName)) return;
 
-    setStateMap[actionName] = function reducer(payload) {
-      model.state = { ...model.state, ...payload };
-      return realDispatch({ type: `${name}/${actionName}`, payload });
-    };
-    const setLoading = (type, loading) => {
+    const setLoading = (loading) => {
       model__proto__[actionName].loading = loading;
-      return realDispatch({
-        type: `${name}/${actionName}/${type}_LOADING`,
-        payload: { loading },
-      });
+      setState({ loading: { [actionName]: loading } });
+    };
+
+    const updateState = () => {
+      realDispatch({ type: `${name}/${actionName}`, state: model.state });
     };
 
     const oldAction = model__proto__[actionName].bind(model);
+
     const newAction = function action(...args) {
-      model__proto__.setState = setStateMap[actionName];
+      createActions.currentModel = name;
       const result = oldAction(...args);
+
       if (!result || typeof result.then !== 'function') {
-        delete model__proto__.setState;
+        updateState();
         return result;
       }
+
       return new Promise((resolve, reject) => {
-        setLoading('START', true);
+        setLoading(true);
+        updateState();
         result
           .then(resolve)
           .catch(reject)
           .finally(() => {
-            setLoading('STOP', false);
-            delete model__proto__.setState;
+            setLoading(false);
+            updateState();
           });
       });
     };
@@ -134,7 +145,7 @@ setStore = (initialModels = {}, middleware = []) => {
   const store = createStore(combineReducers(reducers), newCompose(applyMiddleware(...middleware)));
   const realDispatch = store.dispatch;
   const newDispatch = () => {
-    throw new Error(ERR.NO_DISPATCH());
+    console.error(ERR.NO_DISPATCH());
   };
   store.dispatch = newDispatch;
 

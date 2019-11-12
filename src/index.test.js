@@ -27,9 +27,7 @@ test('setStore', () => {
 
   const store = setStore();
   // NO_DISPATCH
-  expect(() => {
-    store.dispatch();
-  }).toThrow();
+  store.dispatch();
   // NOT_OBJECT - models (add)
   expect(() => {
     store.add([]);
@@ -64,56 +62,75 @@ test('withStore', (done) => {
    * DEVELOPMENT
    */
   process.env.NODE_ENV = 'development';
-  store.add({ message: class {} });
+
   // NOT_STRING - name
+  store.add({ counter: class {} });
   expect(() => {
-    const Message = withStore('message', 123)(() => 'hello'); // eslint-disable-line
+    // eslint-disable-next-line
+    const Counter = withStore('counter', 123)(() => <div />);
     mount(
       <Provider store={store}>
-        <Message />
+        <Counter />
       </Provider>,
     );
   }).toThrow();
+
   // NOT_EXIST - Model
   expect(() => {
-    const Message = withStore('message2')(() => 'hello'); // eslint-disable-line
+    // eslint-disable-next-line
+    const Counter2 = withStore('counter2')(() => <div />);
     mount(
       <Provider store={store}>
-        <Message />
+        <Counter2 />
       </Provider>,
     );
   }).toThrow();
-  // withStore() without names
-  withStore()(() => '');
+
+  // withStore() run as connect()
+  withStore()(() => <div />);
 
   /**
    * PRODUCTION
    */
   process.env.NODE_ENV = 'production';
-  class CounterModel {
-    state = {
-      count: 0,
-    };
-    increment() {
-      const { count } = this.state;
-      this.setState({ count: count + 1 });
-    }
-    async incrementAsync() {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      this.increment();
-    }
-  }
-  store.add({ counter: CounterModel });
+
+  store.add({
+    home: class {},
+    counter3: class {
+      state = {
+        count: 0,
+      };
+      increment() {
+        const { count } = this.state;
+        this.setState({ count: count + 1 });
+      }
+      async incrementAsync() {
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        this.increment();
+      }
+      homeSetState() {
+        const { home } = this.models;
+        home.setState();
+      }
+    },
+  });
   // eslint-disable-next-line
-  const Counter = withStore('counter')(({ incrementAsync }) => (
-    <button className="increase-async" onClick={incrementAsync} />
+  const Counter3 = withStore('counter3')(({ incrementAsync, homeSetState }) => (
+    <>
+      <button id="incrementAsync" onClick={incrementAsync} />
+      <button id="homeSetState" onClick={homeSetState} />
+    </>
   ));
   const wrapper = mount(
     <Provider store={store}>
-      <Counter />
+      <Counter3 />
     </Provider>,
   );
-  wrapper.find('.increase-async').simulate('click');
+  wrapper.find('#incrementAsync').simulate('click');
+  // NO_SET_STATE - name
+  wrapper.find('#homeSetState').simulate('click');
+
+  // Unmount
   setTimeout(() => {
     wrapper.unmount();
     done();
