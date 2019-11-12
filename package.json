@@ -20,7 +20,7 @@
     "src"
   ],
   "scripts": {
-    "dev": "npm yarn rollup -wc",
+    "dev": "yarn rollup -wc",
     "build": "rimraf coverage dist && rollup -c",
     "test": "jest",
     "codecov": "codecov"
