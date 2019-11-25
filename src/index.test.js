@@ -12,6 +12,11 @@ beforeEach(() => {
 });
 
 test('setStore', () => {
+  /**
+   * development
+   */
+  process.env.NODE_ENV = 'development';
+
   // NOT_OBJECT - models
   expect(() => {
     setStore([]);
@@ -34,37 +39,47 @@ test('setStore', () => {
   }).toThrow();
   // NOT_CLASS - Model (add)
   expect(() => {
-    store.add({ model2: 123 });
+    store.add({ model1: 123 });
   }).toThrow();
 
-  /**
-   * DEVELOPMENT
-   */
-  process.env.NODE_ENV = 'development';
   window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ = compose;
-  const store2 = setStore({ model3: class {} });
-  store2.add({ model4: class {} });
-  store2.add({ model4: class {} }); // Add an exist model
+  const store2 = setStore({ model2: class {} });
+  store2.add({ model2a: class {} });
+  store2.add({ model2a: class {} }); // Add an exist model
 
   /**
-   * PRODUCTION
+   * production
    */
   process.env.NODE_ENV = 'production';
-  const store3 = setStore({ model5: class {} });
-  store3.add({ model6: class {} });
-  store3.add({ model6: class {} }); // Add an exist model
+
+  const store3 = setStore({ model3: class {} });
+  store3.add({ model3a: class {} });
+  store3.add({ model3a: class {} }); // Add an exist model
 });
 
 test('withStore', (done) => {
   const store = setStore();
 
   /**
-   * DEVELOPMENT
+   * development
    */
   process.env.NODE_ENV = 'development';
 
+  store.add({
+    counter: class {
+      state = { count: 0 };
+    },
+  });
+
+  // eslint-disable-next-line
+  const CounterNew = withStore({ counter: ['count', 'increment'] })(() => <div />);
+  mount(
+    <Provider store={store}>
+      <CounterNew />
+    </Provider>,
+  );
+
   // NOT_STRING - name
-  store.add({ counter: class {} });
   expect(() => {
     // eslint-disable-next-line
     const Counter = withStore('counter', 123)(() => <div />);
@@ -79,18 +94,22 @@ test('withStore', (done) => {
   expect(() => {
     // eslint-disable-next-line
     const Counter2 = withStore('counter2')(() => <div />);
+    // eslint-disable-next-line
+    const Counter2New = withStore({ counter2: [] })(() => <div />);
+
     mount(
       <Provider store={store}>
         <Counter2 />
+        <Counter2New />
       </Provider>,
     );
   }).toThrow();
 
-  // withStore() run as connect()
+  // withStore() as connect()
   withStore()(() => <div />);
 
   /**
-   * PRODUCTION
+   * production
    */
   process.env.NODE_ENV = 'production';
 
@@ -114,6 +133,7 @@ test('withStore', (done) => {
       }
     },
   });
+
   // eslint-disable-next-line
   const Counter3 = withStore('counter3')(({ incrementAsync, homeSetState }) => (
     <>
@@ -121,9 +141,13 @@ test('withStore', (done) => {
       <button id="homeSetState" onClick={homeSetState} />
     </>
   ));
+  // eslint-disable-next-line
+  const Counter3New = withStore({ counter3: ['count', 'increment'] })(() => <div />);
+
   const wrapper = mount(
     <Provider store={store}>
       <Counter3 />
+      <Counter3New />
     </Provider>,
   );
   wrapper.find('#incrementAsync').simulate('click');

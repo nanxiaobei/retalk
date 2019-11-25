@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 
 export let setStore;
 export let withStore;
-export { Provider } from 'react-redux';
+export { Provider, batch } from 'react-redux';
 
 /**
  * Utils
@@ -20,21 +20,22 @@ const ERR = {
 };
 
 const isObject = (obj) => typeof obj === 'object' && obj !== null && !Array.isArray(obj);
+const isPromise = (obj) => !!obj && typeof obj.then === 'function';
 
 /**
  * Add a model, create the model's reducer
  *
  * @param {string} name
  * @param {class} Model
- * @param {object} models
- * @param {object} reducers
+ * @param {object} newModels
+ * @param {object} newReducers
  */
-const createReducer = (name, Model, models, reducers) => {
+const createReducer = (name, Model, newModels, newReducers) => {
   const model = new Model();
-  models[name] = model;
-  reducers[name] = (state = model.state || null, action) => {
+  newModels[name] = model;
+  newReducers[name] = (state = model.state || {}, action) => {
     const [modelName] = action.type.split('/');
-    if (modelName === name) return action.state;
+    if (modelName === name) return action.newState;
     return state;
   };
 };
@@ -44,60 +45,65 @@ const createReducer = (name, Model, models, reducers) => {
  *
  * @param {string} name
  * @param {class} Model
- * @param {object} models
+ * @param {object} newModels
  * @param {function} newDispatch
  * @param {function} realDispatch
  */
-const createActions = (name, Model, models, newDispatch, realDispatch) => {
+const createActions = (name, Model, newModels, newDispatch, realDispatch) => {
   const model__proto__ = Model.prototype;
-  const model = models[name];
+  const model = newModels[name];
 
   const setState = (payload) => {
-    if (createActions.currentModel !== name) {
+    if (createActions.current.name !== name) {
       console.error(ERR.NO_SET_STATE(name));
       return;
     }
-    model.state = { ...model.state, ...payload };
+    const newState = { ...model.state, ...payload };
+    model.state = newState;
+    return realDispatch({
+      type: `${name}/${createActions.current.actionName}`,
+      newState,
+    });
   };
 
-  model__proto__.models = models;
+  const setLoading = (actionName, type, status) => {
+    model__proto__[actionName].loading = status;
+    return realDispatch({
+      type: `${name}/${actionName}/${type}_LOADING`,
+      newState: { ...model.state, loading: { [actionName]: status } },
+    });
+  };
+
+  model__proto__.models = newModels;
   model__proto__.setState = setState;
+  const skipList = ['constructor', 'models', 'setState'];
 
   newDispatch[name] = {};
-  const skipList = ['constructor', 'models', 'setState'];
 
   Object.getOwnPropertyNames(model__proto__).forEach((actionName) => {
     if (skipList.includes(actionName)) return;
 
-    const setLoading = (loading) => {
-      model__proto__[actionName].loading = loading;
-      setState({ loading: { [actionName]: loading } });
-    };
-
-    const updateState = () => {
-      realDispatch({ type: `${name}/${actionName}`, state: model.state });
-    };
-
     const oldAction = model__proto__[actionName].bind(model);
 
-    const newAction = function action(...args) {
-      createActions.currentModel = name;
-      const result = oldAction(...args);
+    const newAction = (...args) => {
+      const newCurrent = { name, actionName };
+      const prevCurrent = createActions.current || newCurrent;
+      createActions.current = newCurrent;
 
-      if (!result || typeof result.then !== 'function') {
-        updateState();
+      const result = oldAction(...args);
+      if (!isPromise(result)) {
+        createActions.current = prevCurrent;
         return result;
       }
 
+      setLoading(actionName, 'START', true);
       return new Promise((resolve, reject) => {
-        setLoading(true);
-        updateState();
         result
           .then(resolve)
           .catch(reject)
           .finally(() => {
-            setLoading(false);
-            updateState();
+            setLoading(actionName, 'STOP', false);
+            createActions.current = prevCurrent;
           });
       });
     };
@@ -110,31 +116,31 @@ const createActions = (name, Model, models, newDispatch, realDispatch) => {
 /**
  * Initialize all models
  *
- * @param {object} initialModels
+ * @param {object} models
  * @param {array} middleware
  * @return {object} Store
  */
-setStore = (initialModels = {}, middleware = []) => {
+setStore = (models = {}, middleware = []) => {
   const __DEV__ = process.env.NODE_ENV !== 'production';
 
   if (__DEV__) {
-    if (!isObject(initialModels)) throw new Error(ERR.NOT_OBJECT('initialModels'));
+    if (!isObject(models)) throw new Error(ERR.NOT_OBJECT('models'));
     if (!Array.isArray(middleware)) throw new Error(ERR.NOT_ARRAY('middleware'));
   }
 
-  const models = {};
-  const reducers = {};
-  const initialModelList = Object.entries(initialModels);
+  const newModels = {};
+  const newReducers = {};
+  const nameModelList = Object.entries(models);
 
   // Reducers
   if (__DEV__) {
-    initialModelList.forEach(([name, Model]) => {
+    nameModelList.forEach(([name, Model]) => {
       if (typeof Model !== 'function') throw new Error(ERR.NOT_CLASS('Model'));
-      createReducer(name, Model, models, reducers);
+      createReducer(name, Model, newModels, newReducers);
     });
   } else {
-    initialModelList.forEach(([name, Model]) => {
-      createReducer(name, Model, models, reducers);
+    nameModelList.forEach(([name, Model]) => {
+      createReducer(name, Model, newModels, newReducers);
     });
   }
 
@@ -142,7 +148,11 @@ setStore = (initialModels = {}, middleware = []) => {
   const __COMPOSE__ = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__;
   const newCompose = __DEV__ && __COMPOSE__ ? __COMPOSE__ : compose;
 
-  const store = createStore(combineReducers(reducers), newCompose(applyMiddleware(...middleware)));
+  const store = createStore(
+    combineReducers(newReducers),
+    newCompose(applyMiddleware(...middleware)),
+  );
+
   const realDispatch = store.dispatch;
   const newDispatch = () => {
     console.error(ERR.NO_DISPATCH());
@@ -150,28 +160,30 @@ setStore = (initialModels = {}, middleware = []) => {
   store.dispatch = newDispatch;
 
   // Actions
-  initialModelList.forEach(([name, Model]) => {
-    createActions(name, Model, models, newDispatch, realDispatch);
+  nameModelList.forEach(([name, Model]) => {
+    createActions(name, Model, newModels, newDispatch, realDispatch);
   });
 
   // store.add
-  store.add = (initialModelsToAdd) => {
+  store.add = (modelsToAdd) => {
     if (__DEV__) {
-      if (!isObject(initialModelsToAdd)) throw new Error(ERR.NOT_OBJECT('initialModels'));
+      if (!isObject(modelsToAdd)) throw new Error(ERR.NOT_OBJECT('models'));
 
-      Object.entries(initialModelsToAdd).forEach(([name, Model]) => {
-        if (name in models) return;
+      Object.entries(modelsToAdd).forEach(([name, Model]) => {
+        if (name in newModels) return;
         if (typeof Model !== 'function') throw new Error(ERR.NOT_CLASS('Model'));
-        createReducer(name, Model, models, reducers);
-        store.replaceReducer(combineReducers(reducers));
-        createActions(name, Model, models, newDispatch, realDispatch);
+
+        createReducer(name, Model, newModels, newReducers);
+        store.replaceReducer(combineReducers(newReducers));
+        createActions(name, Model, newModels, newDispatch, realDispatch);
       });
     } else {
-      Object.entries(initialModelsToAdd).forEach(([name, Model]) => {
-        if (name in models) return;
-        createReducer(name, Model, models, reducers);
-        store.replaceReducer(combineReducers(reducers));
-        createActions(name, Model, models, newDispatch, realDispatch);
+      Object.entries(modelsToAdd).forEach(([name, Model]) => {
+        if (name in newModels) return;
+
+        createReducer(name, Model, newModels, newReducers);
+        store.replaceReducer(combineReducers(newReducers));
+        createActions(name, Model, newModels, newDispatch, realDispatch);
       });
     }
   };
@@ -186,24 +198,67 @@ setStore = (initialModels = {}, middleware = []) => {
  * @return {function} Higher-order component
  */
 withStore = (...names) => {
-  if (typeof names[0] !== 'string') {
-    return connect(...names);
-  }
-
   const __DEV__ = process.env.NODE_ENV !== 'production';
-  const mapStore = (store) => names.reduce((merged, name) => ({ ...merged, ...store[name] }), {});
+  const first = names[0];
 
-  let mapState;
-  if (__DEV__) {
-    mapState = (state) =>
-      names.reduce((merged, name) => {
-        if (typeof name !== 'string') throw new Error(ERR.NOT_STRING('name'));
-        const partState = state[name];
-        if (typeof partState === 'undefined') throw new Error(ERR.NOT_EXIST(name));
-        return { ...merged, ...partState };
-      }, {});
-  } else {
-    mapState = mapStore;
+  if (typeof first === 'string') {
+    const mapStore = (store) => names.reduce((props, name) => ({ ...props, ...store[name] }), {});
+
+    let mapState;
+    if (__DEV__) {
+      mapState = (state) =>
+        names.reduce((props, name) => {
+          if (typeof name !== 'string') throw new Error(ERR.NOT_STRING('name'));
+          const obj = state[name];
+          if (typeof obj === 'undefined') throw new Error(ERR.NOT_EXIST(name));
+          return { ...props, ...obj };
+        }, {});
+    } else {
+      mapState = mapStore;
+    }
+
+    const mapDispatch = mapStore;
+    return connect(mapState, mapDispatch);
   }
-  return connect(mapState, mapStore);
+
+  if (isObject(first)) {
+    const firstFiltered = {};
+    const getProps = (props, name, keys, obj) => {
+      const modelProps = keys.reduce((part, key) => {
+        const val = obj[key];
+        if (typeof val !== 'undefined') return { ...part, [key]: val };
+        firstFiltered[name].push(key);
+        return part;
+      }, {});
+      return { ...props, ...modelProps, loading: obj.loading };
+    };
+
+    let mapState;
+    if (__DEV__) {
+      mapState = (state) =>
+        Object.entries(first).reduce((props, [name, keys]) => {
+          firstFiltered[name] = [];
+          const obj = state[name];
+          if (typeof obj === 'undefined') throw new Error(ERR.NOT_EXIST(name));
+          return getProps(props, name, keys, obj);
+        }, {});
+    } else {
+      mapState = (state) =>
+        Object.entries(first).reduce((props, [name, keys]) => {
+          firstFiltered[name] = [];
+          return getProps(props, name, keys, state[name]);
+        }, {});
+    }
+
+    const mapDispatch = (dispatch) =>
+      Object.entries(firstFiltered).reduce((props, [name, keys]) => {
+        const obj = dispatch[name];
+        const modelProps = keys.reduce((part, key) => ({ ...part, [key]: obj[key] }), {});
+        return { ...props, ...modelProps };
+      }, {});
+
+    return connect(mapState, mapDispatch);
+  }
+
+  return connect(...names);
 };
