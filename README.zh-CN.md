@@ -16,7 +16,7 @@
 ## 特性
 
 - **极简 Redux** - 与 React 组件相同的语法。
-- **只有 3 个 API** - `setStore()`、`withStore()`、`<Provider>`。
+- **只有 2 个 API** - `setStore()` 与 `withStore()`。
 - **异步 model** - 对 model 进行代码分割的完整支持。
 - **自动 loading** - 自动生成异步 action 的 loading state。
 
@@ -122,31 +122,68 @@ ReactDOM.render(<App />, document.getElementById('root'));
 
 ### 1. setStore()
 
-`setStore(models, middleware)`
-
-```js
-const store = setStore({ a: AModel, b: BModel }, [middleware1, middleware2]);
+```
+const store = setStore(models, middleware);
 ```
 
-生成唯一的 store。
+传入 `models` 与 `middleware`（均为可选），生成唯一的 store。
 
-`development` 模式下，[Redux DevTools](https://github.com/zalmoxisus/redux-devtools-extension) 将默认启用，请确保其版本 [>= v2.15.3](https://github.com/reduxjs/redux/issues/2943) 且 [不是 v2.16.0](https://stackoverflow.com/a/53512072/6919133)。
+> `development` 模式下，[Redux DevTools](https://github.com/zalmoxisus/redux-devtools-extension) 将默认启用，请确保其版本 [>= v2.15.3](https://github.com/reduxjs/redux/issues/2943) 且 [不是 v2.16.0](https://stackoverflow.com/a/53512072/6919133)。
+
+```js
+const store = setStore(
+  {
+    home: HomeModel,
+    counter: CounterModel,
+  },
+  [logger, crashReporter],
+);
+```
 
 ### 2. withStore()
 
 `withStore(...modelNames)(Component)`
 
-```js
-const DemoWrapper = withStore('a', 'b')(Demo);
-```
-
 将一个或多个 model 的 state 与 action 注入组件的 props。
 
-### 3. \<Provider>
+有三种使用方式：
 
-`<Provider store={store}>`
+#### 2.1. 使用 string 注入全部
 
-使用其包裹 app 以获取 store。
+```js
+const CounterWrapper = withStore('home', 'counter')(Counter);
+```
+
+最简单的使用方式，但若注入了一些未用到的 props，其也会触发重新渲染，从而影响性能。
+
+> 若确定所有注入的 props 都会用到，或优先考虑快速开发，不特别在意性能，可使用此方式。
+
+#### 2.2. 使用 object 自定义
+
+```js
+const CounterWrapper = withStore({
+  home: ['name', 'setName'],
+  counter: ['count', 'increment', 'incrementAsync'],
+})(Counter);
+```
+
+对注入的 props 进行自定义，只注入需要的 props，从而优化性能。
+
+#### 2.3. 使用 `mapStateToProps()` 等自定义更多
+
+```js
+const CounterWrapper = withStore(mapStateToProps, mapDispatchToProps)(Counter);
+```
+
+对注入的 props 进行更多的自定义，可使用 [`mapStateToProps`、`mapDispatchToProps`](https://react-redux.js.org/api/connect) 等。
+
+此时 `withStore()` 将被当做 `connect()` 来使用。
+
+### 3. \<Provider> & batch()
+
+即 `redux-redux` 的 [`Provider`](https://react-redux.js.org/api/provider) 与 [`batch()`](https://react-redux.js.org/api/batch)。
+
+你可以从 `retalk` 引入它们以简化开发。
 
 ## FAQ
 
@@ -162,7 +199,7 @@ const DemoWrapper = withStore('a', 'b')(Demo);
 import React from 'react';
 import loadable from 'loadable-components';
 
-const AsyncCounter = loadable(async (store) => {
+const AsyncCounter = loadable(async () => {
   const [{ default: Counter }, { default: CounterModel }] = await Promise.all([
     import('./Counter/index.jsx'),
     import('./Counter/Model.js'),
@@ -172,28 +209,7 @@ const AsyncCounter = loadable(async (store) => {
 });
 ```
 
-### 2. 自定义 state 与 action？
-
-如需对注入组件的 props 进行定制，可将 [`mapStateToProps` 与 `mapDispatchToProps`](https://github.com/reduxjs/react-redux/blob/master/docs/api.md#arguments) 传入 `withStore()`，而不是将 model 名称传入 `withStore()`。
-
-```jsx harmony
-const mapState = ({ counter: { count } }) => ({
-  count,
-});
-
-const mapActions = ({ counter: { increment, incrementAsync } }) => ({
-  increment,
-  incrementAsync,
-});
-
-// `mapDispatchToProps` 的第一个参数是 `dispatch`，`dispatch` 是一个函数。
-// 但在上面的 `mapActions` 中，我们把它当做一个对象来使用。
-// Retalk 做了一些处理，它是 `dispatch` 函数，但在它身上绑定了所有的 model。
-
-export default withStore(mapState, mapActions)(Counter);
-```
-
-### 3. 支持热更新？
+### 2. 支持热更新？
 
 将入口文件 `index.js` 改为：
 
@@ -215,14 +231,14 @@ if (module.hot) {
 ```jsx harmony
 const App = () => (
   <Provider store={store}>
-    <Counter />
+    <Layout />
   </Provider>
 );
 ```
 
-## 从 v2 升级到 v3
+### 3. 从 v2 升级到 v3？
 
-### 1. Models
+#### 3.1. Models
 
 ```diff
 - const counter = {
@@ -241,7 +257,7 @@ const App = () => (
 + }
 ```
 
-### 2. Store
+#### 3.2. Store
 
 ```diff
 - import { createStore } from 'retalk';
@@ -251,7 +267,7 @@ const App = () => (
 + const store = setStore({ counter: CounterModel }, [logger]);
 ```
 
-### 3. Views
+#### 3.3. Views
 
 ```diff
 - import { connect } from 'react-redux';
@@ -266,7 +282,7 @@ const App = () => (
 + const CounterWrapper = withStore('counter')(Counter);
 ```
 
-### 4. App
+#### 3.4. App
 
 ```diff
 - import { Provider } from 'react-redux';

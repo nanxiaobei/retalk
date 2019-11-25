@@ -16,7 +16,7 @@ English | [简体中文](./README.zh-CN.md)
 ## Why
 
 - **Simplest Redux** - Same syntax as a React component.
-- **Only 3 API** - `setStore()`, `withStore()`, `<Provider>`.
+- **Only 2 API** - `setStore()` and `withStore()`.
 - **Async models** - Fully code splitting support for models.
 - **Auto loading** - Auto loading state for async actions.
 
@@ -122,31 +122,68 @@ ReactDOM.render(<App />, document.getElementById('root'));
 
 ### 1. setStore()
 
-`setStore(models, middleware)`
-
-```js
-const store = setStore({ a: AModel, b: BModel }, [middleware1, middleware2]);
+```
+const store = setStore(models, middleware);
 ```
 
-Setup the one and only store.
+Pass `models` and `middleware`(both are optional), Setup the one and only store.
 
 In `development` mode, [Redux DevTools](https://github.com/zalmoxisus/redux-devtools-extension) will be enabled by default, make sure its version [>= v2.15.3](https://github.com/reduxjs/redux/issues/2943) and [not v2.16.0](https://stackoverflow.com/a/53512072/6919133).
+
+```js
+const store = setStore(
+  {
+    home: HomeModel,
+    counter: CounterModel,
+  },
+  [logger, crashReporter],
+);
+```
 
 ### 2. withStore()
 
 `withStore(...modelNames)(Component)`
 
-```js
-const DemoWrapper = withStore('a', 'b')(Demo);
-```
-
 Eject one or more models' state and actions to a component's props.
 
-### 3. \<Provider>
+There are 3 ways to use it:
 
-`<Provider store={store}>`
+#### 2.1. Use string to eject all
 
-Wrap your app with it to access the store.
+```js
+const CounterWrapper = withStore('home', 'counter')(Counter);
+```
+
+Simplest way, but if some unused props are injected, it will also trigger a re-rendering to affect performance.
+
+> This method can be used if it is determined that all injected props will be used, or rapid development will be given priority rather than performance.
+
+#### 2.2. Use object to customize
+
+```js
+const CounterWrapper = withStore({
+  home: ['name', 'setName'],
+  counter: ['count', 'increment', 'incrementAsync'],
+})(Counter);
+```
+
+Customize the injected props, only inject the needed props, so as to optimize the performance.
+
+#### 2.3. Use `mapStateToProps()`... to customize more
+
+```js
+const CounterWrapper = withStore(mapStateToProps, mapDispatchToProps)(Counter);
+```
+
+For more customization of the injected props, you can use [`mapStateToProps`, `mapDispatchToProps`](https://react-redux.js.org/api/connect) etc.
+
+At that time, `withStore()` will be used as `connect()`.
+
+### 3. \<Provider> & batch()
+
+Just `redux-redux`'s [`Provider`](https://react-redux.js.org/api/provider) and [`batch()`](https://react-redux.js.org/api/batch).
+
+You can import them from `retalk` to simplify development.
 
 ## FAQ
 
@@ -162,7 +199,7 @@ Here is an example with `loadable-components`:
 import React from 'react';
 import loadable from 'loadable-components';
 
-const AsyncCounter = loadable(async (store) => {
+const AsyncCounter = loadable(async () => {
   const [{ default: Counter }, { default: CounterModel }] = await Promise.all([
     import('./Counter/index.jsx'),
     import('./Counter/Model.js'),
@@ -172,28 +209,7 @@ const AsyncCounter = loadable(async (store) => {
 });
 ```
 
-### 2. Customize state and actions?
-
-Pass [`mapStateToProps` and `mapDispatchToProps`](https://github.com/reduxjs/react-redux/blob/master/docs/api.md#arguments) to `withStore()`, when you need to customize the ejected props, without passing models' names to `withStore()`.
-
-```jsx harmony
-const mapState = ({ counter: { count } }) => ({
-  count,
-});
-
-const mapActions = ({ counter: { increment, incrementAsync } }) => ({
-  increment,
-  incrementAsync,
-});
-
-// First parameter to `mapDispatchToProps` is `dispatch`, `dispatch` is a function,
-// but in the `mapActions` above, we treat it like an object.
-// Retalk did some tricks here, it's the `dispatch` function, but bound models to it.
-
-export default withStore(mapState, mapActions)(Counter);
-```
-
-### 3. Support HMR?
+### 2. Support HMR?
 
 Change the entry file `index.js` to:
 
@@ -220,9 +236,9 @@ const App = () => (
 );
 ```
 
-## Migrate from v2 to v3
+### 3. Migrate from v2 to v3?
 
-### 1. Models
+#### 3.1. Models
 
 ```diff
 - const counter = {
@@ -241,7 +257,7 @@ const App = () => (
 + }
 ```
 
-### 2. Store
+#### 3.2. Store
 
 ```diff
 - import { createStore } from 'retalk';
@@ -251,7 +267,7 @@ const App = () => (
 + const store = setStore({ counter: CounterModel }, [logger]);
 ```
 
-### 3. Views
+#### 3.3. Views
 
 ```diff
 - import { connect } from 'react-redux';
@@ -266,7 +282,7 @@ const App = () => (
 + const CounterWrapper = withStore('counter')(Counter);
 ```
 
-### 4. App
+#### 3.4. App
 
 ```diff
 - import { Provider } from 'react-redux';
