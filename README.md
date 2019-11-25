@@ -1,4 +1,4 @@
-<img src="./logo/retalk.png" width="280" alt="Retalk">
+<img src="./logo.png" width="280" alt="Retalk">
 
 Simplest solution for Redux, write Redux like React.
 

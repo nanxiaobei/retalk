@@ -1,4 +1,4 @@
-<img src="./logo/retalk.png" width="280" alt="Retalk">
+<img src="./logo.png" width="280" alt="Retalk">
 
 最简单的 Redux 解决方案，像写 React 一样来写 Redux。
 
