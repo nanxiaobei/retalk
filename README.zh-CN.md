@@ -94,7 +94,9 @@ const Counter = ({ count, increment, incrementAsync }) => (
   </div>
 );
 
-const CounterWrapper = withStore('counter')(Counter);
+const CounterWrapper = withStore({
+  counter: ['count', 'increment', 'incrementAsync'],
+})(Counter);
 ```
 
 ### 4. App
