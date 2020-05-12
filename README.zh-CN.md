@@ -238,59 +238,6 @@ const App = () => (
 );
 ```
 
-### 3. 从 v2 升级到 v3？
-
-#### 3.1. Models
-
-```diff
-- const counter = {
-+ class CounterModel {
--   state: {},
-+   state = {};
--   actions: {
--     increment() {
--       const home = this.home; // 获取其它 model
--     },
--   },
-+   increment() {
-+     const { home } = this.models; // 获取其它 model
-+   }
-- };
-+ }
-```
-
-#### 3.2. Store
-
-```diff
-- import { createStore } from 'retalk';
-+ import { setStore } from 'retalk';
-
-- const store = createStore({ counter }, { plugins: [logger] });
-+ const store = setStore({ counter: CounterModel }, [logger]);
-```
-
-#### 3.3. Views
-
-```diff
-- import { connect } from 'react-redux';
-
-- const Counter = ({ incrementAsync, loading }) => (
-+ const Counter = ({ incrementAsync }) => (
--   <button onClick={incrementAsync}>+ Async{loading.incrementAsync && '...'}</button>
-+   <button onClick={incrementAsync}>+ Async{incrementAsync.loading && '...'}</button>
-  );
-
-- const CounterWrapper = connect(...withStore('counter'))(Counter);
-+ const CounterWrapper = withStore('counter')(Counter);
-```
-
-#### 3.4. App
-
-```diff
-- import { Provider } from 'react-redux';
-+ import { Provider } from 'retalk';
-```
-
 ## 协议
 
 [MIT](https://github.com/nanxiaobei/retalk/blob/master/LICENSE) © [nanxiaobei](https://mrlee.me/)
