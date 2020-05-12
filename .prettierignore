@@ -1,7 +1,2 @@
 coverage
 dist
-
-.*ignore
-LICENSE
-yarn.lock
-yarn-error.log
