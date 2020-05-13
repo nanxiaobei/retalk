@@ -45,22 +45,22 @@ class CounterModel {
   state = {
     count: 0,
   };
-  increment() {
-    // this.state -> Get own model's state
-    // this.setState() -> Set own model's state
-    // this.someAction() -> Call own model's actions
+  add() {
+    // this.state -> Get state of own model
+    // this.setState() -> Set state of own model
+    // this.someAction() -> Call actions of own model
 
-    // this.models.someModel.state -> Get other models' state
-    // this.models.someModel.someAction() -> Call other models' actions
+    // this.models.someModel.state -> Get state of other models
+    // this.models.someModel.someAction() -> Call actions of other models
 
     const { count } = this.state;
     this.setState({ count: count + 1 });
   }
-  async incrementAsync() {
+  async addLater() {
     // Auto `someAsyncAction.loading` state can be use
 
     await new Promise((resolve) => setTimeout(resolve, 1000));
-    this.increment();
+    this.add();
   }
 }
 ```
@@ -86,16 +86,16 @@ Use `withStore()` to connect models and components.
 import React from 'react';
 import { withStore } from 'retalk';
 
-const Counter = ({ count, increment, incrementAsync }) => (
+const Counter = ({ count, add, addLater }) => (
   <div>
     <p>{count}</p>
-    <button onClick={increment}>+</button>
-    <button onClick={incrementAsync}>+ Async{incrementAsync.loading && '...'}</button>
+    <button onClick={add}>+</button>
+    <button onClick={addLater}>+ ⏳{addLater.loading && '...'}</button>
   </div>
 );
 
 const CounterWrapper = withStore({
-  counter: ['count', 'increment', 'incrementAsync'],
+  counter: ['count', 'add', 'addLater'],
 })(Counter);
 ```
 
@@ -165,7 +165,7 @@ Simplest way, but if some unused props are injected, it will also trigger a re-r
 ```js
 const CounterWrapper = withStore({
   home: ['name', 'setName'],
-  counter: ['count', 'increment', 'incrementAsync'],
+  counter: ['count', 'add', 'addLater'],
 })(Counter);
 ```
 

@@ -45,7 +45,7 @@ class CounterModel {
   state = {
     count: 0,
   };
-  increment() {
+  add() {
     // this.state -> 获取自身 model 的 state
     // this.setState() -> 更新自身 model 的 state
     // this.someAction() -> 调用自身 model 的 action
@@ -56,11 +56,11 @@ class CounterModel {
     const { count } = this.state;
     this.setState({ count: count + 1 });
   }
-  async incrementAsync() {
+  async addLater() {
     // 自动生成的 `someAsyncAction.loading` state 可供使用
 
     await new Promise((resolve) => setTimeout(resolve, 1000));
-    this.increment();
+    this.add();
   }
 }
 ```
@@ -86,16 +86,16 @@ const store = setStore({
 import React from 'react';
 import { withStore } from 'retalk';
 
-const Counter = ({ count, increment, incrementAsync }) => (
+const Counter = ({ count, add, addLater }) => (
   <div>
     <p>{count}</p>
-    <button onClick={increment}>+</button>
-    <button onClick={incrementAsync}>+ Async{incrementAsync.loading && '...'}</button>
+    <button onClick={add}>+</button>
+    <button onClick={addLater}>+ ⏳{addLater.loading && '...'}</button>
   </div>
 );
 
 const CounterWrapper = withStore({
-  counter: ['count', 'increment', 'incrementAsync'],
+  counter: ['count', 'add', 'addLater'],
 })(Counter);
 ```
 
@@ -165,7 +165,7 @@ const CounterWrapper = withStore('home', 'counter')(Counter);
 ```js
 const CounterWrapper = withStore({
   home: ['name', 'setName'],
-  counter: ['count', 'increment', 'incrementAsync'],
+  counter: ['count', 'add', 'addLater'],
 })(Counter);
 ```
 
