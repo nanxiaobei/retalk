@@ -13,30 +13,35 @@ beforeEach(() => {
 
 test('setStore', () => {
   /**
-   * development
+   * test
    */
-  process.env.NODE_ENV = 'development';
+  process.env.NODE_ENV = 'test';
 
   // NOT_OBJECT - models
   expect(() => {
     setStore([]);
   }).toThrow();
+
   // NOT_ARRAY - middleware
   expect(() => {
     setStore({}, 123);
   }).toThrow();
+
   // NOT_CLASS - Model
   expect(() => {
     setStore({ model1: 123 });
   }).toThrow();
 
   const store = setStore();
+
   // NO_DISPATCH
   store.dispatch();
+
   // NOT_OBJECT - models (add)
   expect(() => {
     store.add([]);
   }).toThrow();
+
   // NOT_CLASS - Model (add)
   expect(() => {
     store.add({ model1: 123 });
@@ -61,46 +66,45 @@ test('withStore', (done) => {
   const store = setStore();
 
   /**
-   * development
+   * test
    */
-  process.env.NODE_ENV = 'development';
+  process.env.NODE_ENV = 'test';
 
   store.add({
-    counter: class {
+    counter1: class {
       state = { count: 0 };
     },
   });
 
-  // eslint-disable-next-line
-  const CounterNew = withStore({ counter: ['count', 'increment'] })(() => <div />);
+  // default
+  const Counter1 = withStore('counter1')(() => <div />); // eslint-disable-line
+  const Counter1New = withStore({ counter1: ['count', 'add'] })(() => <div />); // eslint-disable-line
   mount(
     <Provider store={store}>
-      <CounterNew />
+      <Counter1 />
+      <Counter1New />
     </Provider>,
   );
 
   // NOT_STRING - name
   expect(() => {
-    // eslint-disable-next-line
-    const Counter = withStore('counter', 123)(() => <div />);
+    const Counter1Err = withStore('counter1', 123)(() => <div />); // eslint-disable-line
     mount(
       <Provider store={store}>
-        <Counter />
+        <Counter1Err />
       </Provider>,
     );
   }).toThrow();
 
   // NOT_EXIST - Model
   expect(() => {
-    // eslint-disable-next-line
-    const Counter2 = withStore('counter2')(() => <div />);
-    // eslint-disable-next-line
-    const Counter2New = withStore({ counter2: [] })(() => <div />);
+    const Counter2Err = withStore('counter2')(() => <div />); // eslint-disable-line
+    const Counter2ErrNew = withStore({ counter2: [] })(() => <div />); // eslint-disable-line
 
     mount(
       <Provider store={store}>
-        <Counter2 />
-        <Counter2New />
+        <Counter2Err />
+        <Counter2ErrNew />
       </Provider>,
     );
   }).toThrow();
@@ -114,35 +118,24 @@ test('withStore', (done) => {
   process.env.NODE_ENV = 'production';
 
   store.add({
-    home: class {},
     counter3: class {
       state = {
         count: 0,
       };
-      increment() {
+      add() {
         const { count } = this.state;
         this.setState({ count: count + 1 });
       }
-      async incrementAsync() {
+      async addLater() {
         await new Promise((resolve) => setTimeout(resolve, 1000));
-        this.increment();
-      }
-      homeSetState() {
-        const { home } = this.models;
-        home.setState();
+        this.add();
       }
     },
   });
 
-  // eslint-disable-next-line
-  const Counter3 = withStore('counter3')(({ incrementAsync, homeSetState }) => (
-    <>
-      <button id="incrementAsync" onClick={incrementAsync} />
-      <button id="homeSetState" onClick={homeSetState} />
-    </>
-  ));
-  // eslint-disable-next-line
-  const Counter3New = withStore({ counter3: ['count', 'increment'] })(() => <div />);
+  const Counter3Comp = ({ addLater }) => <button id="addLater" onClick={addLater} />;
+  const Counter3 = withStore('counter3')(Counter3Comp); // eslint-disable-line
+  const Counter3New = withStore({ counter3: ['count', 'add'] })(() => <div />); // eslint-disable-line
 
   const wrapper = mount(
     <Provider store={store}>
@@ -150,9 +143,8 @@ test('withStore', (done) => {
       <Counter3New />
     </Provider>,
   );
-  wrapper.find('#incrementAsync').simulate('click');
-  // NO_SET_STATE - name
-  wrapper.find('#homeSetState').simulate('click');
+  wrapper.find('#addLater').simulate('click');
+  wrapper.find('#addLater').simulate('click');
 
   // Unmount
   setTimeout(() => {
