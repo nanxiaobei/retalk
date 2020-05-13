@@ -54,7 +54,7 @@ const createActions = (name, Model, newModels, newDispatch, realDispatch) => {
     model[actionName].loading = loading;
     return realDispatch({
       type: `${name}/${actionName}/${type}_LOADING`,
-      newState: { ...model.state, [actionName]: model[actionName] },
+      newState: { ...model.state, loading: { [actionName]: loading } },
     });
   };
 
@@ -219,6 +219,7 @@ export const withStore = (...names) => {
             const val = modelState[key];
             typeof val !== 'undefined' ? (stateObj[key] = val) : actionsMap[name].push(key);
           });
+          stateObj.loading = { ...stateObj.loading, ...modelState.loading };
         });
         return stateObj;
       };
@@ -232,6 +233,7 @@ export const withStore = (...names) => {
             const val = modelState[key];
             typeof val !== 'undefined' ? (stateObj[key] = val) : actionsMap[name].push(key);
           });
+          stateObj.loading = { ...stateObj.loading, ...modelState.loading };
         });
         return stateObj;
       };
