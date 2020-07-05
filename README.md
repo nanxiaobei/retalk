@@ -188,11 +188,11 @@ You can import them from `retalk` to simplify development.
 
 ## FAQ
 
-### 1. Async import models?
+### Async import models?
 
-Setup the store with `setStore()`, then use ibraries like [`loadable-components`](https://github.com/smooth-code/loadable-components/#loading-multiple-resources-in-parallel) to import components and models.
+Setup the store with `setStore()`, then use libs like [`loadable-components`](https://github.com/smooth-code/loadable-components/#loading-multiple-resources-in-parallel) to import components and models.
 
-Then, use `store.add(models)` to eject the imported models to the store.
+Then, use `store.add()` to eject models to store.
 
 Here is an example with `loadable-components`:
 
@@ -208,33 +208,6 @@ const AsyncCounter = loadable(async () => {
   store.add({ counter: CounterModel }); // Use `store.add(models)`, like `setStore(models)`
   return (props) => <Counter {...props} />;
 });
-```
-
-### 2. Support HMR?
-
-Change the entry file `index.js` to:
-
-```jsx harmony
-const rootElement = document.getElementById('root');
-const render = () => ReactDOM.render(<App />, rootElement);
-
-render();
-
-if (module.hot) {
-  module.hot.accept('./App', () => {
-    render();
-  });
-}
-```
-
-Make sure that `<Provider>` is inside the `<App>` component:
-
-```jsx harmony
-const App = () => (
-  <Provider store={store}>
-    <Counter />
-  </Provider>
-);
 ```
 
 ## License

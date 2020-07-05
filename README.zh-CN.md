@@ -187,11 +187,11 @@ const CounterWrapper = withStore(mapStateToProps, mapDispatchToProps)(Counter);
 
 ## FAQ
 
-### 1. 异步引入 model？
+### 异步引入 model？
 
-使用 `setStore()` 初始化 store，接着用像 [`loadable-components`](https://github.com/smooth-code/loadable-components/#loading-multiple-resources-in-parallel) 这样的库引入组件与 model。
+使用 `setStore()` 初始化 store，接着使用比如 [`loadable-components`](https://github.com/smooth-code/loadable-components/#loading-multiple-resources-in-parallel) 来引入组件与 model。
 
-然后，使用 `store.add(models)` 将引入的 model 注入 store。
+然后，使用 `store.add()` 将 model 注入 store。
 
 一个使用 `loadable-components` 的示例：
 
@@ -207,33 +207,6 @@ const AsyncCounter = loadable(async () => {
   store.add({ counter: CounterModel }); // 使用 `store.add(models)`，就像 `setStore(models)` 一样
   return (props) => <Counter {...props} />;
 });
-```
-
-### 2. 支持热更新？
-
-将入口文件 `index.js` 改为：
-
-```jsx harmony
-const rootElement = document.getElementById('root');
-const render = () => ReactDOM.render(<App />, rootElement);
-
-render();
-
-if (module.hot) {
-  module.hot.accept('./App', () => {
-    render();
-  });
-}
-```
-
-请确保 `<Provider>` 需在 `<App>` 组件内：
-
-```jsx harmony
-const App = () => (
-  <Provider store={store}>
-    <Layout />
-  </Provider>
-);
 ```
 
 ## 协议
