@@ -1,6 +1,6 @@
-<img src="./logo.png" width="280" alt="Retalk">
+<img src="./logo.png" width="228" alt="Retalk">
 
-Simplest solution for Redux, write Redux like React.
+The simplest solution for Redux.
 
 [![Travis](https://img.shields.io/travis/nanxiaobei/retalk.svg?style=flat-square)](https://travis-ci.org/nanxiaobei/retalk)
 [![Codecov](https://img.shields.io/codecov/c/github/nanxiaobei/retalk.svg?style=flat-square)](https://codecov.io/gh/nanxiaobei/retalk)
@@ -15,7 +15,7 @@ English | [简体中文](./README.zh-CN.md)
 
 ## Why
 
-- **Simplest Redux** - Same syntax as a React component.
+- **Simplest Redux** - Same syntax as React components.
 - **Only 2 API** - `setStore()` and `withStore()`.
 - **Async models** - Fully code splitting support for models.
 - **Auto loading** - Auto loading state for async actions.
@@ -24,12 +24,11 @@ English | [简体中文](./README.zh-CN.md)
 
 ```sh
 yarn add retalk
-```
 
-or
+# or
 
-```sh
 npm install retalk
+
 ```
 
 ## Usage
@@ -138,7 +137,7 @@ const store = setStore(
     home: HomeModel,
     counter: CounterModel,
   },
-  [logger, crashReporter],
+  [logger, crashReporter]
 );
 ```
 

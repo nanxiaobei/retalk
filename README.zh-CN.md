@@ -1,6 +1,6 @@
-<img src="./logo.png" width="280" alt="Retalk">
+<img src="./logo.png" width="228" alt="Retalk">
 
-最简单的 Redux 解决方案，像写 React 一样来写 Redux。
+最简单的 Redux 解决方案。
 
 [![Travis](https://img.shields.io/travis/nanxiaobei/retalk.svg?style=flat-square)](https://travis-ci.org/nanxiaobei/retalk)
 [![Codecov](https://img.shields.io/codecov/c/github/nanxiaobei/retalk.svg?style=flat-square)](https://codecov.io/gh/nanxiaobei/retalk)
@@ -15,20 +15,18 @@
 
 ## 特性
 
-- **极简 Redux** - 与 React 组件相同的语法。
+- **极简 Redux** - 与 React 组件语法相同。
 - **只有 2 个 API** - `setStore()` 与 `withStore()`。
-- **异步 model** - 对 model 进行代码分割的完整支持。
-- **自动 loading** - 自动生成异步 action 的 loading state。
+- **异步 model** - 完整支持对 model 的代码分割。
+- **自动 loading** - 自动处理异步 action 的 loading 状态。
 
 ## 安装
 
 ```sh
 yarn add retalk
-```
 
-或
+# 或
 
-```sh
 npm install retalk
 ```
 
@@ -138,7 +136,7 @@ const store = setStore(
     home: HomeModel,
     counter: CounterModel,
   },
-  [logger, crashReporter],
+  [logger, crashReporter]
 );
 ```
 
