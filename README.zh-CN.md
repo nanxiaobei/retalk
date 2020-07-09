@@ -32,7 +32,7 @@ npm install retalk
 
 ## 使用
 
-### 1. Models
+### 1. Model
 
 通常我们会在 app 内设置多个路由，一个路由对应一个 model，所以将会有多个 model。
 
@@ -76,7 +76,7 @@ const store = setStore({
 });
 ```
 
-### 3. Views
+### 3. View
 
 使用 `withStore()` 来连接 model 与组件。
 
@@ -148,17 +148,17 @@ const store = setStore(
 
 有三种使用方式：
 
-#### 2.1. 使用 string 注入全部
+#### 使用 string 注入全部
 
 ```js
 const CounterWrapper = withStore('home', 'counter')(Counter);
 ```
 
-最简单的使用方式，但若注入了一些未用到的 props，其也会触发重新渲染，从而影响性能。
+最简单的使用方式，但若注入了一些未用到的 props，也会触发重新渲染。
 
-> 若确定所有注入的 props 都会用到，或优先考虑快速开发，不特别在意性能，可使用此方式。
+若确定所有注入的 props 都会用到，或优先考虑快速开发，可使用此方式。
 
-#### 2.2. 使用 object 自定义
+#### 使用 object 自定义
 
 ```js
 const CounterWrapper = withStore({
@@ -169,7 +169,7 @@ const CounterWrapper = withStore({
 
 对注入的 props 进行自定义，只注入需要的 props，从而优化性能。
 
-#### 2.3. 使用 `mapStateToProps()` 等自定义更多
+#### 使用 `mapStateToProps()` 等自定义更多
 
 ```js
 const CounterWrapper = withStore(mapStateToProps, mapDispatchToProps)(Counter);
@@ -179,7 +179,7 @@ const CounterWrapper = withStore(mapStateToProps, mapDispatchToProps)(Counter);
 
 此时 `withStore()` 将被当做 `connect()` 来使用。
 
-### 3. \<Provider> & batch()
+### 3. Provider & batch()
 
 即 `redux-redux` 的 [`Provider`](https://react-redux.js.org/api/provider) 与 [`batch()`](https://react-redux.js.org/api/batch)。
 
@@ -193,7 +193,7 @@ const CounterWrapper = withStore(mapStateToProps, mapDispatchToProps)(Counter);
 
 然后，使用 `store.add()` 将 model 注入 store。
 
-一个使用 `loadable-components` 的示例：
+使用 `loadable-components` 的示例：
 
 ```jsx harmony
 import React from 'react';

@@ -16,7 +16,7 @@ English | [简体中文](./README.zh-CN.md)
 ## Why
 
 - **Simplest Redux** - Same syntax as React components.
-- **Only 2 API** - `setStore()` and `withStore()`.
+- **Only 2 APIs** - `setStore()` and `withStore()`.
 - **Async models** - Fully code splitting support for models.
 - **Auto loading** - Auto loading state for async actions.
 
@@ -33,7 +33,7 @@ npm install retalk
 
 ## Usage
 
-### 1. Models
+### 1. Model
 
 Usually we'll set several routes in our app, one route with one model, so we'll have several models.
 
@@ -66,7 +66,7 @@ class CounterModel {
 
 ### 2. Store
 
-Use `setStore()` to setup all models with theirs namespaces.
+Use `setStore()` to set up all models with theirs namespaces.
 
 ```js
 import { setStore } from 'retalk';
@@ -77,7 +77,7 @@ const store = setStore({
 });
 ```
 
-### 3. Views
+### 3. View
 
 Use `withStore()` to connect models and components.
 
@@ -149,17 +149,17 @@ Eject one or more models' state and actions to a component's props.
 
 There are 3 ways to use it:
 
-#### 2.1. Use string to eject all
+#### Use string to eject all
 
 ```js
 const CounterWrapper = withStore('home', 'counter')(Counter);
 ```
 
-Simplest way, but if some unused props are injected, it will also trigger a re-rendering to affect performance.
+The Simplest way, but if some unused props are injected, it will also trigger a re-render.
 
-> This method can be used if it is determined that all injected props will be used, or rapid development will be given priority rather than performance.
+This method can be used if determined that all injected props will be used, or to rapid develop.
 
-#### 2.2. Use object to customize
+#### Use object to customize
 
 ```js
 const CounterWrapper = withStore({
@@ -168,9 +168,9 @@ const CounterWrapper = withStore({
 })(Counter);
 ```
 
-Customize the injected props, only inject the needed props, so as to optimize the performance.
+Customize the injected props, only inject the needed props, so to optimize the performance.
 
-#### 2.3. Use `mapStateToProps()`... to customize more
+#### Use `mapStateToProps()`... to customize more
 
 ```js
 const CounterWrapper = withStore(mapStateToProps, mapDispatchToProps)(Counter);
@@ -180,7 +180,7 @@ For more customization of the injected props, you can use [`mapStateToProps`, `m
 
 At that time, `withStore()` will be used as `connect()`.
 
-### 3. \<Provider> & batch()
+### 3. Provider & batch()
 
 Just `redux-redux`'s [`Provider`](https://react-redux.js.org/api/provider) and [`batch()`](https://react-redux.js.org/api/batch).
 
