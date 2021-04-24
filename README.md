@@ -213,3 +213,9 @@ const AsyncCounter = loadable(async () => {
 ## License
 
 [MIT](https://github.com/nanxiaobei/retalk/blob/master/LICENSE) © [nanxiaobei](https://mrlee.me/)
+
+## Pitiless Ads
+
+If you use WeChat, please try "**FUTAKE**". It's a WeChat mini app for your inspiration moments. 🌈
+
+![FUTAKE](https://s3.jpg.cm/2021/04/22/TDQuS.png)
