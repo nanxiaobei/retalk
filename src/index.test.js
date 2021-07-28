@@ -83,7 +83,7 @@ test('withStore', (done) => {
     <Provider store={store}>
       <Counter1 />
       <Counter1New />
-    </Provider>,
+    </Provider>
   );
 
   // NOT_STRING - name
@@ -92,7 +92,7 @@ test('withStore', (done) => {
     mount(
       <Provider store={store}>
         <Counter1Err />
-      </Provider>,
+      </Provider>
     );
   }).toThrow();
 
@@ -105,7 +105,7 @@ test('withStore', (done) => {
       <Provider store={store}>
         <Counter2Err />
         <Counter2ErrNew />
-      </Provider>,
+      </Provider>
     );
   }).toThrow();
 
@@ -126,14 +126,14 @@ test('withStore', (done) => {
         const { count } = this.state;
         this.setState({ count: count + 1 });
       }
-      async addLater() {
+      async addAsync() {
         await new Promise((resolve) => setTimeout(resolve, 1000));
         this.add();
       }
     },
   });
 
-  const Counter3Comp = ({ addLater }) => <button id="addLater" onClick={addLater} />;
+  const Counter3Comp = ({ addAsync }) => <button id="addAsync" onClick={addAsync} />;
   const Counter3 = withStore('counter3')(Counter3Comp); // eslint-disable-line
   const Counter3New = withStore({ counter3: ['count', 'add'] })(() => <div />); // eslint-disable-line
 
@@ -141,10 +141,10 @@ test('withStore', (done) => {
     <Provider store={store}>
       <Counter3 />
       <Counter3New />
-    </Provider>,
+    </Provider>
   );
-  wrapper.find('#addLater').simulate('click');
-  wrapper.find('#addLater').simulate('click');
+  wrapper.find('#addAsync').simulate('click');
+  wrapper.find('#addAsync').simulate('click');
 
   // Unmount
   setTimeout(() => {
