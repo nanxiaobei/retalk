@@ -1,3 +1,4 @@
+<div align="center">
 <img src="./logo.png" width="228" alt="Retalk">
 
 最简单的 Redux 解决方案。
@@ -9,7 +10,9 @@
 [![npm downloads](https://img.shields.io/npm/dt/retalk.svg?style=flat-square)](http://www.npmtrends.com/retalk)
 [![license](https://img.shields.io/github/license/nanxiaobei/retalk.svg?style=flat-square)](https://github.com/nanxiaobei/retalk/blob/master/LICENSE)
 
-[English](./README.md) | 简体中文
+[English](./README.md) · 简体中文
+
+</div>
 
 ---
 
@@ -25,93 +28,56 @@
 ```sh
 yarn add retalk
 
-# 或
-
-npm install retalk
+# npm install retalk
 ```
 
 ## 使用
 
-### 1. Model
+model 写法就像一个 React class 组件，只是没有了生命周期。
 
-通常我们会在 app 内设置多个路由，一个路由对应一个 model，所以将会有多个 model。
+```jsx
+import { setStore, withStore, Provider } from 'retalk';
 
-像写一个 React 组件一样来写 model，只是没有了生命周期而已。
-
-```js
 class CounterModel {
   state = {
     count: 0,
   };
   add() {
-    // this.state -> 获取自身 model 的 state
-    // this.setState() -> 更新自身 model 的 state
-    // this.someAction() -> 调用自身 model 的 action
-
-    // this.models.someModel.state -> 获取其它 model 的 state
-    // this.models.someModel.someAction() -> 调用其它 model 的 action
-
     const { count } = this.state;
     this.setState({ count: count + 1 });
-  }
-  async addLater() {
-    // 自动生成的 `someAsyncAction.loading` state 可供使用
 
+    // this.state          -> 获取自身 state
+    // this.setState()     -> 更新自身 state
+    // this.someAction()   -> 调用自身 action
+
+    // this.models.someModel.state          -> 获取其它 model 的 state
+    // this.models.someModel.someAction()   -> 调用其它 model 的 action
+  }
+  async addAsync() {
     await new Promise((resolve) => setTimeout(resolve, 1000));
     this.add();
   }
 }
-```
 
-### 2. Store
+const Counter = withStore({ counter: ['count', 'add', 'addAsync'] })((props) => {
+  const { count, add, addAsync } = props; // addAsync.loading 可供使用
 
-使用 `setStore()` 来初始化所有 model 与其命名空间。
-
-```js
-import { setStore } from 'retalk';
-
-const store = setStore({
-  counter: CounterModel,
-  // 其它 model...
+  return (
+    <div>
+      <p>{count}</p>
+      <button onClick={add}>+</button>
+      <button onClick={addAsync}>+ ⏳{addAsync.loading && '...'}</button>
+    </div>
+  );
 });
-```
 
-### 3. View
-
-使用 `withStore()` 来连接 model 与组件。
-
-```jsx harmony
-import React from 'react';
-import { withStore } from 'retalk';
-
-const Counter = ({ count, add, addLater }) => (
-  <div>
-    <p>{count}</p>
-    <button onClick={add}>+</button>
-    <button onClick={addLater}>+ ⏳{addLater.loading && '...'}</button>
-  </div>
-);
-
-const CounterWrapper = withStore({
-  counter: ['count', 'add', 'addLater'],
-})(Counter);
-```
-
-### 4. App
-
-使用 `<Provider>` 来将 store 提供给 app。
-
-```jsx harmony
-import ReactDOM from 'react-dom';
-import { Provider } from 'retalk';
+const store = setStore({ counter: CounterModel });
 
 const App = () => (
   <Provider store={store}>
-    <CounterWrapper />
+    <Counter />
   </Provider>
 );
-
-ReactDOM.render(<App />, document.getElementById('root'));
 ```
 
 ## 示例
@@ -122,13 +88,7 @@ ReactDOM.render(<App />, document.getElementById('root'));
 
 ### 1. setStore()
 
-```
-const store = setStore(models, middleware);
-```
-
-传入 `models` 与 `middleware`（均为可选），生成唯一的 store。
-
-> `development` 模式下，[Redux DevTools](https://github.com/zalmoxisus/redux-devtools-extension) 将默认启用，请确保其版本 [>= v2.15.3](https://github.com/reduxjs/redux/issues/2943) 且 [不是 v2.16.0](https://stackoverflow.com/a/53512072/6919133)。
+`setStore(models, middleware);`
 
 ```js
 const store = setStore(
@@ -140,44 +100,42 @@ const store = setStore(
 );
 ```
 
+传入 `models` 与 `middleware`（均为可选），生成唯一的 store。
+
+> `development` 模式下，[Redux DevTools](https://github.com/zalmoxisus/redux-devtools-extension) 将默认启用，请确保其版本 [>= v2.15.3](https://github.com/reduxjs/redux/issues/2943) 且 [不是 v2.16.0](https://stackoverflow.com/a/53512072/6919133)。
+
 ### 2. withStore()
 
 `withStore(...modelNames)(Component)`
 
-将一个或多个 model 的 state 与 action 注入组件的 props。
-
-有三种使用方式：
-
-#### 使用 string 注入全部
+将一个或多个 model 的 state 与 action 注入组件的 props。有 3 种使用方式：
 
 ```js
-const CounterWrapper = withStore('home', 'counter')(Counter);
+// 1. 使用 string 注入全部
+const Wrapper = withStore('home', 'counter')(Counter);
+
+// 最简单的使用方式，但若注入一些未用到的 props，也会触发更新。
+// 若所有注入的 props 都会用到，或考虑快速开发，可使用此方式。
 ```
 
-最简单的使用方式，但若注入了一些未用到的 props，也会触发重新渲染。
-
-若确定所有注入的 props 都会用到，或优先考虑快速开发，可使用此方式。
-
-#### 使用 object 自定义
-
 ```js
-const CounterWrapper = withStore({
+// 2. 使用 object 自定义
+const Wrapper = withStore({
   home: ['name', 'setName'],
-  counter: ['count', 'add', 'addLater'],
+  counter: ['count', 'add', 'addAsync'],
 })(Counter);
+
+// 对注入的 props 进行自定义，只注入需要的 props。
 ```
-
-对注入的 props 进行自定义，只注入需要的 props，从而优化性能。
-
-#### 使用 `mapStateToProps()` 等自定义更多
 
 ```js
-const CounterWrapper = withStore(mapStateToProps, mapDispatchToProps)(Counter);
+// 3. 使用 `mapStateToProps()` 等自定义更多
+const Wrapper = withStore(mapStateToProps, mapDispatchToProps)(Counter);
+
+// 对注入的 props 进行更多自定义，
+// 可使用 `mapStateToProps`、`mapDispatchToProps` 等。
+// react-redux.js.org/api/connect
 ```
-
-对注入的 props 进行更多的自定义，可使用 [`mapStateToProps`、`mapDispatchToProps`](https://react-redux.js.org/api/connect) 等。
-
-此时 `withStore()` 将被当做 `connect()` 来使用。
 
 ### 3. Provider & batch()
 
@@ -199,12 +157,12 @@ const CounterWrapper = withStore(mapStateToProps, mapDispatchToProps)(Counter);
 import React from 'react';
 import loadable from 'loadable-components';
 
-const AsyncCounter = loadable(async () => {
+const Wrapper = loadable(async () => {
   const [{ default: Counter }, { default: CounterModel }] = await Promise.all([
     import('./Counter/index.jsx'),
     import('./Counter/Model.js'),
   ]);
-  store.add({ counter: CounterModel }); // 使用 `store.add(models)`，就像 `setStore(models)` 一样
+  store.add({ counter: CounterModel }); // 使用 `store.add(models)` 就像 `setStore(models)` 一样
   return (props) => <Counter {...props} />;
 });
 ```

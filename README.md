@@ -1,3 +1,4 @@
+<div align="center">
 <img src="./logo.png" width="228" alt="Retalk">
 
 The simplest solution for Redux.
@@ -9,11 +10,13 @@ The simplest solution for Redux.
 [![npm downloads](https://img.shields.io/npm/dt/retalk.svg?style=flat-square)](http://www.npmtrends.com/retalk)
 [![license](https://img.shields.io/github/license/nanxiaobei/retalk.svg?style=flat-square)](https://github.com/nanxiaobei/retalk/blob/master/LICENSE)
 
-English | [简体中文](./README.zh-CN.md)
+English · [简体中文](./README.zh-CN.md)
+
+</div>
 
 ---
 
-## Why
+## Features
 
 - **Simplest Redux** - Same syntax as React components.
 - **Only 2 APIs** - `setStore()` and `withStore()`.
@@ -25,94 +28,56 @@ English | [简体中文](./README.zh-CN.md)
 ```sh
 yarn add retalk
 
-# or
-
-npm install retalk
-
+# npm install retalk
 ```
 
 ## Usage
 
-### 1. Model
+Model syntax is like a React class component, just without lifecycle methods.
 
-Usually we'll set several routes in our app, one route with one model, so we'll have several models.
+```jsx
+import { setStore, withStore, Provider } from 'retalk';
 
-Write the model like a React component, just without the lifecycle methods.
-
-```js
 class CounterModel {
   state = {
     count: 0,
   };
   add() {
-    // this.state -> Get state of own model
-    // this.setState() -> Set state of own model
-    // this.someAction() -> Call actions of own model
-
-    // this.models.someModel.state -> Get state of other models
-    // this.models.someModel.someAction() -> Call actions of other models
-
     const { count } = this.state;
     this.setState({ count: count + 1 });
-  }
-  async addLater() {
-    // Auto `someAsyncAction.loading` state can be use
 
+    // this.state          -> get own state
+    // this.setState()     -> set own state
+    // this.someAction()   -> call own actions
+
+    // this.models.someModel.state          -> get state of other models
+    // this.models.someModel.someAction()   -> call actions of other models
+  }
+  async addAsync() {
     await new Promise((resolve) => setTimeout(resolve, 1000));
     this.add();
   }
 }
-```
 
-### 2. Store
+const Counter = withStore({ counter: ['count', 'add', 'addAsync'] })((props) => {
+  const { count, add, addAsync } = props; // addAsync.loading is ready to use
 
-Use `setStore()` to set up all models with theirs namespaces.
-
-```js
-import { setStore } from 'retalk';
-
-const store = setStore({
-  counter: CounterModel,
-  // Other models...
+  return (
+    <div>
+      <p>{count}</p>
+      <button onClick={add}>+</button>
+      <button onClick={addAsync}>+ ⏳{addAsync.loading && '...'}</button>
+    </div>
+  );
 });
-```
 
-### 3. View
-
-Use `withStore()` to connect models and components.
-
-```jsx harmony
-import React from 'react';
-import { withStore } from 'retalk';
-
-const Counter = ({ count, add, addLater }) => (
-  <div>
-    <p>{count}</p>
-    <button onClick={add}>+</button>
-    <button onClick={addLater}>+ ⏳{addLater.loading && '...'}</button>
-  </div>
-);
-
-const CounterWrapper = withStore({
-  counter: ['count', 'add', 'addLater'],
-})(Counter);
-```
-
-### 4. App
-
-Use `<Provider>` to provide the store to your app.
-
-```jsx harmony
-import ReactDOM from 'react-dom';
-import { Provider } from 'retalk';
+const store = setStore({ counter: CounterModel });
 
 const App = () => (
   <Provider store={store}>
-    <CounterWrapper />
+    <Counter />
   </Provider>
 );
-
-ReactDOM.render(<App />, document.getElementById('root'));
 ```
 
 ## Demo
@@ -123,13 +88,7 @@ ReactDOM.render(<App />, document.getElementById('root'));
 
 ### 1. setStore()
 
-```
-const store = setStore(models, middleware);
-```
-
-Pass `models` and `middleware`(both are optional), Setup the one and only store.
-
-In `development` mode, [Redux DevTools](https://github.com/zalmoxisus/redux-devtools-extension) will be enabled by default, make sure its version [>= v2.15.3](https://github.com/reduxjs/redux/issues/2943) and [not v2.16.0](https://stackoverflow.com/a/53512072/6919133).
+`setStore(models, middleware)`
 
 ```js
 const store = setStore(
@@ -141,44 +100,44 @@ const store = setStore(
 );
 ```
 
+Pass `models` and `middleware`(both are optional), Set up the one and only store.
+
+In `development` mode, [Redux DevTools](https://github.com/zalmoxisus/redux-devtools-extension) will be enabled by default, make sure its version [>= v2.15.3](https://github.com/reduxjs/redux/issues/2943) and [not v2.16.0](https://stackoverflow.com/a/53512072/6919133).
+
 ### 2. withStore()
 
 `withStore(...modelNames)(Component)`
 
-Eject one or more models' state and actions to a component's props.
+Eject state and actions of one or more models, to the props of a component. 3 ways to use it:
 
-There are 3 ways to use it:
-
-#### Use string to eject all
+####
 
 ```js
-const CounterWrapper = withStore('home', 'counter')(Counter);
+// 1. Use string to eject all
+const Wrapper = withStore('home', 'counter')(Counter);
+
+// The simplest way, but unused props will also trigger re-render.
+// Use this if all injected props will be used, or to rapid develop.
 ```
 
-The Simplest way, but if some unused props are injected, it will also trigger a re-render.
-
-This method can be used if determined that all injected props will be used, or to rapid develop.
-
-#### Use object to customize
-
 ```js
-const CounterWrapper = withStore({
+// 2. Use object to customize
+const Wrapper = withStore({
   home: ['name', 'setName'],
-  counter: ['count', 'add', 'addLater'],
+  counter: ['count', 'add', 'addAsync'],
 })(Counter);
+
+// Customize the injected props, only inject the needed props.
 ```
-
-Customize the injected props, only inject the needed props, so to optimize the performance.
-
-#### Use `mapStateToProps()`... to customize more
 
 ```js
-const CounterWrapper = withStore(mapStateToProps, mapDispatchToProps)(Counter);
+// 3. Use `mapStateToProps()`... to customize more
+const Wrapper = withStore(mapStateToProps, mapDispatchToProps)(Counter);
+
+// For more customization of the injected props,
+// use `mapStateToProps`, `mapDispatchToProps` etc.
+// react-redux.js.org/api/connect
 ```
-
-For more customization of the injected props, you can use [`mapStateToProps`, `mapDispatchToProps`](https://react-redux.js.org/api/connect) etc.
-
-At that time, `withStore()` will be used as `connect()`.
 
 ### 3. Provider & batch()
 
@@ -200,12 +159,12 @@ Here is an example with `loadable-components`:
 import React from 'react';
 import loadable from 'loadable-components';
 
-const AsyncCounter = loadable(async () => {
+const Wrapper = loadable(async () => {
   const [{ default: Counter }, { default: CounterModel }] = await Promise.all([
     import('./Counter/index.jsx'),
     import('./Counter/Model.js'),
   ]);
-  store.add({ counter: CounterModel }); // Use `store.add(models)`, like `setStore(models)`
+  store.add({ counter: CounterModel }); // use `store.add(models)` just like `setStore(models)`
   return (props) => <Counter {...props} />;
 });
 ```
