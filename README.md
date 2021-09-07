@@ -38,6 +38,7 @@ Model syntax is like a React class component, just without lifecycle methods.
 ```jsx
 import { setStore, withStore, Provider } from 'retalk';
 
+// Setup model
 class CounterModel {
   state = {
     count: 0,
@@ -59,7 +60,10 @@ class CounterModel {
   }
 }
 
-const Counter = withStore({ counter: ['count', 'add', 'addAsync'] })((props) => {
+// Use in component
+const Counter = withStore({
+  counter: ['count', 'add', 'addAsync'],
+})((props) => {
   const { count, add, addAsync } = props; // addAsync.loading is ready to use
 
   return (
@@ -71,6 +75,7 @@ const Counter = withStore({ counter: ['count', 'add', 'addAsync'] })((props) => 
   );
 });
 
+// Setup store
 const store = setStore({ counter: CounterModel });
 
 const App = () => (

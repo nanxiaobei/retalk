@@ -38,6 +38,7 @@ model 写法就像一个 React class 组件，只是没有了生命周期。
 ```jsx
 import { setStore, withStore, Provider } from 'retalk';
 
+// 设置 model
 class CounterModel {
   state = {
     count: 0,
@@ -46,12 +47,12 @@ class CounterModel {
     const { count } = this.state;
     this.setState({ count: count + 1 });
 
-    // this.state          -> 获取自身 state
-    // this.setState()     -> 更新自身 state
-    // this.someAction()   -> 调用自身 action
+    // this.state          -> 获取 state
+    // this.setState()     -> 更新 state
+    // this.someAction()   -> 调用 action
 
-    // this.models.someModel.state          -> 获取其它 model 的 state
-    // this.models.someModel.someAction()   -> 调用其它 model 的 action
+    // this.models.someModel.state          -> 获取其它 model state
+    // this.models.someModel.someAction()   -> 调用其它 model action
   }
   async addAsync() {
     await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -59,7 +60,10 @@ class CounterModel {
   }
 }
 
-const Counter = withStore({ counter: ['count', 'add', 'addAsync'] })((props) => {
+// 组件中使用
+const Counter = withStore({
+  counter: ['count', 'add', 'addAsync'],
+})((props) => {
   const { count, add, addAsync } = props; // addAsync.loading 可供使用
 
   return (
@@ -71,6 +75,7 @@ const Counter = withStore({ counter: ['count', 'add', 'addAsync'] })((props) => 
   );
 });
 
+// 设置 store
 const store = setStore({ counter: CounterModel });
 
 const App = () => (
