@@ -176,10 +176,10 @@ const Wrapper = loadable(async () => {
 
 ## License
 
-[MIT](https://github.com/nanxiaobei/retalk/blob/master/LICENSE) © [nanxiaobei](https://mrlee.me/)
+[MIT](https://github.com/nanxiaobei/retalk/blob/master/LICENSE) © [nanxiaobei](https://lee.so/)
 
-## Pitiless Ads
+## FUTAKE
 
-If you use WeChat, please try "**FUTAKE**". It's a WeChat mini app for your inspiration moments. 🌈
+Try [**FUTAKE**](https://sotake.com/f) in WeChat. A mini app for your inspiration moments. 🌈
 
-![FUTAKE](https://s3.jpg.cm/2021/04/22/TDQuS.png)
+![FUTAKE](https://s3.jpg.cm/2021/09/21/IFG3wi.png)

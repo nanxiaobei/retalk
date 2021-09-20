@@ -174,4 +174,10 @@ const Wrapper = loadable(async () => {
 
 ## 协议
 
-[MIT](https://github.com/nanxiaobei/retalk/blob/master/LICENSE) © [nanxiaobei](https://mrlee.me/)
+[MIT](https://github.com/nanxiaobei/retalk/blob/master/LICENSE) © [nanxiaobei](https://lee.so/)
+
+## FUTAKE
+
+试试 [**FUTAKE**](https://sotake.com/f) 小程序，你的灵感相册。🌈
+
+![FUTAKE](https://s3.jpg.cm/2021/09/21/IFG3wi.png)
