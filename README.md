@@ -44,27 +44,25 @@ class CounterModel {
     count: 0,
   };
   add() {
-    const { count } = this.state;
-    this.setState({ count: count + 1 });
+    const { count } = this.state; // get own state
+    this.setState({ count: ++count }); // set own state
+    this.addAsync(); // run own action
 
-    // this.state          -> get own state
-    // this.setState()     -> set own state
-    // this.someAction()   -> call own actions
-
-    // this.models.someModel.state          -> get state of other models
-    // this.models.someModel.someAction()   -> call actions of other models
+    // this.models.someModel.state        -> get another model's state
+    // this.models.someModel.someAction() -> run another model's action
   }
   async addAsync() {
     await new Promise((resolve) => setTimeout(resolve, 1000));
-    this.add();
+    const { count } = this.state;
+    this.setState({ count: ++count });
   }
 }
 
-// Use in component
+// Use in components
 const Counter = withStore({
   counter: ['count', 'add', 'addAsync'],
 })((props) => {
-  const { count, add, addAsync } = props; // addAsync.loading is ready to use
+  const { count, add, addAsync } = props; // addAsync.loading can be use
 
   return (
     <div>

@@ -44,19 +44,17 @@ class CounterModel {
     count: 0,
   };
   add() {
-    const { count } = this.state;
-    this.setState({ count: count + 1 });
+    const { count } = this.state; // 获取自身 state
+    this.setState({ count: ++count }); // 更新自身 state
+    this.addAsync(); // 调用自身 action
 
-    // this.state          -> 获取 state
-    // this.setState()     -> 更新 state
-    // this.someAction()   -> 调用 action
-
-    // this.models.someModel.state          -> 获取其它 model state
-    // this.models.someModel.someAction()   -> 调用其它 model action
+    // this.models.someModel.state        -> 获取其它 model 的 state
+    // this.models.someModel.someAction() -> 调用其它 model 的 action
   }
   async addAsync() {
     await new Promise((resolve) => setTimeout(resolve, 1000));
-    this.add();
+    const { count } = this.state;
+    this.setState({ count: ++count });
   }
 }
 
