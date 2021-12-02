@@ -1,7 +1,7 @@
 <div align="center">
 <img src="./logo.png" width="228" alt="Retalk">
 
-The simplest solution for Redux.
+The Simplest Solution for Redux.
 
 [![Travis](https://img.shields.io/travis/nanxiaobei/retalk.svg?style=flat-square)](https://travis-ci.org/nanxiaobei/retalk)
 [![Codecov](https://img.shields.io/codecov/c/github/nanxiaobei/retalk.svg?style=flat-square)](https://codecov.io/gh/nanxiaobei/retalk)
@@ -18,7 +18,7 @@ English · [简体中文](./README.zh-CN.md)
 
 ## Features
 
-- **Simplest Redux** - Same syntax as React components.
+- **Simplest Redux** - Same syntax as Class Components.
 - **Only 2 APIs** - `setStore()` and `withStore()`.
 - **Async models** - Fully code splitting support for models.
 - **Auto loading** - Auto loading state for async actions.
