@@ -37,12 +37,12 @@ test('setStore', () => {
   // NO_DISPATCH
   store.dispatch();
 
-  // NOT_OBJECT - models (add)
+  // NOT_OBJECT - models (store.add)
   expect(() => {
     store.add([]);
   }).toThrow();
 
-  // NOT_CLASS - Model (add)
+  // NOT_CLASS - Model (store.add)
   expect(() => {
     store.add({ model1: 123 });
   }).toThrow();
@@ -50,7 +50,7 @@ test('setStore', () => {
   window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ = compose;
   const store2 = setStore({ model2: class {} });
   store2.add({ model2a: class {} });
-  store2.add({ model2a: class {} }); // Add an exist model
+  store2.add({ model2a: class {} }); // Add exist model
 
   /**
    * production
@@ -59,7 +59,7 @@ test('setStore', () => {
 
   const store3 = setStore({ model3: class {} });
   store3.add({ model3a: class {} });
-  store3.add({ model3a: class {} }); // Add an exist model
+  store3.add({ model3a: class {} }); // Add exist model
 });
 
 test('withStore', (done) => {
@@ -124,7 +124,7 @@ test('withStore', (done) => {
       };
       add() {
         const { count } = this.state;
-        this.setState({ count: count + 1 });
+        this.setState({ count: ++count });
       }
       async addAsync() {
         await new Promise((resolve) => setTimeout(resolve, 1000));
