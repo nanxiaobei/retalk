@@ -28,7 +28,7 @@
 ```sh
 yarn add retalk
 
-# npm install retalk
+# npm i retalk
 ```
 
 ## 使用
@@ -85,7 +85,7 @@ const App = () => (
 
 ## 示例
 
-[![Edit retalk](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/retalk-5l9mqnzvx?fontsize=14)
+[![Edit retalk](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/retalk-5l9mqnzvx?fontsize=14&file=/src/Counter/Index.jsx)
 
 ## API
 
