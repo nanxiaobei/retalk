@@ -1,7 +1,7 @@
 <div align="center">
 <img src="./logo.png" width="228" alt="Retalk">
 
-最简单的 Redux 解决方案。
+最简单的 Redux
 
 [![Travis](https://img.shields.io/travis/nanxiaobei/retalk.svg?style=flat-square)](https://travis-ci.org/nanxiaobei/retalk)
 [![Codecov](https://img.shields.io/codecov/c/github/nanxiaobei/retalk.svg?style=flat-square)](https://codecov.io/gh/nanxiaobei/retalk)
