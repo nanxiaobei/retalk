@@ -18,10 +18,10 @@
 
 ## 特性
 
-- **极简 Redux** - 与 React 组件语法相同。
-- **只有 2 个 API** - `setStore()` 与 `withStore()`。
-- **异步 model** - 完整支持对 model 的代码分割。
-- **自动 loading** - 自动处理异步 action 的 loading 状态。
+- **最简单** - 与 class 组件语法相同
+- **仅两个 API** - `setStore()` 与 `withStore()`
+- **异步 model** - 对 model 进行代码分割的完整支持
+- **自动 loading** - 异步 action loading 的自动处理
 
 ## 安装
 

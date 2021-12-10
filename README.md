@@ -18,10 +18,10 @@ English · [简体中文](./README.zh-CN.md)
 
 ## Features
 
-- **Simplest Redux** - Same syntax as Class Components.
-- **Only 2 APIs** - `setStore()` and `withStore()`.
-- **Async models** - Fully code splitting support for models.
-- **Auto loading** - Auto loading state for async actions.
+- **Simplest** - Same syntax as a class component
+- **Only 2 API** - `setStore()` and `withStore()`
+- **Async model** - Code splitting support for models
+- **Auto loading** - Auto loading state for async actions
 
 ## Install
 
