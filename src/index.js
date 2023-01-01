@@ -1,5 +1,6 @@
-import { createStore, combineReducers, compose, applyMiddleware } from 'redux';
 import { connect } from 'react-redux';
+import { applyMiddleware, combineReducers, compose, createStore } from 'redux';
+
 export { Provider, batch } from 'react-redux';
 
 /**
@@ -15,7 +16,9 @@ const ERR = {
   NOT_EXIST: (name) => `'${name}' Model dose not exist`,
 };
 
-const isObj = (obj) => Object.prototype.toString.call(obj) === '[object Object]';
+const isObj = (obj) => {
+  return Object.prototype.toString.call(obj) === '[object Object]';
+};
 
 /**
  * Add a model, create the model's reducer
@@ -32,7 +35,9 @@ const createReducer = (name, Model, newModels, newReducers) => {
 
   newReducers[name] = (state = model.state || {}, action) => {
     const [modelName] = action.type.split('/');
-    if (modelName === name) return action.newState;
+    if (modelName === name) {
+      return action.newState;
+    }
     return state;
   };
 };
@@ -60,19 +65,28 @@ const createActions = (name, Model, newModels, newDispatch, realDispatch) => {
 
   newDispatch[name] = {};
   Object.getOwnPropertyNames(model__proto__).forEach((actionName) => {
-    if (actionName === 'constructor' || actionName === 'models') return;
+    if (actionName === 'constructor' || actionName === 'models') {
+      return;
+    }
 
     const setState = (payload) => {
       const newState = Object.assign(model.state, payload);
-      return realDispatch({ type: `${name}/${actionName}`, newState: { ...newState } });
+      return realDispatch({
+        type: `${name}/${actionName}`,
+        newState: { ...newState },
+      });
     };
 
     let oldAction;
     const newAction = (...args) => {
-      if (!oldAction) oldAction = model__proto__[actionName].bind({ ...model, setState });
+      if (!oldAction) {
+        oldAction = model__proto__[actionName].bind({ ...model, setState });
+      }
 
       const res = oldAction(...args);
-      if (!res || typeof res.then !== 'function') return res;
+      if (!res || typeof res.then !== 'function') {
+        return res;
+      }
 
       setLoading(actionName, 'START', true);
       return res.finally(() => {
@@ -96,8 +110,13 @@ export const setStore = (models = {}, middleware = []) => {
   const __DEV__ = process.env.NODE_ENV !== 'production';
 
   if (__DEV__) {
-    if (!isObj(models)) throw new Error(ERR.NOT_OBJECT('models'));
-    if (!Array.isArray(middleware)) throw new Error(ERR.NOT_ARRAY('middleware'));
+    if (!isObj(models)) {
+      throw new Error(ERR.NOT_OBJECT('models'));
+    }
+
+    if (!Array.isArray(middleware)) {
+      throw new Error(ERR.NOT_ARRAY('middleware'));
+    }
   }
 
   const newModels = {};
@@ -107,7 +126,10 @@ export const setStore = (models = {}, middleware = []) => {
   // Reducers
   if (__DEV__) {
     nameModelList.forEach(([name, Model]) => {
-      if (typeof Model !== 'function') throw new Error(ERR.NOT_CLASS('Model'));
+      if (typeof Model !== 'function') {
+        throw new Error(ERR.NOT_CLASS('Model'));
+      }
+
       createReducer(name, Model, newModels, newReducers);
     });
   } else {
@@ -122,7 +144,7 @@ export const setStore = (models = {}, middleware = []) => {
 
   const store = createStore(
     combineReducers(newReducers),
-    newCompose(applyMiddleware(...middleware)),
+    newCompose(applyMiddleware(...middleware))
   );
 
   const realDispatch = store.dispatch;
@@ -139,11 +161,18 @@ export const setStore = (models = {}, middleware = []) => {
   // store.add
   store.add = (modelsToAdd) => {
     if (__DEV__) {
-      if (!isObj(modelsToAdd)) throw new Error(ERR.NOT_OBJECT('models'));
+      if (!isObj(modelsToAdd)) {
+        throw new Error(ERR.NOT_OBJECT('models'));
+      }
 
       Object.entries(modelsToAdd).forEach(([name, Model]) => {
-        if (name in newModels) return;
-        if (typeof Model !== 'function') throw new Error(ERR.NOT_CLASS('Model'));
+        if (name in newModels) {
+          return;
+        }
+
+        if (typeof Model !== 'function') {
+          throw new Error(ERR.NOT_CLASS('Model'));
+        }
 
         createReducer(name, Model, newModels, newReducers);
         store.replaceReducer(combineReducers(newReducers));
@@ -151,7 +180,9 @@ export const setStore = (models = {}, middleware = []) => {
       });
     } else {
       Object.entries(modelsToAdd).forEach(([name, Model]) => {
-        if (name in newModels) return;
+        if (name in newModels) {
+          return;
+        }
 
         createReducer(name, Model, newModels, newReducers);
         store.replaceReducer(combineReducers(newReducers));
@@ -188,9 +219,15 @@ export const withStore = (...names) => {
       mapState = (state) => {
         let stateObj = {};
         names.forEach((name, index) => {
-          if (index > 0 && typeof name !== 'string') throw new Error(ERR.NOT_STRING('name'));
+          if (index > 0 && typeof name !== 'string') {
+            throw new Error(ERR.NOT_STRING('name'));
+          }
+
           const modelState = state[name];
-          if (typeof modelState === 'undefined') throw new Error(ERR.NOT_EXIST(name));
+          if (typeof modelState === 'undefined') {
+            throw new Error(ERR.NOT_EXIST(name));
+          }
+
           stateObj = { ...stateObj, ...modelState };
         });
         return stateObj;
@@ -214,10 +251,15 @@ export const withStore = (...names) => {
         Object.entries(stateActionsMap).forEach(([name, keys]) => {
           actionsMap[name] = [];
           const modelState = state[name];
-          if (typeof modelState === 'undefined') throw new Error(ERR.NOT_EXIST(name));
+          if (typeof modelState === 'undefined') {
+            throw new Error(ERR.NOT_EXIST(name));
+          }
+
           keys.forEach((key) => {
             const val = modelState[key];
-            typeof val !== 'undefined' ? (stateObj[key] = val) : actionsMap[name].push(key);
+            typeof val !== 'undefined'
+              ? (stateObj[key] = val)
+              : actionsMap[name].push(key);
           });
           stateObj.loading = { ...stateObj.loading, ...modelState.loading };
         });
@@ -231,7 +273,9 @@ export const withStore = (...names) => {
           const modelState = state[name];
           keys.forEach((key) => {
             const val = modelState[key];
-            typeof val !== 'undefined' ? (stateObj[key] = val) : actionsMap[name].push(key);
+            typeof val !== 'undefined'
+              ? (stateObj[key] = val)
+              : actionsMap[name].push(key);
           });
           stateObj.loading = { ...stateObj.loading, ...modelState.loading };
         });
