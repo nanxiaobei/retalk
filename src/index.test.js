@@ -124,7 +124,7 @@ test('withStore', (done) => {
       };
       add() {
         const { count } = this.state;
-        this.setState({ count: ++count });
+        this.setState({ count: count + 1 });
       }
       async addAsync() {
         await new Promise((resolve) => setTimeout(resolve, 1000));
