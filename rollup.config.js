@@ -1,15 +1,16 @@
-import babel from 'rollup-plugin-babel';
+import { babel } from '@rollup/plugin-babel';
 import pkg from './package.json';
 
 const input = 'src/index.js';
 const cjsOutput = { file: pkg.main, format: 'cjs' };
 const esmOutput = { file: pkg.module, format: 'es' };
 const deps = Object.keys(pkg.dependencies);
-const external = (id) => deps.includes(id) || id.includes('@babel/runtime/');
-const plugins = (useESModules) => [
+const external = (id) => deps.includes(id) || id.includes('@babel/runtime');
+const plugins = (isESM) => [
   babel({
-    plugins: [['@babel/plugin-transform-runtime', { useESModules }]],
-    runtimeHelpers: true,
+    presets: [['@babel/preset-env']],
+    plugins: [['@babel/plugin-transform-runtime', { useESModules: isESM }]],
+    babelHelpers: 'runtime',
   }),
 ];
 

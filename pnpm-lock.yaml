@@ -3,6 +3,7 @@ lockfileVersion: 5.4
 specifiers:
   '@babel/preset-env': ^7.20.2
   '@babel/runtime': ^7.20.7
+  '@rollup/plugin-babel': ^6.0.3
   '@testing-library/jest-dom': ^5.16.5
   '@testing-library/react': ^13.4.0
   '@trivago/prettier-plugin-sort-imports': ^4.0.0
@@ -18,7 +19,6 @@ specifiers:
   react-redux: ^8.0.5
   redux: ^4.2.0
   rollup: ^3.9.0
-  rollup-plugin-babel: ^4.4.0
   typescript: ^4.9.4
   vite: ^4.0.3
   vitest: ^0.26.3
@@ -30,6 +30,7 @@ dependencies:
 
 devDependencies:
   '@babel/preset-env': 7.20.2
+  '@rollup/plugin-babel': 6.0.3_rollup@3.9.0
   '@testing-library/jest-dom': 5.16.5
   '@testing-library/react': 13.4.0_biqbaboplfbrettd7655fr4n2y
   '@trivago/prettier-plugin-sort-imports': 4.0.0_prettier@2.8.1
@@ -43,7 +44,6 @@ devDependencies:
   react: 18.2.0
   react-dom: 18.2.0_react@18.2.0
   rollup: 3.9.0
-  rollup-plugin-babel: 4.4.0_rollup@3.9.0
   typescript: 4.9.4
   vite: 4.0.3
   vitest: 0.26.3_jsdom@20.0.3
@@ -2638,6 +2638,39 @@ packages:
       fastq: 1.14.0
     dev: true
 
+  /@rollup/plugin-babel/6.0.3_rollup@3.9.0:
+    resolution: {integrity: sha512-fKImZKppa1A/gX73eg4JGo+8kQr/q1HBQaCGKECZ0v4YBBv3lFqi14+7xyApECzvkLTHCifx+7ntcrvtBIRcpg==}
+    engines: {node: '>=14.0.0'}
+    peerDependencies:
+      '@babel/core': ^7.0.0
+      '@types/babel__core': ^7.1.9
+      rollup: ^1.20.0||^2.0.0||^3.0.0
+    peerDependenciesMeta:
+      '@types/babel__core':
+        optional: true
+      rollup:
+        optional: true
+    dependencies:
+      '@babel/helper-module-imports': 7.18.6
+      '@rollup/pluginutils': 5.0.2_rollup@3.9.0
+      rollup: 3.9.0
+    dev: true
+
+  /@rollup/pluginutils/5.0.2_rollup@3.9.0:
+    resolution: {integrity: sha512-pTd9rIsP92h+B6wWwFbW8RkZv4hiR/xKsqre4SIuAOaOEQRxi0lqLke9k2/7WegC85GgUs9pjmOjCUi3In4vwA==}
+    engines: {node: '>=14.0.0'}
+    peerDependencies:
+      rollup: ^1.20.0||^2.0.0||^3.0.0
+    peerDependenciesMeta:
+      rollup:
+        optional: true
+    dependencies:
+      '@types/estree': 1.0.0
+      estree-walker: 2.0.2
+      picomatch: 2.3.1
+      rollup: 3.9.0
+    dev: true
+
   /@rushstack/eslint-patch/1.2.0:
     resolution: {integrity: sha512-sXo/qW2/pAcmT43VoRKOJbDOfV3cYpq3szSVfIThQXNt+E4DfKj361vaAt3c88U5tPUxzEswam7GW48PJqtKAg==}
     dev: true
@@ -2724,6 +2757,10 @@ packages:
 
   /@types/chai/4.3.4:
     resolution: {integrity: sha512-KnRanxnpfpjUTqTCXslZSEdLfXExwgNxYPdiO2WGUj8+HDjFi8R3k5RVKPeSCzLjCcshCAtVO2QBbVuAV4kTnw==}
+    dev: true
+
+  /@types/estree/1.0.0:
+    resolution: {integrity: sha512-WulqXMDUTYAXCjZnk6JtIHPigp55cVtDgDrO2gHRwhyJto21+1zbVCtOYB2L1F9w4qCQ0rOGWBnBe0FNTiEJIQ==}
     dev: true
 
   /@types/hoist-non-react-statics/3.3.1:
@@ -4095,8 +4132,8 @@ packages:
     engines: {node: '>=4.0'}
     dev: true
 
-  /estree-walker/0.6.1:
-    resolution: {integrity: sha512-SqmZANLWS0mnatqbSfRP5g8OXZC12Fgg1IwNtLsyHDzJizORW4khDfjPqJZsemPWBB2uqykUah5YpQ6epsqC/w==}
+  /estree-walker/2.0.2:
+    resolution: {integrity: sha512-Rfkk/Mp/DL7JVje3u18FxFujQlTNR2q6QfMSMB7AvCBx91NGj/ba3kCfza0f6dVDbw7YlRf/nDrn7pQrCCyQ/w==}
     dev: true
 
   /esutils/2.0.3:
@@ -5401,24 +5438,6 @@ packages:
     hasBin: true
     dependencies:
       glob: 7.2.3
-    dev: true
-
-  /rollup-plugin-babel/4.4.0_rollup@3.9.0:
-    resolution: {integrity: sha512-Lek/TYp1+7g7I+uMfJnnSJ7YWoD58ajo6Oarhlex7lvUce+RCKRuGRSgztDO3/MF/PuGKmUL5iTHKf208UNszw==}
-    deprecated: This package has been deprecated and is no longer maintained. Please use @rollup/plugin-babel.
-    peerDependencies:
-      '@babel/core': 7 || ^7.0.0-rc.2
-      rollup: '>=0.60.0 <3'
-    dependencies:
-      '@babel/helper-module-imports': 7.18.6
-      rollup: 3.9.0
-      rollup-pluginutils: 2.8.2
-    dev: true
-
-  /rollup-pluginutils/2.8.2:
-    resolution: {integrity: sha512-EEp9NhnUkwY8aif6bxgovPHMoMoNr2FulJziTndpt5H9RdwC47GSGuII9XxpSdzVGM0GWrNPHV6ie1LTNJPaLQ==}
-    dependencies:
-      estree-walker: 0.6.1
     dev: true
 
   /rollup/3.9.0:
