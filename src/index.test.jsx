@@ -1,14 +1,15 @@
-import React from 'react'; // eslint-disable-line
+import { afterEach, beforeEach, expect, test, vi } from 'vitest';
+import '@testing-library/jest-dom';
+import { fireEvent, render } from '@testing-library/react';
 import { compose } from 'redux';
-import { configure, mount } from 'enzyme';
-import Adapter from 'enzyme-adapter-react-16';
-import { setStore, withStore, Provider } from './index'; // eslint-disable-line
+import { Provider, setStore, withStore } from './index';
 
-configure({ adapter: new Adapter() });
-
+const realConsoleError = console.error;
 beforeEach(() => {
-  jest.spyOn(console, 'error');
-  global.console.error.mockImplementation(() => {});
+  console.error = vi.fn();
+});
+afterEach(() => {
+  console.error = realConsoleError;
 });
 
 test('setStore', () => {
@@ -62,7 +63,7 @@ test('setStore', () => {
   store3.add({ model3a: class {} }); // Add exist model
 });
 
-test('withStore', (done) => {
+test('withStore', async () => {
   const store = setStore();
 
   /**
@@ -77,9 +78,9 @@ test('withStore', (done) => {
   });
 
   // default
-  const Counter1 = withStore('counter1')(() => <div />); // eslint-disable-line
-  const Counter1New = withStore({ counter1: ['count', 'add'] })(() => <div />); // eslint-disable-line
-  mount(
+  const Counter1 = withStore('counter1')(() => <div />);
+  const Counter1New = withStore({ counter1: ['count', 'add'] })(() => <div />);
+  render(
     <Provider store={store}>
       <Counter1 />
       <Counter1New />
@@ -88,8 +89,8 @@ test('withStore', (done) => {
 
   // NOT_STRING - name
   expect(() => {
-    const Counter1Err = withStore('counter1', 123)(() => <div />); // eslint-disable-line
-    mount(
+    const Counter1Err = withStore('counter1', 123)(() => <div />);
+    render(
       <Provider store={store}>
         <Counter1Err />
       </Provider>
@@ -98,10 +99,10 @@ test('withStore', (done) => {
 
   // NOT_EXIST - Model
   expect(() => {
-    const Counter2Err = withStore('counter2')(() => <div />); // eslint-disable-line
-    const Counter2ErrNew = withStore({ counter2: [] })(() => <div />); // eslint-disable-line
+    const Counter2Err = withStore('counter2')(() => <div />);
+    const Counter2ErrNew = withStore({ counter2: [] })(() => <div />);
 
-    mount(
+    render(
       <Provider store={store}>
         <Counter2Err />
         <Counter2ErrNew />
@@ -133,22 +134,23 @@ test('withStore', (done) => {
     },
   });
 
-  const Counter3Comp = ({ addAsync }) => <button id="addAsync" onClick={addAsync} />;
-  const Counter3 = withStore('counter3')(Counter3Comp); // eslint-disable-line
-  const Counter3New = withStore({ counter3: ['count', 'add'] })(() => <div />); // eslint-disable-line
+  const Counter3Comp = ({ add, addAsync }) => (
+    <>
+      <button onClick={add}>add</button>
+      <button onClick={addAsync}>addAsync</button>
+    </>
+  );
+  const Counter3 = withStore('counter3')(Counter3Comp);
+  const Counter3New = withStore({ counter3: ['count', 'add'] })(() => <div />);
 
-  const wrapper = mount(
+  const { getByText } = render(
     <Provider store={store}>
       <Counter3 />
       <Counter3New />
     </Provider>
   );
-  wrapper.find('#addAsync').simulate('click');
-  wrapper.find('#addAsync').simulate('click');
 
-  // Unmount
-  setTimeout(() => {
-    wrapper.unmount();
-    done();
-  }, 1000);
+  fireEvent.click(getByText('add'));
+  fireEvent.click(getByText('addAsync'));
+  await new Promise((resolve) => setTimeout(resolve, 1000));
 });
