@@ -1,4 +1,13 @@
 <div align="center">
+<p><a href="https://kee.so/" target="_blank"><img src="https://i.imgur.com/x5SRUoo.png" alt="kee.so" /></a></p>
+
+Create now ➫ [🔗 kee.so](https://kee.so/)
+
+</div>
+
+---
+
+<div align="center">
 <img src="./logo.png" width="228" alt="Retalk">
 
 最简单的 Redux
@@ -36,7 +45,7 @@ yarn add retalk
 model 写法就像一个 React class 组件，只是没有了生命周期。
 
 ```jsx
-import { setStore, withStore, Provider } from 'retalk';
+import { Provider, setStore, withStore } from 'retalk';
 
 // 设置 model
 class CounterModel {
@@ -173,9 +182,3 @@ const Wrapper = loadable(async () => {
 ## 协议
 
 [MIT](https://github.com/nanxiaobei/retalk/blob/master/LICENSE) © [nanxiaobei](https://lee.so/)
-
-## FUTAKE
-
-试试 [**FUTAKE**](https://sotake.com/f) 小程序，你的灵感相册。🌈
-
-![](https://s3.bmp.ovh/imgs/2022/07/21/452dd47aeb790abd.png)
